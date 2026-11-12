@@ -1,0 +1,87 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    overflow-y: overlay;
+}
+
+body {
+    background-color: rgba(227, 227, 227, 0.867);
+    font-family: roboto, Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+#header-container {
+    width: 100%;
+}
+
+h1 {
+    font-size: 20px;
+    margin: 0;
+}
+
+h3 {
+    font-weight: bold;
+    color: rgb(32, 62, 90);
+    margin: 7px;
+}
+
+p {
+    margin: 0;
+}
+
+h2 {
+    margin: 0;
+}
+
+.fondo-transparente {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px 30px;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.contenedor-card {
+    display: flex;
+    box-sizing: border-box;
+    justify-content: left;
+}
+
+.sombra:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.tarjeta {
+    background-color: aliceblue;
+    min-height: 200px;
+    width: 180px;
+    border-radius: 10px;
+    padding: 15px 15px;
+}
+
+.centrar {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: auto;
+    display: flex;
+    justify-content: flex-end;
+}

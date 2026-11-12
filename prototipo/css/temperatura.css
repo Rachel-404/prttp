@@ -1,0 +1,33 @@
+.txt-card {
+    color: blue;
+    font-family: roboto, Arial, Helvetica, sans-serif;
+    font-size: 50px;
+    font-weight: bold;
+    text-align: left;
+    margin: 0;
+}
+
+.icono {
+    width: 40px;
+    height: 40px;
+    background-color: rgb(127, 142, 255);
+    color: aliceblue;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+.txt-descr {
+    background-color: #dcdbdb;
+    border-radius: 50px;
+    padding: 0 8px;
+}
+
+.txt-mini {
+    border-radius: 50px;
+    padding: 5px 8px 0 8px;
+    color: #575757;
+    font-size: 0.8rem;
+}

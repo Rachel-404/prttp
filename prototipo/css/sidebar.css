@@ -1,0 +1,123 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    overflow-y: overlay;
+}
+
+.sidebar {
+    height: 100vh;
+    height: 100dvh;
+    width: 280px;
+    overflow-y: auto;
+    border: 0;
+    padding: 20px;
+    background: rgb(238, 238, 238);
+    color: rgb(4, 0, 0);
+}
+
+/*SCROLL*/
+::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(105, 105, 105, 0.6);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(105, 105, 105, 0.9);
+}
+
+/* Panel lateral */
+.menu-lateral {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    /* Oculto a la izquierda */
+    width: 280px;
+    height: 100vh;
+    background: #333333;
+    color: aliceblue;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+    transition: left 0.35s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Clase que activa el despliegue */
+.menu-lateral.activo {
+    left: 0;
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #242424;
+    border-bottom: 1px solid #4a4a4a;
+}
+
+.btn-cerrar {
+    background: none;
+    border: none;
+    color: aliceblue;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.menu-lista {
+    list-style: none;
+    padding: 15px 0;
+}
+
+.menu-lista li a {
+    display: block;
+    padding: 15px 25px;
+    color: aliceblue;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.2s ease, padding-left 0.2s ease;
+}
+
+.menu-lista li a:hover {
+    background: #4a4a4a;
+    padding-left: 32px;
+    /* Pequeño desplazamiento al pasar el mouse */
+}
+
+/* Fondo oscuro semitransparente */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 999;
+}
+
+.overlay.activo {
+    opacity: 1;
+    visibility: visible;
+}

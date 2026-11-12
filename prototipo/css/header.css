@@ -1,0 +1,106 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+    margin: 0 0 30px 0;
+    background: rgb(214, 214, 214);
+    box-sizing: border-box;
+}
+
+/*TITULO Y HAMBURGUESA*/
+.mi-header {
+    align-items: center;
+    display: flex;
+    padding: 10px 0;
+    gap: 20px;
+}
+
+/*HAMBURGUESA*/
+.hmbrgs {
+    background: black;
+    border-radius: 50px;
+    height: 5px;
+    width: 90%;
+    margin: 2px;
+}
+
+.abajo {
+    height: 100%;
+    width: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-menu {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+/*TITULO*/
+.mi-header a {
+    text-decoration: none;
+    color: black;
+}
+
+/*PERFIL*/
+
+.perfil {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-login {
+    box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid #4a4a4a;
+    padding: 0 0 0 10px;
+    display: flex;
+    border-radius: 50px;
+    margin: 0;
+    background: #7b7b7b;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: aliceblue;
+    overflow: hidden;
+    transition: padding 0.5s ease, background 0.3s ease;
+}
+
+.btn-login.intercambiado {
+    padding: 0 12px 0 0;
+}
+
+.txt-login,
+.icono-perfil {
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.btn-login:hover {
+    background: #4a4a4a;
+
+    .icono-perfil {
+        background: rgb(154, 154, 154);
+    }
+}
+
+.icono-perfil {
+    background: rgb(181, 181, 181);
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    box-shadow: -5px 0px 5px rgb(0, 0, 0, 0.2), inset 5px 6px 8px rgba(224, 224, 224, 0.7);
+}
