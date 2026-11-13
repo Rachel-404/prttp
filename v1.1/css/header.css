@@ -1,0 +1,138 @@
+.navbar-contenido {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    height: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .navbar-titulo {
+        display: none;
+    }
+
+    .imagen-movil {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+}
+
+/* HAMBURGUESA */
+.btn-menu {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.abajo {
+    height: 36px;
+    width: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hmbrgs {
+    background: #ffffff;
+    border-radius: 50px;
+    height: 4px;
+    width: 90%;
+    margin: 2.5px 0;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-menu:hover .hmbrgs {
+    background: #d6d6d6;
+}
+
+.navbar-titulo {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+/* LOGO */
+.img-logo {
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+}
+
+.contenedor-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* CONTROL DE TEMA (OSCURO / CLARO) */
+.control-tema {
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.btn-tema {
+    width: 64px;
+    height: 34px;
+    padding: 3px;
+    margin: 0;
+    border-radius: 50px;
+    border: 2px solid #334155;
+    background: #0f172a;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-tema:hover {
+    border-color: #64748b;
+}
+
+.icono-tema {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #475569;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.2);
+    transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
+                background 0.3s ease,
+                color 0.3s ease;
+}
+
+.icono-tema .material-symbols-outlined {
+    font-size: 17px;
+    line-height: 1;
+    user-select: none;
+}
+
+/* Estado Modo Claro */
+.btn-tema.modo-claro {
+    background: #cbd5e1;
+    border-color: #94a3b8;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.btn-tema.modo-claro .icono-tema {
+    transform: translateX(28px);
+    background: #f8fafc;
+    color: #1e293b;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.1);
+}
