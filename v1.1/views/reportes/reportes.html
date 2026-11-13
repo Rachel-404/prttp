@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes y Respaldos - AXIÓN IOT</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/header.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/reportes.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <main id="contenedor-base">
+            <div class="modulo-reportes">
+                <!-- Barra superior de pestañas estilo navegador -->
+                <header class="encabezado-reportes">
+                    <div class="titulo-modulo-reportes">
+                        <h2>Reportes y Respaldos</h2>
+                    </div>
+                    <nav class="barra-pestanas" role="tablist" aria-label="Secciones de Reportes y Respaldos">
+                        <button
+                            type="button"
+                            id="tab-historial"
+                            class="btn-pestana activa"
+                            role="tab"
+                            aria-selected="true"
+                            aria-controls="contenido-pestana-reportes"
+                            data-tab="historial"
+                            data-view="historial_exportacion.html"
+                        >
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                            <span>Historial y Exportación</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            id="tab-respaldos"
+                            class="btn-pestana"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="contenido-pestana-reportes"
+                            data-tab="respaldos"
+                            data-view="respaldos_backup.html"
+                        >
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Respaldos Automáticos (Backup)</span>
+                        </button>
+                    </nav>
+                </header>
+
+                <!-- Contenedor dinámico para la vista HTML de la pestaña activa -->
+                <section
+                    id="contenido-pestana-reportes"
+                    class="contenido-pestana"
+                    role="tabpanel"
+                    aria-labelledby="tab-historial"
+                ></section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal compartido de confirmación / aviso de exportación -->
+    <div id="modal-reportes-overlay" class="modal-reportes-overlay" hidden>
+        <div class="modal-reportes-caja" role="dialog" aria-modal="true" aria-labelledby="modal-reportes-titulo" aria-describedby="modal-reportes-mensaje">
+            <h4 id="modal-reportes-titulo" class="modal-reportes-titulo"></h4>
+            <p id="modal-reportes-mensaje" class="modal-reportes-mensaje"></p>
+            <div class="modal-reportes-acciones">
+                <button type="button" id="btn-modal-reportes-cancelar" class="btn-modal btn-modal-cancelar">Cancelar</button>
+                <button type="button" id="btn-modal-reportes-aceptar" class="btn-modal btn-modal-activar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve (Toast) -->
+    <div id="toast-reportes" class="toast-reportes" role="status" aria-live="polite" hidden></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/reportes.js"></script>
+</body>
+
+</html>
+

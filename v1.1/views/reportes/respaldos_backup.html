@@ -1,0 +1,125 @@
+<div class="grid-respaldos">
+    <!-- Tarjeta Izquierda: Envío Automático al Correo del Administrador -->
+    <article class="card">
+        <div class="titulo-card">
+            <h3>Envío Automático al Correo del Administrador</h3>
+            <button type="button" id="btn-estado-backup-correo" class="badge-estado-reporte activo" aria-pressed="true">
+                <span class="punto-estado" aria-hidden="true"></span>
+                <span id="txt-estado-backup-correo">Activo</span>
+            </button>
+        </div>
+
+        <form id="form-backup-correo" class="cuerpo-card" novalidate>
+            <div class="grupo-campo">
+                <label for="backup-correo-destino" class="etiqueta-campo">Correo Institucional Destino</label>
+                <input
+                    type="email"
+                    id="backup-correo-destino"
+                    name="correoDestino"
+                    class="campo-control"
+                    value="admin@universidad.edu"
+                    required
+                />
+            </div>
+
+            <div class="grupo-campo">
+                <label for="backup-correo-frecuencia" class="etiqueta-campo">Frecuencia de Envío</label>
+                <select id="backup-correo-frecuencia" name="frecuenciaCorreo" class="campo-control">
+                    <option value="diario">Diario (al finalizar el día - 23:59)</option>
+                    <option value="semanal" selected>Semanal (Domingos)</option>
+                    <option value="mensual">Mensual (Día 1)</option>
+                </select>
+            </div>
+
+            <div class="grupo-campo">
+                <label for="backup-correo-formato" class="etiqueta-campo">Formato del Archivo Adjunto</label>
+                <select id="backup-correo-formato" name="formatoCorreo" class="campo-control">
+                    <option value="xlsx" selected>Excel (.xlsx)</option>
+                    <option value="csv">CSV (.csv)</option>
+                    <option value="pdf">Reporte Ejecutivo (.pdf)</option>
+                </select>
+            </div>
+
+            <p id="error-backup-correo" class="mensaje-error-form" role="alert" hidden></p>
+
+            <div class="acciones-card acciones-dobles">
+                <button type="button" id="btn-enviar-copia-ahora" class="btn-modal btn-modal-cancelar btn-con-icono">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span>Enviar Copia Ahora</span>
+                </button>
+                <button type="submit" id="btn-guardar-programacion-correo" class="btn-modal btn-modal-activar">
+                    Guardar Programación
+                </button>
+            </div>
+        </form>
+    </article>
+
+    <!-- Tarjeta Derecha: Sincronización con Google Drive Institucional -->
+    <article class="card">
+        <div class="titulo-card">
+            <h3>Sincronización con Google Drive Institucional</h3>
+            <button type="button" id="btn-estado-backup-drive" class="badge-estado-reporte activo" aria-pressed="true">
+                <span class="punto-estado" aria-hidden="true"></span>
+                <span id="txt-estado-backup-drive">Conectado</span>
+            </button>
+        </div>
+
+        <form id="form-backup-drive" class="cuerpo-card" novalidate>
+            <div class="grupo-campo">
+                <label for="backup-drive-cuenta" class="etiqueta-campo">Cuenta Vinculada</label>
+                <input
+                    type="text"
+                    id="backup-drive-cuenta"
+                    name="cuentaVinculada"
+                    class="campo-control campo-solo-lectura"
+                    value="admin@universidad.edu"
+                    readonly
+                />
+            </div>
+
+            <div class="grupo-campo">
+                <label for="backup-drive-ruta" class="etiqueta-campo">Ruta / Carpeta de Destino en Drive</label>
+                <input
+                    type="text"
+                    id="backup-drive-ruta"
+                    name="rutaDrive"
+                    class="campo-control"
+                    value="/AXION-IOT/Respaldos_Hidroponia/"
+                    required
+                />
+            </div>
+
+            <div class="grupo-campo">
+                <label for="backup-drive-frecuencia" class="etiqueta-campo">Frecuencia de Respaldo en la Nube</label>
+                <select id="backup-drive-frecuencia" name="frecuenciaDrive" class="campo-control">
+                    <option value="24h" selected>Cada 24 horas</option>
+                    <option value="7d">Cada 7 días</option>
+                </select>
+            </div>
+
+            <div class="caja-estado-respaldo">
+                <span class="etiqueta-campo">Estado de Sincronización</span>
+                <p id="texto-ultimo-respaldo-drive" class="texto-registro">Último respaldo exitoso: Hoy a las 00:00 hrs</p>
+            </div>
+
+            <p id="error-backup-drive" class="mensaje-error-form" role="alert" hidden></p>
+
+            <div class="acciones-card acciones-dobles">
+                <button type="button" id="btn-respaldar-drive-ahora" class="btn-modal btn-modal-cancelar btn-con-icono">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    <span>Respaldar en Drive Ahora</span>
+                </button>
+                <button type="submit" id="btn-guardar-config-drive" class="btn-modal btn-modal-activar">
+                    Guardar Configuración
+                </button>
+            </div>
+        </form>
+    </article>
+</div>
+

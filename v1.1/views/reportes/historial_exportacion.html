@@ -1,0 +1,155 @@
+<div class="vista-historial">
+    <!-- Tarjeta 1: Filtros de Consulta Histórica -->
+    <article class="card">
+        <div class="titulo-card">
+            <h3>Filtros de Consulta Histórica</h3>
+        </div>
+
+        <form id="form-filtros-historial" class="cuerpo-card" novalidate>
+            <div class="grid-filtros-fecha">
+                <div class="grupo-campo">
+                    <label for="filtro-fecha-inicio" class="etiqueta-campo">Fecha y Hora Inicio</label>
+                    <input type="datetime-local" id="filtro-fecha-inicio" name="fechaInicio" class="campo-control" required />
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="filtro-fecha-fin" class="etiqueta-campo">Fecha y Hora Fin</label>
+                    <input type="datetime-local" id="filtro-fecha-fin" name="fechaFin" class="campo-control" required />
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="filtro-intervalo" class="etiqueta-campo">Intervalo de Datos</label>
+                    <select id="filtro-intervalo" name="intervalo" class="campo-control">
+                        <option value="1m">Cada 1 minuto</option>
+                        <option value="15m">Cada 15 minutos</option>
+                        <option value="1h" selected>Cada 1 hora (Promedio)</option>
+                        <option value="1d">Resumen Diario</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grupo-campo">
+                <span class="etiqueta-campo">Variables del Cultivo</span>
+                <div id="contenedor-variables-cultivo" class="grid-checkbox-variables" role="group" aria-label="Variables del Cultivo">
+                    <label class="item-checkbox-variable">
+                        <input type="checkbox" name="variables" value="ph" checked />
+                        <span>pH del Agua (pH)</span>
+                    </label>
+                    <label class="item-checkbox-variable">
+                        <input type="checkbox" name="variables" value="ec" checked />
+                        <span>Conductividad Eléctrica (µS/cm)</span>
+                    </label>
+                    <label class="item-checkbox-variable">
+                        <input type="checkbox" name="variables" value="tempAgua" checked />
+                        <span>Temperatura del Agua (°C)</span>
+                    </label>
+                    <label class="item-checkbox-variable">
+                        <input type="checkbox" name="variables" value="tempAmbiente" />
+                        <span>Temperatura Ambiente (°C)</span>
+                    </label>
+                    <label class="item-checkbox-variable">
+                        <input type="checkbox" name="variables" value="humedad" />
+                        <span>Humedad Relativa (%)</span>
+                    </label>
+                    <label class="item-checkbox-variable">
+                        <input type="checkbox" name="variables" value="nivelAgua" />
+                        <span>Nivel de Agua (%)</span>
+                    </label>
+                </div>
+            </div>
+
+            <p id="error-filtros-historial" class="mensaje-error-form" role="alert" hidden></p>
+
+            <div class="acciones-card">
+                <button type="submit" id="btn-consultar-historial" class="btn-modal btn-modal-activar btn-con-icono">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span>Consultar Historial</span>
+                </button>
+            </div>
+        </form>
+    </article>
+
+    <!-- Tarjeta 2: Evolución Histórica y Tabla de Registros -->
+    <article class="card">
+        <div class="titulo-card">
+            <h3>Evolución Histórica y Tabla de Registros</h3>
+            <span id="resumen-consulta-historial" class="texto-guia">Mostrando registros del rango seleccionado</span>
+        </div>
+
+        <div class="cuerpo-card">
+            <div class="contenedor-canvas-historial">
+                <canvas id="grafica-historial-reportes" aria-label="Gráfica de evolución histórica de variables del cultivo"></canvas>
+            </div>
+
+            <div class="contenedor-tabla-registros">
+                <table class="tabla-historial" aria-label="Tabla de registros históricos">
+                    <thead>
+                        <tr>
+                            <th>Fecha / Hora</th>
+                            <th>Variable</th>
+                            <th>Valor</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-registros-historial"></tbody>
+                </table>
+            </div>
+
+            <div class="paginacion-historial" aria-label="Paginación de registros">
+                <span id="info-paginacion-historial" class="texto-guia">Página 1 de 1</span>
+                <div class="controles-paginacion">
+                    <button type="button" id="btn-pagina-anterior" class="btn-modal btn-modal-cancelar">Anterior</button>
+                    <button type="button" id="btn-pagina-siguiente" class="btn-modal btn-modal-cancelar">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Tarjeta 3: Exportación Manual de Reportes -->
+    <article class="card">
+        <div class="titulo-card">
+            <h3>Exportación Manual de Reportes</h3>
+        </div>
+
+        <div class="cuerpo-card">
+            <p class="texto-guia">
+                Genera y descarga los registros históricos correspondientes al rango de fechas y variables consultadas actualmente.
+            </p>
+            <div class="fila-botones-exportacion">
+                <button type="button" class="btn-modal btn-modal-cancelar btn-con-icono btn-exportar-formato" data-formato="CSV">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="8" y1="13" x2="16" y2="13"></line>
+                        <line x1="8" y1="17" x2="16" y2="17"></line>
+                    </svg>
+                    <span>Exportar CSV</span>
+                </button>
+
+                <button type="button" class="btn-modal btn-modal-activar btn-con-icono btn-exportar-formato" data-formato="XLSX">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="3" y1="15" x2="21" y2="15"></line>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                    <span>Exportar Excel (XLSX)</span>
+                </button>
+
+                <button type="button" class="btn-modal btn-modal-cancelar btn-con-icono btn-exportar-formato" data-formato="PDF">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <path d="M12 18v-6"></path>
+                        <polyline points="9 15 12 18 15 15"></polyline>
+                    </svg>
+                    <span>Exportar Reporte PDF</span>
+                </button>
+            </div>
+        </div>
+    </article>
+</div>
+
