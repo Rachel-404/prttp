@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración EC / TDS</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/header.css">
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/ec.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <div id="contenedor-base">
+            <div class="ordenar-div">
+
+                <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Cultivo -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Alertas y Control del Cultivo</h3>
+                        <button type="button" id="btn-estado-ec" class="txt-descr activo" aria-pressed="true">
+                            <span id="estado-ec">Activo</span>
+                        </button>
+                    </div>
+
+                    <form id="form-control-ec" class="cuerpo-card" novalidate>
+                        <!-- 2. Frecuencia de Lectura -->
+                        <div class="grupo-campo">
+                            <label for="frecuencia-lectura-ec" class="etiqueta-campo">Frecuencia de Lectura</label>
+                            <select id="frecuencia-lectura-ec" name="frecuenciaLectura" class="campo-control">
+                                <option value="5">Cada 5 segundos</option>
+                                <option value="10" selected>Cada 10 segundos</option>
+                                <option value="30">Cada 30 segundos</option>
+                                <option value="60">Cada 1 minuto</option>
+                                <option value="300">Cada 5 minutos</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Umbrales de Alerta del Cultivo -->
+                        <div class="fila-umbrales-ec">
+                            <div class="grupo-campo">
+                                <label for="ec-minimo" class="etiqueta-campo">EC Mínima (mS/cm)</label>
+                                <input
+                                    type="number"
+                                    id="ec-minimo"
+                                    name="ecMinimo"
+                                    class="campo-control"
+                                    min="0.0"
+                                    max="2.0"
+                                    step="0.01"
+                                    value="0.80"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="ec-maximo" class="etiqueta-campo">EC Máxima (mS/cm)</label>
+                                <input
+                                    type="number"
+                                    id="ec-maximo"
+                                    name="ecMaximo"
+                                    class="campo-control"
+                                    min="0.0"
+                                    max="2.0"
+                                    step="0.01"
+                                    value="1.80"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="tds-minimo" class="etiqueta-campo">TDS Mínimo (ppm)</label>
+                                <input
+                                    type="number"
+                                    id="tds-minimo"
+                                    name="tdsMinimo"
+                                    class="campo-control"
+                                    min="0"
+                                    max="1000"
+                                    step="1"
+                                    value="400"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="tds-maximo" class="etiqueta-campo">TDS Máximo (ppm)</label>
+                                <input
+                                    type="number"
+                                    id="tds-maximo"
+                                    name="tdsMaximo"
+                                    class="campo-control"
+                                    min="0"
+                                    max="1000"
+                                    step="1"
+                                    value="900"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <!-- 4. Compensación Térmica y Sensor Asociado -->
+                        <div class="fila-switch">
+                            <label for="btn-compensacion-ec" class="etiqueta-campo">Compensación Térmica Automática</label>
+                            <button type="button" id="btn-compensacion-ec" class="txt-descr activo" aria-pressed="true">
+                                <span id="texto-compensacion-ec">Activada</span>
+                            </button>
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label for="sonda-temp-asociada" class="etiqueta-campo">Sonda de Temperatura Asociada (0-40°C)</label>
+                            <select id="sonda-temp-asociada" name="sondaTempAsociada" class="campo-control">
+                                <option value="pt100" selected>Sonda PT100 (Agua)</option>
+                                <option value="sen0708">Sensor pH RS485 SEN0708 (Interna)</option>
+                                <option value="fijo25">Valor Fijo (25 °C)</option>
+                            </select>
+                        </div>
+
+                        <p id="error-control-ec" class="mensaje-error-form" role="alert" hidden></p>
+
+                        <!-- 5. Pie de tarjeta -->
+                        <div class="acciones-card">
+                            <button type="submit" id="btn-guardar-control-ec" class="btn-modal btn-modal-activar">
+                                Guardar Configuración
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- BLOQUE 2 (Tarjeta Superior Derecha): Calibración de Conductividad (EC / TDS) -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Calibración de Conductividad (EC / TDS)</h3>
+                    </div>
+
+                    <div class="cuerpo-card">
+                        <!-- 1. Encabezado y Registro -->
+                        <div class="registro-mantenimiento">
+                            <p class="texto-registro">
+                                Última calibración realizada: <strong id="ultima-calibracion-ec">Hace 18 días</strong>
+                            </p>
+                            <p class="texto-guia">Se recomienda recalibrar cada 30 días.</p>
+                        </div>
+
+                        <!-- 2. Sub-tarjeta de Calibración en Líquido Patrón -->
+                        <div class="paso-calibracion">
+                            <div class="paso-info">
+                                <p class="etiqueta-campo">Calibración con Solución Estándar</p>
+                                <p class="texto-guia">
+                                    Sumerge la sonda limpia en solución estándar de conductividad conocida (ej. 1.41 mS/cm o 700 ppm) y espera 1 minuto a que se estabilice.
+                                </p>
+
+                                <div class="fila-calibracion-ec">
+                                    <div class="grupo-campo campo-calibracion-ec">
+                                        <label for="valor-solucion-estandar" class="etiqueta-campo">Valor de la solución estándar (mS/cm)</label>
+                                        <input
+                                            type="number"
+                                            id="valor-solucion-estandar"
+                                            name="solucionEstandar"
+                                            class="campo-control"
+                                            min="0.01"
+                                            max="20.00"
+                                            step="0.01"
+                                            value="1.41"
+                                            required
+                                        />
+                                    </div>
+                                    <div class="paso-accion">
+                                        <button type="button" id="btn-calibrar-ec" class="btn-modal btn-modal-activar">
+                                            Calibrar Sensor
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <p id="error-calibracion-ec" class="mensaje-error-form" role="alert" hidden></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 3 (Acordeón Inferior Colapsado): Configuración Técnica y Conexión -->
+                <div class="card card-acordeon" id="bloque-tecnico-ec">
+                    <button
+                        type="button"
+                        id="btn-acordeon-tecnico-ec"
+                        class="titulo-card acordeon-tecnico-toggle"
+                        aria-expanded="false"
+                        aria-controls="panel-tecnico-ec"
+                    >
+                        <h3>Configuración Técnica y Conexión (Solo Técnicos)</h3>
+                        <span class="material-symbols-outlined flecha-desplegable" aria-hidden="true">expand_more</span>
+                    </button>
+
+                    <div id="panel-tecnico-ec" class="acordeon-tecnico-panel">
+                        <div class="acordeon-tecnico-inner">
+                            <form id="form-tecnico-ec" class="cuerpo-card" novalidate>
+
+                                <!-- 1. Subsección Hardware y ADC (ESP32-S3) -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección Hardware y ADC (ESP32-S3)</legend>
+
+                                    <div class="grid-tecnico-adc">
+                                        <div class="grupo-campo">
+                                            <label for="tec-ec-gpio" class="etiqueta-campo">Pin GPIO / Canal ADC</label>
+                                            <select id="tec-ec-gpio" name="gpioAdc" class="campo-control">
+                                                <option value="GPIO1_ADC1" selected>GPIO 1 (ADC1)</option>
+                                                <option value="GPIO2_ADC1">GPIO 2 (ADC1)</option>
+                                                <option value="GPIO3_ADC1">GPIO 3 (ADC1)</option>
+                                                <option value="GPIO4_ADC1">GPIO 4 (ADC1)</option>
+                                                <option value="GPIO5_ADC1">GPIO 5 (ADC1)</option>
+                                                <option value="GPIO6_ADC1">GPIO 6 (ADC1)</option>
+                                                <option value="GPIO7_ADC1">GPIO 7 (ADC1)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-ec-vref" class="etiqueta-campo">Voltaje de Referencia (Vref)</label>
+                                            <select id="tec-ec-vref" name="vref" class="campo-control">
+                                                <option value="3.3" selected>3.3 V (ADC Interno)</option>
+                                                <option value="5.0">5.0 V</option>
+                                            </select>
+                                            <small class="texto-guia">
+                                                La señal de salida del sensor (0 - 2.3V) no debe superar los 3.3V de entrada del ESP32.
+                                            </small>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-ec-resolucion" class="etiqueta-campo">Resolución ADC</label>
+                                            <select id="tec-ec-resolucion" name="resolucionBits" class="campo-control">
+                                                <option value="10">10 bits</option>
+                                                <option value="11">11 bits</option>
+                                                <option value="12" selected>12 bits (4095 niveles)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <!-- 2. Subsección Matemáticas y Filtrado -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección Matemáticas y Filtrado</legend>
+
+                                    <div class="grid-tecnico-mate">
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-ec-kvalue" class="etiqueta-campo">Factor de Conversión (K_value)</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-ec-kvalue"
+                                                        aria-label="Información sobre Factor de Conversión K_value"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-ec-kvalue" class="popover-ayuda" role="region" hidden>
+                                                        <p class="texto-guia">Para convertir mS/cm a ppm (TDS = EC × 1000 × K_value).</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-ec-kvalue" name="kValue" class="campo-control" min="0.1" max="1.0" step="0.01" value="0.50" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-ec-alpha" class="etiqueta-campo">Coeficiente Térmico (α)</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-ec-alpha"
+                                                        aria-label="Información sobre Coeficiente Térmico"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-ec-alpha" class="popover-ayuda" role="region" hidden>
+                                                        <p class="texto-guia">Representa 2% (0.02) de ajuste por cada °C respecto a 25 °C.</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-ec-alpha" name="coeficienteTermico" class="campo-control" min="0.001" max="0.1" step="0.001" value="0.02" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-ec-ventana" class="etiqueta-campo">Ventana de Muestreo (N lecturas)</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-ec-ventana"
+                                                        aria-label="Información sobre Ventana de Muestreo"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-ec-ventana" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                                        <p class="texto-guia">Cantidad de muestras que promedia el filtro para estabilizar la señal analógica.</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-ec-ventana" name="ventanaMuestreo" class="campo-control" min="1" max="200" step="1" value="30" required />
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <p id="error-tecnico-ec" class="mensaje-error-form" role="alert" hidden></p>
+
+                                <!-- 3. Pie del acordeón técnico -->
+                                <div class="acciones-card acciones-tecnicas">
+                                    <button type="button" id="btn-restaurar-fabrica-ec" class="btn-modal btn-modal-cancelar">
+                                        Restaurar valores de fábrica
+                                    </button>
+                                    <button type="submit" id="btn-guardar-tecnico-ec" class="btn-modal btn-modal-activar">
+                                        Guardar Configuración Técnica
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación operativa (EC / TDS V1.0) -->
+    <div id="modal-confirmacion-ec" class="modal-ec-overlay" hidden>
+        <div class="modal-ec-caja" role="dialog" aria-modal="true" aria-labelledby="modal-ec-titulo" aria-describedby="modal-ec-mensaje">
+            <h4 id="modal-ec-titulo" class="modal-ec-titulo"></h4>
+            <p id="modal-ec-mensaje" class="modal-ec-mensaje"></p>
+            <div class="modal-ec-acciones">
+                <button type="button" id="btn-modal-cancelar-ec" class="btn-modal btn-modal-cancelar">Cancelar</button>
+                <button type="button" id="btn-modal-aceptar-ec" class="btn-modal btn-modal-pausar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve de orden enviada -->
+    <div id="toast-ec" class="toast-ec" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../../js/main.js"></script>
+    <script src="../../../js/ec.js"></script>
+</body>
+
+</html>
