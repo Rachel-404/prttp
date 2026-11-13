@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración Temperatura Foliar de la Lechuga</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/header.css">
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/temperatura_lechuga.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <div id="contenedor-base">
+            <div class="ordenar-div">
+
+                <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Cultivo -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Alertas y Control del Cultivo</h3>
+                        <button type="button" id="btn-estado-lechuga" class="txt-descr activo" aria-pressed="true">
+                            <span id="estado-lechuga">Activo</span>
+                        </button>
+                    </div>
+
+                    <form id="form-control-lechuga" class="cuerpo-card" novalidate>
+                        <!-- 2. Frecuencia de Lectura -->
+                        <div class="grupo-campo">
+                            <label for="frecuencia-lectura-lechuga" class="etiqueta-campo">Frecuencia de Lectura</label>
+                            <select id="frecuencia-lectura-lechuga" name="frecuenciaLectura" class="campo-control">
+                                <option value="5">Cada 5 segundos</option>
+                                <option value="10" selected>Cada 10 segundos</option>
+                                <option value="30">Cada 30 segundos</option>
+                                <option value="60">Cada 1 minuto</option>
+                                <option value="300">Cada 5 minutos</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Umbrales de Alerta Foliar de la Lechuga -->
+                        <div class="fila-tres-cols">
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="temp-min-hoja" class="etiqueta-campo">Temp. Mínima Hoja (°C)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-hoja-min"
+                                            aria-label="Información sobre Temp. Mínima Hoja"
+                                        >
+                                            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                        </button>
+                                        <div id="ayuda-hoja-min" class="popover-ayuda" role="region" hidden>
+                                            <p class="texto-guia">Evita estrés por frío o detención de crecimiento foliar.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="temp-min-hoja"
+                                    name="tempMinimaHoja"
+                                    class="campo-control"
+                                    min="-70.0"
+                                    max="380.0"
+                                    step="0.1"
+                                    value="15.0"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="temp-max-hoja" class="etiqueta-campo">Temp. Máxima Hoja (°C)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-hoja-max"
+                                            aria-label="Información sobre Temp. Máxima Hoja"
+                                        >
+                                            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                        </button>
+                                        <div id="ayuda-hoja-max" class="popover-ayuda" role="region" hidden>
+                                            <p class="texto-guia">Previene estrés térmico, cierre de estomas y quemadura de bordes (tipburn).</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="temp-max-hoja"
+                                    name="tempMaximaHoja"
+                                    class="campo-control"
+                                    min="-70.0"
+                                    max="380.0"
+                                    step="0.1"
+                                    value="25.0"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="delta-t-max-hoja" class="etiqueta-campo">Diferencial Máximo Hoja - Ambiente (ΔT °C)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-delta-t"
+                                            aria-label="Información sobre Diferencial Máximo Hoja - Ambiente"
+                                        >
+                                            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                        </button>
+                                        <div id="ayuda-delta-t" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                            <p class="texto-guia">Alerta si la hoja está demasiado caliente respecto al aire circundante por falta de transpiración.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="delta-t-max-hoja"
+                                    name="deltaTMaxHoja"
+                                    class="campo-control"
+                                    min="0.1"
+                                    max="30.0"
+                                    step="0.1"
+                                    value="3.0"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <!-- 4. Sincronización de Microclima -->
+                        <div class="fila-switch">
+                            <div class="etiqueta-con-ayuda">
+                                <label for="btn-comparar-ambiente" class="etiqueta-campo">Comparar con temperatura ambiente interna del sensor</label>
+                                <span class="ayuda-contextual">
+                                    <button
+                                        type="button"
+                                        class="btn-ayuda-campo"
+                                        aria-expanded="false"
+                                        aria-controls="ayuda-microclima"
+                                        aria-label="Información sobre comparación con temperatura ambiente"
+                                    >
+                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                    </button>
+                                    <div id="ayuda-microclima" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                        <p class="texto-guia">Calcula automáticamente si la planta está enfriándose por transpiración o sobrecalentándose frente al microclima del sensor MLX90614.</p>
+                                    </div>
+                                </span>
+                            </div>
+                            <button type="button" id="btn-comparar-ambiente" class="txt-descr activo" aria-pressed="true">
+                                <span id="texto-comparar-ambiente">Activada</span>
+                            </button>
+                        </div>
+
+                        <p id="error-control-lechuga" class="mensaje-error-form" role="alert" hidden></p>
+
+                        <!-- 5. Pie de tarjeta -->
+                        <div class="acciones-card">
+                            <button type="submit" id="btn-guardar-control-lechuga" class="btn-modal btn-modal-activar">
+                                Guardar Configuración
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- BLOQUE 2 (Tarjeta Superior Derecha): Calibración Óptica y Emisividad -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Calibración Óptica y Emisividad</h3>
+                    </div>
+
+                    <div class="cuerpo-card">
+                        <!-- 1. Encabezado y Registro -->
+                        <div class="registro-mantenimiento">
+                            <p class="texto-registro">
+                                Última verificación realizada: <strong id="ultima-verificacion-lechuga">Hace 10 días</strong>
+                            </p>
+                            <p class="texto-guia">Se recomienda limpiar el lente óptico y verificar cada 30 días</p>
+                        </div>
+
+                        <!-- 2. Sub-tarjeta de Emisividad Vegetal y Ajuste -->
+                        <div class="paso-calibracion">
+                            <div class="paso-info">
+                                <p class="etiqueta-campo">Calibración de Superficie Vegetal</p>
+                                <p class="texto-guia">
+                                    Los sensores infrarrojos requieren ajustar la emisividad según la superficie medida. Para hojas verdes de lechuga el valor estándar es 0.98. Si notas una desviación fija frente a un termómetro patrón, aplica un ajuste.
+                                </p>
+
+                                <div class="fila-dos-cols">
+                                    <div class="grupo-campo">
+                                        <label for="emisividad-hoja" class="etiqueta-campo">Emisividad de la Hoja (ε)</label>
+                                        <input
+                                            type="number"
+                                            id="emisividad-hoja"
+                                            name="emisividadHoja"
+                                            class="campo-control"
+                                            min="0.10"
+                                            max="1.00"
+                                            step="0.01"
+                                            value="0.98"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="offset-temp-lechuga" class="etiqueta-campo">Desviación / Offset (°C)</label>
+                                        <input
+                                            type="number"
+                                            id="offset-temp-lechuga"
+                                            name="offsetTemperatura"
+                                            class="campo-control"
+                                            min="-20.0"
+                                            max="20.0"
+                                            step="0.1"
+                                            value="0.0"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <p id="error-calibracion-lechuga" class="mensaje-error-form" role="alert" hidden></p>
+
+                                <div class="acciones-card">
+                                    <button type="button" id="btn-aplicar-ajuste-lechuga" class="btn-modal btn-modal-activar">
+                                        Aplicar Ajuste
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 3 (Acordeón Inferior Colapsado): Configuración Técnica y Conexión -->
+                <div class="card card-acordeon" id="bloque-tecnico-lechuga">
+                    <button
+                        type="button"
+                        id="btn-acordeon-tecnico-lechuga"
+                        class="titulo-card acordeon-tecnico-toggle"
+                        aria-expanded="false"
+                        aria-controls="panel-tecnico-lechuga"
+                    >
+                        <h3>Configuración Técnica y Conexión (Solo Técnicos)</h3>
+                        <span class="material-symbols-outlined flecha-desplegable" aria-hidden="true">expand_more</span>
+                    </button>
+
+                    <div id="panel-tecnico-lechuga" class="acordeon-tecnico-panel">
+                        <div class="acordeon-tecnico-inner">
+                            <form id="form-tecnico-lechuga" class="cuerpo-card" novalidate>
+
+                                <!-- 1. Subsección A: Bus I2C y Pines ESP32-S3 -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección A: Bus I2C y Pines ESP32-S3</legend>
+
+                                    <div class="grid-tecnico-cinco">
+                                        <div class="grupo-campo">
+                                            <label for="tec-lechuga-bus" class="etiqueta-campo">Bus de Comunicación</label>
+                                            <select id="tec-lechuga-bus" name="busI2c" class="campo-control">
+                                                <option value="I2C0" selected>I2C0 (Wire)</option>
+                                                <option value="I2C1">I2C1 (Wire1)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-lechuga-direccion" class="etiqueta-campo">Dirección I2C del Sensor</label>
+                                            <input
+                                                type="text"
+                                                id="tec-lechuga-direccion"
+                                                name="direccionI2c"
+                                                class="campo-control"
+                                                value="0x5A"
+                                                pattern="^0[xX][0-9A-Fa-f]{2}$"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-lechuga-sda" class="etiqueta-campo">Pin Datos (SDA)</label>
+                                            <input
+                                                type="text"
+                                                id="tec-lechuga-sda"
+                                                name="pinSda"
+                                                class="campo-control"
+                                                value="GPIO 8"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-lechuga-scl" class="etiqueta-campo">Pin Reloj (SCL)</label>
+                                            <input
+                                                type="text"
+                                                id="tec-lechuga-scl"
+                                                name="pinScl"
+                                                class="campo-control"
+                                                value="GPIO 9"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-lechuga-frecuencia-i2c" class="etiqueta-campo">Frecuencia del Bus I2C</label>
+                                            <select id="tec-lechuga-frecuencia-i2c" name="frecuenciaI2c" class="campo-control">
+                                                <option value="100" selected>100 kHz (Estándar)</option>
+                                                <option value="400">400 kHz (Rápido)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <!-- 2. Subsección B: Geometría Óptica y Filtrado (Campo de Visión FOV) -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección B: Geometría Óptica y Filtrado (Campo de Visión FOV)</legend>
+
+                                    <div class="grid-tecnico-tres">
+                                        <div class="grupo-campo">
+                                            <label for="tec-lechuga-fov" class="etiqueta-campo">Variante Óptica / Ángulo de Visión (FOV)</label>
+                                            <select id="tec-lechuga-fov" name="varianteFov" class="campo-control">
+                                                <option value="90" selected>BAA / BAF (90° - Estándar)</option>
+                                                <option value="35">BCC (35° - Enfoque medio)</option>
+                                                <option value="10">BCI (10° - Largo alcance)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-lechuga-distancia" class="etiqueta-campo">Distancia al Dosel de la Lechuga (cm)</label>
+                                            <input
+                                                type="number"
+                                                id="tec-lechuga-distancia"
+                                                name="distanciaDoselCm"
+                                                class="campo-control"
+                                                min="1"
+                                                max="500"
+                                                step="1"
+                                                value="15"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-lechuga-iir" class="etiqueta-campo">Filtro Digital Interno (IIR)</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-filtro-iir"
+                                                        aria-label="Información sobre Filtro Digital Interno IIR"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-filtro-iir" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                                        <p class="texto-guia">Estabiliza las lecturas infrarrojas frente a corrientes de aire sobre el dosel foliar.</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <select id="tec-lechuga-iir" name="filtroIir" class="campo-control">
+                                                <option value="off">Desactivado</option>
+                                                <option value="medio_50" selected>Medio (50%)</option>
+                                                <option value="fuerte_80">Fuerte (80%)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="resumen-fov" aria-live="polite">
+                                        <span class="etiqueta-campo">Diámetro del área medida sobre la hoja:</span>
+                                        <strong id="diametro-area-medida" class="texto-registro">30.0 cm</strong>
+                                        <span id="detalle-area-fov" class="texto-guia">(con FOV 90° a 15 cm de distancia)</span>
+                                    </div>
+                                </fieldset>
+
+                                <p id="error-tecnico-lechuga" class="mensaje-error-form" role="alert" hidden></p>
+
+                                <!-- 3. Pie del acordeón técnico -->
+                                <div class="acciones-card acciones-tecnicas">
+                                    <button type="button" id="btn-restaurar-fabrica-lechuga" class="btn-modal btn-modal-cancelar">
+                                        Restaurar valores de fábrica
+                                    </button>
+                                    <button type="submit" id="btn-guardar-tecnico-lechuga" class="btn-modal btn-modal-activar">
+                                        Guardar Configuración Técnica
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación operativa (MLX90614 / GY-906) -->
+    <div id="modal-confirmacion-lechuga" class="modal-lechuga-overlay" hidden>
+        <div class="modal-lechuga-caja" role="dialog" aria-modal="true" aria-labelledby="modal-lechuga-titulo" aria-describedby="modal-lechuga-mensaje">
+            <h4 id="modal-lechuga-titulo" class="modal-lechuga-titulo"></h4>
+            <p id="modal-lechuga-mensaje" class="modal-lechuga-mensaje"></p>
+            <div class="modal-lechuga-acciones">
+                <button type="button" id="btn-modal-cancelar-lechuga" class="btn-modal btn-modal-cancelar">Cancelar</button>
+                <button type="button" id="btn-modal-aceptar-lechuga" class="btn-modal btn-modal-pausar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve de orden enviada -->
+    <div id="toast-lechuga" class="toast-lechuga" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../../js/main.js"></script>
+    <script src="../../../js/temperatura_lechuga.js"></script>
+</body>
+
+</html>
