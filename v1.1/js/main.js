@@ -109,16 +109,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    cargarComponente("views/partials/sidebar.html", "contenedor-sidebar").then(() => {
-        const itemsDesplegables = document.querySelectorAll(".sidebar-item-desplegable");
-        itemsDesplegables.forEach((item) => {
-            const boton = item.querySelector(".contenedor-opcion");
-            if (boton) {
-                boton.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    item.classList.toggle("abierto");
-                });
-            }
-        });
-    });
+    cargarComponente("views/partials/sidebar.html", "contenedor-sidebar");
 });

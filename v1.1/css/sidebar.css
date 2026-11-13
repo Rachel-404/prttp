@@ -9,7 +9,7 @@
     padding: 0;
 }
 
-/* Botón principal de la opción */
+/* Botón o enlace principal del sidebar */
 .contenedor-opcion {
     display: flex;
     flex-direction: row;
@@ -19,7 +19,7 @@
     padding: 0.6rem 0.8rem;
     gap: 0.5rem;
     font-size: 1.2rem;
-    color: #ffffff;
+    color: var(--text-main);
     text-decoration: none;
     border-radius: 8px;
     cursor: pointer;
@@ -27,34 +27,27 @@
 }
 
 .contenedor-opcion:hover {
-    background: #1e293b;
+    background: var(--hover-bg);
 }
 
-/* Flecha indicadora del menú desplegable */
-.flecha-desplegable {
-    margin-left: auto;
-    transition: transform 0.3s ease;
+/* Título estático de sección en el sidebar (sin desplegable) */
+.sidebar-titulo-seccion {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 5px 10px;
+    padding: 0.6rem 0.8rem;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    color: var(--text-main);
+    cursor: default;
 }
 
-.sidebar-item-desplegable.abierto .flecha-desplegable {
-    transform: rotate(180deg);
-}
-
-/* Contenedor del submenú desplegable (oculto por defecto) */
-.submenu-desplegable {
+.submenu-sensores {
     list-style: none;
     margin: 0;
     padding: 0;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.35s ease, opacity 0.25s ease;
-}
-
-/* Estado abierto del submenú */
-.sidebar-item-desplegable.abierto .submenu-desplegable {
-    max-height: 400px;
-    opacity: 1;
 }
 
 /* Sub-opciones del menú */
@@ -67,7 +60,7 @@
     padding: 0.45rem 0.75rem 0.45rem 1.8rem;
     gap: 0.5rem;
     font-size: 1.05rem;
-    color: #d6d6d6;
+    color: var(--text-muted);
     border-radius: 6px;
     transition: background 0.2s ease, color 0.2s ease;
 }
@@ -80,12 +73,24 @@
     text-decoration: none;
 }
 
-.opcionII .material-symbols-outlined {
-    font-size: 1.2rem;
+.sidebar-nav .material-symbols-outlined,
+.sidebar-nav .icono-sidebar-svg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
     line-height: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.opcionII .material-symbols-outlined {
+    font-size: 20px;
 }
 
 .opcionII:hover {
-    background: #1e293b;
-    color: #ffffff;
+    background: var(--hover-bg);
+    color: var(--text-main);
 }

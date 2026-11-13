@@ -138,6 +138,17 @@ body.tema-claro .opcionII:hover {
     color: #0f172a;
 }
 
+.material-symbols-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
 /*CARD GENERAL*/
 .card {
     background-color: var(--bg-card);
