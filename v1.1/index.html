@@ -147,11 +147,36 @@
                 </article>
 
             </div>
+
+            <!-- Sección de Tendencias Rápidas (Ancho completo 100%) -->
+            <section class="card card-tendencias" aria-label="Tendencias rápidas de las últimas 24 horas">
+                <div class="titulo-card encabezado-tendencias">
+                    <h3>Tendencia de las últimas 24 horas</h3>
+                    <div class="controles-tendencias">
+                        <label for="selector-tendencia" class="sr-only">Variable a graficar</label>
+                        <select id="selector-tendencia" class="selector-tendencia">
+                            <option value="ph_ec" selected>pH y Conductividad (EC)</option>
+                            <option value="temperaturas">Temperaturas (Agua y Ambiente)</option>
+                            <option value="nivel_agua">Nivel de Agua</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="cuerpo-tendencias">
+                    <div class="contenedor-canvas-tendencias">
+                        <canvas id="grafica-tendencias" aria-label="Gráfica de tendencia de las últimas 24 horas"></canvas>
+                    </div>
+
+                    <div id="leyenda-tendencias" class="leyenda-tendencias" aria-label="Leyenda de la gráfica"></div>
+                </div>
+            </section>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="js/main.js"></script>
     <script src="js/dashboard.js"></script>
+    <script src="js/dashboard_charts.js"></script>
 </body>
 
 </html>
