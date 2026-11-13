@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración Temperatura y Humedad Ambiental</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/header.css">
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/temperatura_humedad.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <div id="contenedor-base">
+            <div class="ordenar-div">
+
+                <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Microclima -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Alertas y Control del Microclima</h3>
+                        <button type="button" id="btn-estado-dht22" class="txt-descr activo" aria-pressed="true">
+                            <span id="estado-dht22">Activo</span>
+                        </button>
+                    </div>
+
+                    <form id="form-control-dht22" class="cuerpo-card" novalidate>
+                        <!-- Frecuencia de Lectura -->
+                        <div class="grupo-campo">
+                            <label for="frecuencia-lectura-dht22" class="etiqueta-campo">Frecuencia de Lectura</label>
+                            <select id="frecuencia-lectura-dht22" name="frecuenciaLectura" class="campo-control">
+                                <option value="5">Cada 5 segundos</option>
+                                <option value="10" selected>Cada 10 segundos</option>
+                                <option value="30">Cada 30 segundos</option>
+                                <option value="60">Cada 1 minuto</option>
+                                <option value="300">Cada 5 minutos</option>
+                            </select>
+                        </div>
+
+                        <!-- Umbrales de Alerta de Temperatura del Aire -->
+                        <div class="fila-dos-cols">
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="temp-min-aire" class="etiqueta-campo">Temp. Mínima Aire (°C)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-temp-min-aire"
+                                            aria-label="Información sobre Temp. Mínima Aire"
+                                        >
+                                            <svg class="icono-ayuda-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                            </svg>
+                                        </button>
+                                        <div id="ayuda-temp-min-aire" class="popover-ayuda" role="region" hidden>
+                                            <p class="texto-guia">Evita estrés por frío ambiental en el cultivo.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="temp-min-aire"
+                                    name="tempMinimaAire"
+                                    class="campo-control"
+                                    min="-40.0"
+                                    max="80.0"
+                                    step="0.1"
+                                    value="16.0"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="temp-max-aire" class="etiqueta-campo">Temp. Máxima Aire (°C)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-temp-max-aire"
+                                            aria-label="Información sobre Temp. Máxima Aire"
+                                        >
+                                            <svg class="icono-ayuda-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                            </svg>
+                                        </button>
+                                        <div id="ayuda-temp-max-aire" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                            <p class="texto-guia">Alerta por exceso de calor en el invernadero.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="temp-max-aire"
+                                    name="tempMaximaAire"
+                                    class="campo-control"
+                                    min="-40.0"
+                                    max="80.0"
+                                    step="0.1"
+                                    value="28.0"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Umbrales de Alerta de Humedad Relativa -->
+                        <div class="fila-dos-cols">
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="humedad-min-aire" class="etiqueta-campo">Humedad Mínima (%)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-humedad-min"
+                                            aria-label="Información sobre Humedad Mínima"
+                                        >
+                                            <svg class="icono-ayuda-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                            </svg>
+                                        </button>
+                                        <div id="ayuda-humedad-min" class="popover-ayuda" role="region" hidden>
+                                            <p class="texto-guia">Evita aire excesivamente seco que deshidrate las hojas.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="humedad-min-aire"
+                                    name="humedadMinima"
+                                    class="campo-control"
+                                    min="0"
+                                    max="100"
+                                    step="1"
+                                    value="50"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="humedad-max-aire" class="etiqueta-campo">Humedad Máxima (%)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-humedad-max"
+                                            aria-label="Información sobre Humedad Máxima"
+                                        >
+                                            <svg class="icono-ayuda-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                            </svg>
+                                        </button>
+                                        <div id="ayuda-humedad-max" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                            <p class="texto-guia">Previene aparición de hongos por exceso de condensación.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="humedad-max-aire"
+                                    name="humedadMaxima"
+                                    class="campo-control"
+                                    min="0"
+                                    max="100"
+                                    step="1"
+                                    value="80"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <p id="error-control-dht22" class="mensaje-error-form" role="alert" hidden></p>
+
+                        <!-- Pie de tarjeta -->
+                        <div class="acciones-card">
+                            <button type="submit" id="btn-guardar-control-dht22" class="btn-modal btn-modal-activar">
+                                Guardar Configuración
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- BLOQUE 2 (Tarjeta Superior Derecha): Calibración de Temperatura y Humedad -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Calibración de Temperatura y Humedad</h3>
+                    </div>
+
+                    <div class="cuerpo-card">
+                        <!-- Encabezado y Registro -->
+                        <div class="registro-mantenimiento">
+                            <p class="texto-registro">
+                                Última verificación realizada: <strong id="ultima-verificacion-dht22">Hace 15 días</strong>
+                            </p>
+                            <p class="texto-guia">Se recomienda verificar cada 60 días</p>
+                        </div>
+
+                        <!-- Sub-tarjeta de Ajuste de Desviación (Offset) -->
+                        <div class="paso-calibracion">
+                            <div class="paso-info">
+                                <p class="etiqueta-campo">Ajuste de Desviación Ambiental</p>
+                                <p class="texto-guia">
+                                    Si al comparar con un termohigrómetro patrón certificado notas una diferencia fija en el aire, ingresa el valor de corrección correspondiente.
+                                </p>
+
+                                <div class="fila-dos-cols">
+                                    <div class="grupo-campo">
+                                        <label for="offset-temp-dht22" class="etiqueta-campo">Desviación Temperatura (°C)</label>
+                                        <input
+                                            type="number"
+                                            id="offset-temp-dht22"
+                                            name="offsetTemperatura"
+                                            class="campo-control"
+                                            min="-20.0"
+                                            max="20.0"
+                                            step="0.1"
+                                            value="0.0"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="offset-humedad-dht22" class="etiqueta-campo">Desviación Humedad (%)</label>
+                                        <input
+                                            type="number"
+                                            id="offset-humedad-dht22"
+                                            name="offsetHumedad"
+                                            class="campo-control"
+                                            min="-30.0"
+                                            max="30.0"
+                                            step="0.1"
+                                            value="0.0"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <p id="error-calibracion-dht22" class="mensaje-error-form" role="alert" hidden></p>
+
+                                <div class="acciones-card">
+                                    <button type="button" id="btn-aplicar-ajuste-dht22" class="btn-modal btn-modal-activar">
+                                        Aplicar Ajuste
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 3 (Acordeón Inferior Colapsado): Configuración Técnica y Conexión (Solo Técnicos) -->
+                <div class="card card-acordeon" id="bloque-tecnico-dht22">
+                    <button
+                        type="button"
+                        id="btn-acordeon-tecnico-dht22"
+                        class="titulo-card acordeon-tecnico-toggle"
+                        aria-expanded="false"
+                        aria-controls="panel-tecnico-dht22"
+                    >
+                        <h3>Configuración Técnica y Conexión (Solo Técnicos)</h3>
+                        <svg class="flecha-desplegable-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+
+                    <div id="panel-tecnico-dht22" class="acordeon-tecnico-panel">
+                        <div class="acordeon-tecnico-inner">
+                            <form id="form-tecnico-dht22" class="cuerpo-card" novalidate>
+
+                                <!-- Subsección A: Cableado y Protocolo Digital (ESP32-S3) -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección A: Cableado y Protocolo Digital (ESP32-S3)</legend>
+
+                                    <div class="grid-tecnico-tres">
+                                        <div class="grupo-campo">
+                                            <label for="tec-dht22-modelo" class="etiqueta-campo">Modelo de Sensor</label>
+                                            <select id="tec-dht22-modelo" name="modeloSensor" class="campo-control">
+                                                <option value="DHT22" selected>DHT22 / AM2302 (Alta precisión)</option>
+                                                <option value="DHT11">DHT11</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-dht22-gpio" class="etiqueta-campo">Pin Digital de Datos (GPIO)</label>
+                                            <select id="tec-dht22-gpio" name="pinGpio" class="campo-control">
+                                                <option value="GPIO 4" selected>GPIO 4</option>
+                                                <option value="GPIO 5">GPIO 5</option>
+                                                <option value="GPIO 15">GPIO 15</option>
+                                                <option value="GPIO 16">GPIO 16</option>
+                                                <option value="GPIO 17">GPIO 17</option>
+                                                <option value="GPIO 18">GPIO 18</option>
+                                                <option value="GPIO 21">GPIO 21</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-dht22-pullup" class="etiqueta-campo">Resistencia Pull-Up</label>
+                                            <select id="tec-dht22-pullup" name="resistenciaPullUp" class="campo-control">
+                                                <option value="externa_10k" selected>Externa 10 kΩ instalada (Recomendado)</option>
+                                                <option value="interna_esp32">Interna del ESP32-S3</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="cuadro-verificacion-electrica" role="note" aria-label="Verificación eléctrica del sensor">
+                                        <div class="encabezado-info-electrica">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                            </svg>
+                                            <span class="etiqueta-campo">Verificación Eléctrica (Solo lectura)</span>
+                                        </div>
+                                        <ul class="lista-verificacion-electrica">
+                                            <li><strong>Alimentación:</strong> Pin VCC (+) a 3.3V o 5V DC y Pin GND (-) a tierra común del ESP32-S3.</li>
+                                            <li><strong>Señal:</strong> Protocolo digital de un solo cable (Single-Bus) con tiempo mínimo de muestreo de 2 segundos entre lecturas.</li>
+                                        </ul>
+                                    </div>
+                                </fieldset>
+
+                                <!-- Subsección B: Rangos Físicos y Filtrado de Señal -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección B: Rangos Físicos y Filtrado de Señal</legend>
+
+                                    <div class="grid-tecnico-tres">
+                                        <div class="grupo-campo">
+                                            <label for="tec-dht22-rango-temp" class="etiqueta-campo">Rango Operativo Temperatura (°C)</label>
+                                            <input
+                                                type="text"
+                                                id="tec-dht22-rango-temp"
+                                                name="rangoOperativoTemp"
+                                                class="campo-control campo-solo-lectura"
+                                                value="-40 a 80 °C"
+                                                readonly
+                                            />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-dht22-rango-hum" class="etiqueta-campo">Rango Operativo Humedad (%)</label>
+                                            <input
+                                                type="text"
+                                                id="tec-dht22-rango-hum"
+                                                name="rangoOperativoHum"
+                                                class="campo-control campo-solo-lectura"
+                                                value="0 a 100 % HR"
+                                                readonly
+                                            />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-dht22-muestras" class="etiqueta-campo">Muestras para Promedio (Filtro)</label>
+                                            <input
+                                                type="number"
+                                                id="tec-dht22-muestras"
+                                                name="muestrasPromedio"
+                                                class="campo-control"
+                                                min="1"
+                                                max="30"
+                                                step="1"
+                                                value="5"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <p id="error-tecnico-dht22" class="mensaje-error-form" role="alert" hidden></p>
+
+                                <!-- Pie del acordeón técnico -->
+                                <div class="acciones-card acciones-tecnicas">
+                                    <button type="button" id="btn-restaurar-fabrica-dht22" class="btn-modal btn-modal-cancelar">
+                                        Restaurar valores de fábrica
+                                    </button>
+                                    <button type="submit" id="btn-guardar-tecnico-dht22" class="btn-modal btn-modal-activar">
+                                        Guardar Configuración Técnica
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación operativa (DHT22) -->
+    <div id="modal-confirmacion-dht22" class="modal-dht22-overlay" hidden>
+        <div class="modal-dht22-caja" role="dialog" aria-modal="true" aria-labelledby="modal-dht22-titulo" aria-describedby="modal-dht22-mensaje">
+            <h4 id="modal-dht22-titulo" class="modal-dht22-titulo"></h4>
+            <p id="modal-dht22-mensaje" class="modal-dht22-mensaje"></p>
+            <div class="modal-dht22-acciones">
+                <button type="button" id="btn-modal-cancelar-dht22" class="btn-modal btn-modal-cancelar">Cancelar</button>
+                <button type="button" id="btn-modal-aceptar-dht22" class="btn-modal btn-modal-pausar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve de orden enviada -->
+    <div id="toast-dht22" class="toast-dht22" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../../js/main.js"></script>
+    <script src="../../../js/temperatura_humedad.js"></script>
+</body>
+
+</html>
+
