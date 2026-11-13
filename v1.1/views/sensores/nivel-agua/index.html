@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración Nivel de Agua</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/header.css">
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/nivel-agua.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <div id="contenedor-base">
+            <div class="ordenar-div">
+
+                <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Tanque -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Alertas y Control del Tanque</h3>
+                        <button type="button" id="btn-estado-na" class="txt-descr activo" aria-pressed="true">
+                            <span id="estado-na">Activo</span>
+                        </button>
+                    </div>
+
+                    <form id="form-control-na" class="cuerpo-card" novalidate>
+                        <!-- 2. Frecuencia y Unidad de Visualización -->
+                        <div class="fila-dos-cols">
+                            <div class="grupo-campo">
+                                <label for="frecuencia-lectura-na" class="etiqueta-campo">Frecuencia de Lectura</label>
+                                <select id="frecuencia-lectura-na" name="frecuenciaLectura" class="campo-control">
+                                    <option value="5">Cada 5 segundos</option>
+                                    <option value="10" selected>Cada 10 segundos</option>
+                                    <option value="30">Cada 30 segundos</option>
+                                    <option value="60">Cada 1 minuto</option>
+                                    <option value="300">Cada 5 minutos</option>
+                                </select>
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="unidad-principal-na" class="etiqueta-campo">Unidad Principal a Mostrar</label>
+                                <select id="unidad-principal-na" name="unidadPrincipal" class="campo-control">
+                                    <option value="cm" selected>Centímetros (cm)</option>
+                                    <option value="pct">Porcentaje (%)</option>
+                                    <option value="L">Litros (L)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 3. Umbrales de Alerta del Tanque -->
+                        <div class="fila-dos-cols">
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="nivel-minimo-na" class="etiqueta-campo">Nivel Mínimo Crítico (cm)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-na-min"
+                                            aria-label="Información sobre Nivel Mínimo Crítico"
+                                        >
+                                            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                        </button>
+                                        <div id="ayuda-na-min" class="popover-ayuda" role="region" hidden>
+                                            <p class="texto-guia">Protege la bomba de agua contra trabajo en seco.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="nivel-minimo-na"
+                                    name="nivelMinimoCm"
+                                    class="campo-control"
+                                    min="0"
+                                    step="0.5"
+                                    value="15"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="nivel-maximo-na" class="etiqueta-campo">Nivel Máximo Alerta (cm)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-na-max"
+                                            aria-label="Información sobre Nivel Máximo Alerta"
+                                        >
+                                            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                        </button>
+                                        <div id="ayuda-na-max" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                            <p class="texto-guia">Evita desbordamientos en el reservorio.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="nivel-maximo-na"
+                                    name="nivelMaximoCm"
+                                    class="campo-control"
+                                    min="0"
+                                    step="0.5"
+                                    value="90"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <p id="error-control-na" class="mensaje-error-form" role="alert" hidden></p>
+
+                        <!-- 4. Pie de tarjeta -->
+                        <div class="acciones-card">
+                            <button type="submit" id="btn-guardar-control-na" class="btn-modal btn-modal-activar">
+                                Guardar Configuración
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- BLOQUE 2 (Tarjeta Superior Derecha): Dimensiones del Tanque y Ajuste Cero -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Dimensiones del Tanque y Ajuste Cero</h3>
+                    </div>
+
+                    <div class="cuerpo-card">
+                        <!-- 1. Geometría del Reservorio -->
+                        <div class="grupo-campo">
+                            <label for="forma-tanque" class="etiqueta-campo">Forma del Tanque</label>
+                            <select id="forma-tanque" name="formaTanque" class="campo-control">
+                                <option value="rectangular" selected>Rectangular / Cuadrado</option>
+                                <option value="cilindrico">Cilíndrico</option>
+                            </select>
+                        </div>
+
+                        <div id="campos-rectangular" class="fila-tres-cols">
+                            <div class="grupo-campo">
+                                <label for="tanque-largo" class="etiqueta-campo">Largo (m)</label>
+                                <input type="number" id="tanque-largo" class="campo-control" min="0.05" step="0.01" value="0.80" required />
+                            </div>
+                            <div class="grupo-campo">
+                                <label for="tanque-ancho" class="etiqueta-campo">Ancho (m)</label>
+                                <input type="number" id="tanque-ancho" class="campo-control" min="0.05" step="0.01" value="0.50" required />
+                            </div>
+                            <div class="grupo-campo">
+                                <label for="tanque-altura-rect" class="etiqueta-campo">Altura Total del Tanque (m)</label>
+                                <input type="number" id="tanque-altura-rect" class="campo-control" min="0.05" step="0.01" value="1.00" required />
+                            </div>
+                        </div>
+
+                        <div id="campos-cilindrico" class="fila-dos-cols" hidden>
+                            <div class="grupo-campo">
+                                <label for="tanque-diametro" class="etiqueta-campo">Diámetro (m)</label>
+                                <input type="number" id="tanque-diametro" class="campo-control" min="0.05" step="0.01" value="0.80" required />
+                            </div>
+                            <div class="grupo-campo">
+                                <label for="tanque-altura-cil" class="etiqueta-campo">Altura Total del Tanque (m)</label>
+                                <input type="number" id="tanque-altura-cil" class="campo-control" min="0.05" step="0.01" value="1.00" required />
+                            </div>
+                        </div>
+
+                        <p class="texto-registro">
+                            Capacidad total estimada: <strong id="capacidad-estimada-litros">400 Litros</strong>
+                        </p>
+
+                        <!-- 2. Ajuste de Punto Cero (Tara en Campo) -->
+                        <div class="paso-calibracion">
+                            <div class="paso-info">
+                                <p class="etiqueta-campo">Calibración de Nivel Cero (Tanque Vacío)</p>
+                                <p class="texto-guia">
+                                    Si el sensor está suspendido a unos centímetros del fondo o marca una pequeña desviación estando el tanque vacío, presiona este botón para fijar la lectura actual como 0 cm.
+                                </p>
+                                <p class="texto-registro">
+                                    Último ajuste cero: <strong id="ultimo-ajuste-cero">Hace 20 días</strong>
+                                </p>
+                            </div>
+                            <div class="paso-accion">
+                                <button type="button" id="btn-fijar-cero" class="btn-modal btn-modal-activar">
+                                    Fijar Nivel Cero Actual
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 3 (Acordeón Inferior Colapsado): Configuración Técnica y Conexión -->
+                <div class="card card-acordeon" id="bloque-tecnico-na">
+                    <button
+                        type="button"
+                        id="btn-acordeon-tecnico-na"
+                        class="titulo-card acordeon-tecnico-toggle"
+                        aria-expanded="false"
+                        aria-controls="panel-tecnico-na"
+                    >
+                        <h3>Configuración Técnica y Conexión (Solo Técnicos)</h3>
+                        <span class="material-symbols-outlined flecha-desplegable" aria-hidden="true">expand_more</span>
+                    </button>
+
+                    <div id="panel-tecnico-na" class="acordeon-tecnico-panel">
+                        <div class="acordeon-tecnico-inner">
+                            <form id="form-tecnico-na" class="cuerpo-card" novalidate>
+
+                                <!-- 1. Subsección A: Señal Eléctrica y Rango de Fábrica -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección A: Señal Eléctrica y Rango de Fábrica</legend>
+
+                                    <div class="grid-tecnico-dos">
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-salida" class="etiqueta-campo">Tipo de Salida Eléctrica</label>
+                                            <select id="tec-na-salida" name="tipoSalida" class="campo-control">
+                                                <option value="4-20mA" selected>4-20 mA (Código F/H - Dos hilos)</option>
+                                                <option value="0.5-4.5V">0.5 - 4.5 VDC (Código 5/6 - Tres hilos)</option>
+                                                <option value="modbus">Modbus-RTU / RS485 (Código R/G - Cuatro hilos)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-url" class="etiqueta-campo">Rango Nominal de Fábrica (URL)</label>
+                                            <select id="tec-na-url" name="rangoNominal" class="campo-control">
+                                                <option value="C203G" selected>C203G (0 - 20 kPa / 2 mH2O)</option>
+                                                <option value="C403G">C403G (40 kPa / 4 mH2O)</option>
+                                                <option value="C104G">C104G (100 kPa / 10 mH2O)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos dinámicos: 4-20 mA -->
+                                    <div id="grupo-salida-420ma" class="grid-tecnico-dos">
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-shunt" class="etiqueta-campo">Resistencia Shunt (Ω)</label>
+                                            <input type="number" id="tec-na-shunt" name="resistenciaShunt" class="campo-control" min="10" max="1000" step="1" value="150" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-adc-420" class="etiqueta-campo">Pin ADC ESP32-S3</label>
+                                            <select id="tec-na-adc-420" name="pinAdc420" class="campo-control">
+                                                <option value="GPIO1">GPIO 1 (ADC1)</option>
+                                                <option value="GPIO2" selected>GPIO 2 (ADC1)</option>
+                                                <option value="GPIO3">GPIO 3 (ADC1)</option>
+                                                <option value="GPIO4">GPIO 4 (ADC1)</option>
+                                                <option value="GPIO5">GPIO 5 (ADC1)</option>
+                                                <option value="GPIO6">GPIO 6 (ADC1)</option>
+                                                <option value="GPIO7">GPIO 7 (ADC1)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos dinámicos: 0.5 - 4.5 VDC -->
+                                    <div id="grupo-salida-vdc" class="grid-tecnico-dos" hidden>
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-adc-vdc" class="etiqueta-campo">Pin ADC ESP32-S3</label>
+                                            <select id="tec-na-adc-vdc" name="pinAdcVdc" class="campo-control">
+                                                <option value="GPIO1">GPIO 1 (ADC1)</option>
+                                                <option value="GPIO2" selected>GPIO 2 (ADC1)</option>
+                                                <option value="GPIO3">GPIO 3 (ADC1)</option>
+                                                <option value="GPIO4">GPIO 4 (ADC1)</option>
+                                                <option value="GPIO5">GPIO 5 (ADC1)</option>
+                                                <option value="GPIO6">GPIO 6 (ADC1)</option>
+                                                <option value="GPIO7">GPIO 7 (ADC1)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-na-divisor" class="etiqueta-campo">Factor Divisor de Tensión</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-na-divisor"
+                                                        aria-label="Información sobre Factor Divisor de Tensión"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-na-divisor" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                                        <p class="texto-guia">Relación del divisor resistivo para adaptar la señal 0.5–4.5 V al máximo de 3.3 V del ADC del ESP32-S3.</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-na-divisor" name="factorDivisorTension" class="campo-control" min="0.1" max="10" step="0.01" value="0.66" required />
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos dinámicos: Modbus-RTU -->
+                                    <div id="grupo-salida-modbus" class="grid-tecnico-dos" hidden>
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-slave" class="etiqueta-campo">Slave ID</label>
+                                            <input type="number" id="tec-na-slave" name="slaveId" class="campo-control" min="1" max="247" step="1" value="1" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-baud" class="etiqueta-campo">Baud Rate</label>
+                                            <select id="tec-na-baud" name="baudRate" class="campo-control">
+                                                <option value="4800">4800</option>
+                                                <option value="9600" selected>9600</option>
+                                                <option value="19200">19200</option>
+                                                <option value="38400">38400</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <!-- 2. Subsección B: Escalamiento, Densidad y Estabilidad -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección B: Escalamiento, Densidad y Estabilidad</legend>
+
+                                    <div class="grid-tecnico-cuatro">
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-lrv" class="etiqueta-campo">LRV - Límite Inferior Calibrado (kPa)</label>
+                                            <input type="number" id="tec-na-lrv" name="lrvKpa" class="campo-control" min="0" max="100" step="0.1" value="0" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-urv" class="etiqueta-campo">URV - Límite Superior Calibrado (kPa)</label>
+                                            <input type="number" id="tec-na-urv" name="urvKpa" class="campo-control" min="0.1" max="100" step="0.1" value="20" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-na-densidad" class="etiqueta-campo">Densidad del Líquido ρ (kg/m³)</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-na-densidad"
+                                                        aria-label="Información sobre Densidad del Líquido"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-na-densidad" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                                        <p class="texto-guia">Ajustado para agua con sales nutrientes hidropónicas.</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-na-densidad" name="densidadKgM3" class="campo-control" min="500" max="2000" step="1" value="1005" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-na-damping" class="etiqueta-campo">Tiempo de Amortiguamiento / Damping (segundos)</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-na-damping"
+                                                        aria-label="Información sobre Damping"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-na-damping" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                                        <p class="texto-guia">Filtra el oleaje del agua en el reservorio (0 a 100 s).</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-na-damping" name="dampingSeg" class="campo-control" min="0" max="100" step="1" value="2" required />
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <!-- 3. Subsección C: Compensación Mecánica del Cabezal -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección C: Compensación Mecánica del Cabezal</legend>
+
+                                    <div class="grid-tecnico-dos">
+                                        <div class="grupo-campo">
+                                            <label for="tec-na-carcasa" class="etiqueta-campo">Tipo de Sonda / Carcasa</label>
+                                            <select id="tec-na-carcasa" name="tipoCarcasa" class="campo-control">
+                                                <option value="H46" selected>Anticorrosiva PP/PVDF - H46 (Offset automático: 7.5 mm)</option>
+                                                <option value="H39">Acero Inoxidable SUS316 - H39 (Offset automático: 4.0 mm)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-na-offset" class="etiqueta-campo">Offset Mecánico Total (mm)</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-na-offset"
+                                                        aria-label="Información sobre Offset Mecánico Total"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-na-offset" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                                        <p class="texto-guia">Permite sumar altura extra si lleva contrapeso P5/P6.</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-na-offset" name="offsetMecanicoMm" class="campo-control" min="0" max="500" step="0.5" value="7.5" required />
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <p id="error-tecnico-na" class="mensaje-error-form" role="alert" hidden></p>
+
+                                <!-- 4. Pie del acordeón técnico -->
+                                <div class="acciones-card acciones-tecnicas">
+                                    <button type="button" id="btn-restaurar-fabrica-na" class="btn-modal btn-modal-cancelar">
+                                        Restaurar valores de fábrica
+                                    </button>
+                                    <button type="submit" id="btn-guardar-tecnico-na" class="btn-modal btn-modal-activar">
+                                        Guardar Configuración Técnica
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación operativa (LMP633-NCN) -->
+    <div id="modal-confirmacion-na" class="modal-na-overlay" hidden>
+        <div class="modal-na-caja" role="dialog" aria-modal="true" aria-labelledby="modal-na-titulo" aria-describedby="modal-na-mensaje">
+            <h4 id="modal-na-titulo" class="modal-na-titulo"></h4>
+            <p id="modal-na-mensaje" class="modal-na-mensaje"></p>
+            <div class="modal-na-acciones">
+                <button type="button" id="btn-modal-cancelar-na" class="btn-modal btn-modal-cancelar">Cancelar</button>
+                <button type="button" id="btn-modal-aceptar-na" class="btn-modal btn-modal-pausar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve de orden enviada -->
+    <div id="toast-na" class="toast-na" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../../js/main.js"></script>
+    <script src="../../../js/nivel-agua.js"></script>
+</body>
+
+</html>
+
