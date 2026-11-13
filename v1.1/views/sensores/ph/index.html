@@ -1,14 +1,387 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuracion PH</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/header.css">
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/ph.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 
 <body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
 
+        <div id="contenedor-base">
+            <div class="ordenar-div">
+
+            <!-- Bloque 1: Alertas y Control del Cultivo -->
+            <div class="card">
+                <!-- 1. Control de Estado del Sensor -->
+                <div class="titulo-card">
+                    <h3>Alertas y Control del Cultivo</h3>
+                    <button type="button" id="btn-estado" class="txt-descr activo" aria-pressed="true">
+                        <span id="estado">Activo</span>
+                    </button>
+                </div>
+
+                <form id="form-control-cultivo" class="cuerpo-card" novalidate>
+                    <!-- 2. Frecuencia de Lectura (Polling Rate) -->
+                    <div class="grupo-campo">
+                        <label for="frecuencia-lectura" class="etiqueta-campo">Frecuencia de Lectura</label>
+                        <select id="frecuencia-lectura" name="frecuenciaLectura" class="campo-control">
+                            <option value="5">Cada 5 segundos</option>
+                            <option value="10" selected>Cada 10 segundos</option>
+                            <option value="30">Cada 30 segundos</option>
+                            <option value="60">Cada 1 minuto</option>
+                            <option value="300">Cada 5 minutos</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. Límites de Alerta del Cultivo -->
+                    <div class="fila-limites">
+                        <div class="grupo-campo">
+                            <label for="ph-minimo" class="etiqueta-campo">pH Mínimo (Ácido)</label>
+                            <input
+                                type="number"
+                                id="ph-minimo"
+                                name="phMinimo"
+                                class="campo-control"
+                                min="0.00"
+                                max="14.00"
+                                step="0.01"
+                                value="5.50"
+                                required
+                            />
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label for="ph-maximo" class="etiqueta-campo">pH Máximo (Alcalino)</label>
+                            <input
+                                type="number"
+                                id="ph-maximo"
+                                name="phMaximo"
+                                class="campo-control"
+                                min="0.00"
+                                max="14.00"
+                                step="0.01"
+                                value="6.50"
+                                required
+                            />
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label for="temp-maxima" class="etiqueta-campo">Temp. Máxima Agua (°C)</label>
+                            <input
+                                type="number"
+                                id="temp-maxima"
+                                name="tempMaxima"
+                                class="campo-control"
+                                min="0.0"
+                                max="50.0"
+                                step="0.1"
+                                value="24.0"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <!-- 4. Compensación Térmica Automática -->
+                    <div class="fila-switch">
+                        <label for="btn-compensacion" class="etiqueta-campo">Compensación Térmica Automática</label>
+                        <button type="button" id="btn-compensacion" class="txt-descr activo" aria-pressed="true">
+                            <span id="texto-compensacion">Activada</span>
+                        </button>
+                    </div>
+
+                    <p id="error-control-cultivo" class="mensaje-error-form" role="alert" hidden></p>
+
+                    <!-- 5. Guardado -->
+                    <div class="acciones-card">
+                        <button type="submit" id="btn-guardar-control" class="btn-modal btn-modal-activar">
+                            Guardar Configuración
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bloque 2: Calibración del pH -->
+            <div class="card">
+                <div class="titulo-card">
+                    <h3>Calibracion del pH</h3>
+                </div>
+
+                <div class="cuerpo-card">
+                    <!-- 1. Registro Histórico de Mantenimiento -->
+                    <div class="registro-mantenimiento">
+                        <p class="texto-registro">
+                            Última calibración realizada: <strong id="ultima-calibracion">Hace 12 días</strong>
+                        </p>
+                        <p class="texto-guia">Se recomienda recalibrar cada 30 días.</p>
+                    </div>
+
+                    <!-- 2. Paso 1: Calibración en Líquido Neutro (Punto Base) -->
+                    <div class="paso-calibracion">
+                        <div class="paso-info">
+                            <p class="etiqueta-campo">Paso 1: Líquido Neutro (pH 6.86)</p>
+                            <p class="texto-guia">
+                                Sumerge la sonda limpia en la solución buffer neutra (sobre verde pH 6.86) y espera 1 minuto a que se estabilice la lectura.
+                            </p>
+                        </div>
+                        <div class="paso-accion">
+                            <button type="button" id="btn-calibrar-neutro" class="btn-modal btn-modal-activar">
+                                Calibrar Punto Neutro
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. Paso 2: Calibración en Líquido Ácido o Alcalino (Segundo Punto) -->
+                    <div class="paso-calibracion">
+                        <div class="paso-info">
+                            <div class="grupo-campo">
+                                <label for="select-buffer-segundo" class="etiqueta-campo">Paso 2: Líquido Ácido o Alcalino</label>
+                                <select id="select-buffer-segundo" class="campo-control">
+                                    <option value="4.01">Sobre Rojo (Ácido - pH 4.01)</option>
+                                    <option value="9.18">Sobre Azul (Alcalino - pH 9.18)</option>
+                                </select>
+                            </div>
+                            <p class="texto-guia">
+                                Enjuaga la sonda con agua destilada, sumérgela en el sobre seleccionado y espera 1 minuto antes de confirmar.
+                            </p>
+                        </div>
+                        <div class="paso-accion">
+                            <button type="button" id="btn-calibrar-segundo" class="btn-modal btn-modal-activar">
+                                Calibrar Segundo Punto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloque 3: Configuración Técnica y Conexión -->
+            <div class="card card-acordeon" id="bloque-tecnico">
+                <button
+                    type="button"
+                    id="btn-acordeon-tecnico"
+                    class="titulo-card acordeon-tecnico-toggle"
+                    aria-expanded="false"
+                    aria-controls="panel-tecnico-ph"
+                >
+                    <h3>Configuración Técnica y Conexión (Solo Técnicos)</h3>
+                    <span class="material-symbols-outlined flecha-desplegable" aria-hidden="true">expand_more</span>
+                </button>
+
+                <div id="panel-tecnico-ph" class="acordeon-tecnico-panel">
+                    <div class="acordeon-tecnico-inner">
+                        <form id="form-tecnico-ph" class="cuerpo-card" novalidate>
+
+                            <!-- Subsección A: Hardware y Conexión Física al ESP32-S3 -->
+                            <fieldset class="subseccion-tecnica">
+                                <legend class="subtitulo-tecnico subtitulo-con-ayuda">
+                                    <span>Subsección A: Hardware y Conexión Física al ESP32-S3</span>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-electrica"
+                                            aria-label="Verificación eléctrica de conexión"
+                                        >
+                                            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                        </button>
+                                        <div id="ayuda-electrica" class="popover-ayuda" role="region" hidden>
+                                            <p class="etiqueta-campo">Verificación Eléctrica (Solo lectura)</p>
+                                            <ul class="lista-checklist">
+                                                <li class="texto-guia">
+                                                    <strong>Alimentación:</strong> Cable Marrón (VCC) a fuente 12V DC y Cable Negro a GND.
+                                                </li>
+                                                <li class="texto-guia">
+                                                    <strong>Referencia:</strong> Tierra (GND) de la fuente de 12V unida al GND del ESP32-S3.
+                                                </li>
+                                                <li class="texto-guia">
+                                                    <strong>Bus RS485:</strong> Cable Amarillo (485-A) al terminal A y Cable Azul (485-B) al terminal B del conversor.
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </span>
+                                </legend>
+
+                                <div class="grid-tecnico-hardware">
+                                    <div class="grupo-campo">
+                                        <label for="tec-uart" class="etiqueta-campo">Puerto Serial (UART)</label>
+                                        <select id="tec-uart" name="uart" class="campo-control">
+                                            <option value="UART1" selected>UART1</option>
+                                            <option value="UART2">UART2</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-pin-rx" class="etiqueta-campo">Pin Recepción (RX) - GPIO</label>
+                                        <input type="number" id="tec-pin-rx" name="pinRx" class="campo-control" min="0" max="48" step="1" value="18" required />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-pin-tx" class="etiqueta-campo">Pin Transmisión (TX) - GPIO</label>
+                                        <input type="number" id="tec-pin-tx" name="pinTx" class="campo-control" min="0" max="48" step="1" value="17" required />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-pin-dere" class="etiqueta-campo">Pin Control de Flujo (DE/RE) - GPIO</label>
+                                        <input type="number" id="tec-pin-dere" name="pinDeRe" class="campo-control" min="0" max="48" step="1" value="21" required />
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Subsección B: Protocolo de Comunicación (Modbus-RTU) -->
+                            <fieldset class="subseccion-tecnica">
+                                <legend class="subtitulo-tecnico">Subsección B: Protocolo de Comunicación (Modbus-RTU)</legend>
+
+                                <div class="grid-tecnico-modbus">
+                                    <div class="grupo-campo">
+                                        <label for="tec-slave-id" class="etiqueta-campo">Slave ID (Dirección del Sensor)</label>
+                                        <input type="number" id="tec-slave-id" name="slaveId" class="campo-control" min="1" max="247" step="1" value="1" required />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-baud-rate" class="etiqueta-campo">Baud Rate (Velocidad)</label>
+                                        <select id="tec-baud-rate" name="baudRate" class="campo-control">
+                                            <option value="4800" selected>4800</option>
+                                            <option value="9600">9600</option>
+                                            <option value="19200">19200</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-paridad" class="etiqueta-campo">Paridad</label>
+                                        <select id="tec-paridad" name="paridad" class="campo-control">
+                                            <option value="None" selected>None</option>
+                                            <option value="Even">Even</option>
+                                            <option value="Odd">Odd</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-stop-bits" class="etiqueta-campo">Stop Bits</label>
+                                        <select id="tec-stop-bits" name="stopBits" class="campo-control">
+                                            <option value="1" selected>1</option>
+                                            <option value="2">2</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <div class="etiqueta-con-ayuda">
+                                            <label for="tec-timeout" class="etiqueta-campo">Timeout de Respuesta (ms)</label>
+                                            <span class="ayuda-contextual">
+                                                <button
+                                                    type="button"
+                                                    class="btn-ayuda-campo"
+                                                    aria-expanded="false"
+                                                    aria-controls="ayuda-timeout"
+                                                    aria-label="Información sobre Timeout de Respuesta"
+                                                >
+                                                    <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                </button>
+                                                <div id="ayuda-timeout" class="popover-ayuda" role="region" hidden>
+                                                    <p class="texto-guia">El sensor tarda hasta 1000 ms en responder.</p>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <input type="number" id="tec-timeout" name="timeoutMs" class="campo-control" min="1000" max="10000" step="50" value="1200" required />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-reintentos" class="etiqueta-campo">Reintentos ante fallo</label>
+                                        <input type="number" id="tec-reintentos" name="reintentos" class="campo-control" min="0" max="10" step="1" value="3" required />
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Subsección C: Mapa de Registros y Escala Interna -->
+                            <fieldset class="subseccion-tecnica">
+                                <legend class="subtitulo-tecnico">Subsección C: Mapa de Registros y Escala Interna</legend>
+
+                                <div class="grid-tecnico-registros">
+                                    <div class="grupo-campo">
+                                        <label for="tec-reg-ph" class="etiqueta-campo">Registro de Lectura pH</label>
+                                        <input type="text" id="tec-reg-ph" name="registroPh" class="campo-control" value="0x0000" required />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <div class="etiqueta-con-ayuda">
+                                            <label for="tec-div-ph" class="etiqueta-campo">Factor Divisor pH</label>
+                                            <span class="ayuda-contextual">
+                                                <button
+                                                    type="button"
+                                                    class="btn-ayuda-campo"
+                                                    aria-expanded="false"
+                                                    aria-controls="ayuda-divisor-ph"
+                                                    aria-label="Información sobre Factor Divisor pH"
+                                                >
+                                                    <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                </button>
+                                                <div id="ayuda-divisor-ph" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                                    <p class="texto-guia">Mantiene resolución de 0.01 pH.</p>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <input type="number" id="tec-div-ph" name="divisorPh" class="campo-control" min="1" step="1" value="100" required />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-reg-temp" class="etiqueta-campo">Registro de Lectura Temperatura</label>
+                                        <input type="text" id="tec-reg-temp" name="registroTemp" class="campo-control" value="0x0001" required />
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-div-temp" class="etiqueta-campo">Factor Divisor Temperatura</label>
+                                        <input type="number" id="tec-div-temp" name="divisorTemp" class="campo-control" min="1" step="1" value="10" required />
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <p id="error-tecnico-ph" class="mensaje-error-form" role="alert" hidden></p>
+
+                            <!-- Acción de Restauración y Guardado -->
+                            <div class="acciones-card acciones-tecnicas">
+                                <button type="button" id="btn-restaurar-fabrica" class="btn-modal btn-modal-cancelar">
+                                    Restaurar valores de fábrica
+                                </button>
+                                <button type="submit" id="btn-guardar-tecnico" class="btn-modal btn-modal-activar">
+                                    Guardar Configuración Técnica
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación operativa (SEN0708) -->
+    <div id="modal-confirmacion-ph" class="modal-ph-overlay" hidden>
+        <div class="modal-ph-caja" role="dialog" aria-modal="true" aria-labelledby="modal-ph-titulo" aria-describedby="modal-ph-mensaje">
+            <h4 id="modal-ph-titulo" class="modal-ph-titulo"></h4>
+            <p id="modal-ph-mensaje" class="modal-ph-mensaje"></p>
+            <div class="modal-ph-acciones">
+                <button type="button" id="btn-modal-cancelar" class="btn-modal btn-modal-cancelar">Cancelar</button>
+                <button type="button" id="btn-modal-aceptar" class="btn-modal btn-modal-pausar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve de orden enviada -->
+    <div id="toast-ph" class="toast-ph" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../../js/main.js"></script>
+    <script src="../../../js/ph.js"></script>
 </body>
 
 </html>

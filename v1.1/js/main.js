@@ -1,5 +1,40 @@
+// Calcula la ruta base de v1.1/ sin importar en qué subcarpeta esté el HTML actual
+const BASE_URL = document.currentScript
+    ? new URL("../", document.currentScript.src).href
+    : "./";
+
+const CLAVE_TEMA = "axion_tema";
+
 document.addEventListener("DOMContentLoaded", () => {
-    const cargarComponente = (url, contenedorId) => {
+    // Aplica el tema guardado en localStorage antes de cargar fragmentos
+    const temaGuardado = localStorage.getItem(CLAVE_TEMA) === "claro";
+    document.body.classList.toggle("tema-claro", temaGuardado);
+
+    const resolverRutasRelativas = (contenedor) => {
+        const esUrlExternaOAncla = (valor) =>
+            !valor ||
+            valor.startsWith("#") ||
+            valor.startsWith("/") ||
+            /^(https?:)?\/\//i.test(valor) ||
+            /^(mailto:|tel:|data:|javascript:)/i.test(valor);
+
+        contenedor.querySelectorAll("[src]").forEach((el) => {
+            const src = el.getAttribute("src");
+            if (!esUrlExternaOAncla(src)) {
+                el.setAttribute("src", new URL(src, BASE_URL).href);
+            }
+        });
+
+        contenedor.querySelectorAll("a[href]").forEach((el) => {
+            const href = el.getAttribute("href");
+            if (!esUrlExternaOAncla(href)) {
+                el.setAttribute("href", new URL(href, BASE_URL).href);
+            }
+        });
+    };
+
+    const cargarComponente = (rutaRelativa, contenedorId) => {
+        const url = new URL(rutaRelativa, BASE_URL).href;
         return fetch(url)
             .then(response => {
                 if (!response.ok) throw new Error(`Error al cargar ${url}`);
@@ -9,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const contenedor = document.getElementById(contenedorId);
                 if (contenedor) {
                     contenedor.innerHTML = html;
+                    resolverRutasRelativas(contenedor);
                 }
             })
             .catch(error => console.error(error));
@@ -33,10 +69,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const iconoTemaSpan = headerContainer.querySelector(".icono-tema .material-symbols-outlined");
 
             if (btnTema && iconoTemaSpan) {
-                btnTema.addEventListener("click", () => {
-                    const esClaro = btnTema.classList.toggle("modo-claro");
+                const sincronizarBotonTema = (esClaro) => {
+                    btnTema.classList.toggle("modo-claro", esClaro);
                     document.body.classList.toggle("tema-claro", esClaro);
                     iconoTemaSpan.textContent = esClaro ? "light_mode" : "dark_mode";
+                };
+
+                // Sincroniza el estado visual del botón al cargar cualquier página
+                sincronizarBotonTema(document.body.classList.contains("tema-claro"));
+
+                btnTema.addEventListener("click", () => {
+                    const esClaro = !document.body.classList.contains("tema-claro");
+                    sincronizarBotonTema(esClaro);
+                    localStorage.setItem(CLAVE_TEMA, esClaro ? "claro" : "oscuro");
                 });
             }
         }

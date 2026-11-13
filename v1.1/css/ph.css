@@ -1,0 +1,512 @@
+.ordenar-div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: max-content;
+    gap: 30px;
+    width: 100%;
+    justify-items: center;
+    align-content: start;
+}
+
+.ordenar-div>div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+.card {
+    width: 100%;
+}
+
+.titulo-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: var(--text-main);
+    font-size: 14px;
+    border-bottom: 1px solid #4c596f;
+    padding: 15px 20px 10px 20px;
+    width: 100%;
+}
+
+/* ==========================================================================
+   CUERPO Y CAMPOS DEL FORMULARIO (BLOQUE 1: ALERTAS Y CONTROL DEL CULTIVO)
+   ========================================================================== */
+.cuerpo-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 20px 20px 20px;
+    width: 100%;
+}
+
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.etiqueta-campo {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.campo-control {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.campo-control:focus {
+    border-color: var(--text-muted);
+}
+
+.fila-limites {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.fila-switch {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 4px;
+}
+
+.mensaje-error-form {
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #991b1b;
+    background-color: #7f1d1d;
+    color: #fee2e2;
+    font-size: 13px;
+}
+
+.acciones-card {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+}
+
+/* ==========================================================================
+   BLOQUE 2: CALIBRACIÓN DEL PH (ESTRUCTURA CON VARIABLES EXISTENTES)
+   ========================================================================== */
+.registro-mantenimiento {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.paso-calibracion {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-main);
+}
+
+.paso-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 220px;
+}
+
+.paso-accion {
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+.paso-accion .btn-modal {
+    white-space: nowrap;
+}
+
+.texto-registro {
+    font-size: 13.5px;
+    color: var(--text-main);
+}
+
+.texto-guia {
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   BLOQUE 3: CONFIGURACIÓN TÉCNICA Y CONEXIÓN (ACORDEÓN COLAPSABLE)
+   ========================================================================== */
+.card-acordeon {
+    min-height: unset;
+}
+
+.acordeon-tecnico-toggle {
+    background: transparent;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.card-acordeon:not(.abierto) .acordeon-tecnico-toggle {
+    border-bottom-color: transparent;
+}
+
+.card-acordeon.abierto .flecha-desplegable {
+    transform: rotate(180deg);
+}
+
+.acordeon-tecnico-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition: grid-template-rows 0.35s ease, opacity 0.25s ease, visibility 0s linear 0.35s;
+}
+
+.card-acordeon.abierto .acordeon-tecnico-panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition: grid-template-rows 0.35s ease, opacity 0.25s ease, visibility 0s;
+}
+
+.acordeon-tecnico-inner {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.subseccion-tecnica {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-main);
+}
+
+.subtitulo-tecnico {
+    padding: 0 6px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.grid-tecnico-hardware,
+.grid-tecnico-modbus {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.grid-tecnico-hardware {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.grid-tecnico-registros {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.subtitulo-con-ayuda {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.etiqueta-con-ayuda {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ayuda-contextual {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-ayuda-campo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.btn-ayuda-campo:hover,
+.btn-ayuda-campo[aria-expanded="true"] {
+    color: var(--text-main);
+}
+
+.btn-ayuda-campo .material-symbols-outlined {
+    font-size: 17px;
+}
+
+.popover-ayuda {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 50;
+    width: max-content;
+    max-width: min(360px, 80vw);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-navbar);
+    color: var(--text-main);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    font-weight: 400;
+    text-align: left;
+}
+
+.popover-ayuda-izq {
+    left: auto;
+    right: 0;
+}
+
+.popover-ayuda .etiqueta-campo {
+    margin-bottom: 6px;
+}
+
+.lista-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 16px;
+}
+
+.lista-checklist li {
+    list-style: disc;
+}
+
+.acciones-tecnicas {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   BOTÓN DE ESTADO (BLOQUE 1: ALERTAS Y CONTROL DEL CULTIVO)
+   ========================================================================== */
+.txt-descr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    padding: 5px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.txt-descr:hover {
+    opacity: 0.9;
+}
+
+/* Estado Activo */
+.txt-descr.activo {
+    background-color: #14532d;
+    color: #dcfce7;
+    border-color: #166534;
+}
+
+/* Estado Pausado */
+.txt-descr.inactivo {
+    background-color: #7f1d1d;
+    color: #fee2e2;
+    border-color: #991b1b;
+}
+
+/* ==========================================================================
+   MODAL SIMPLE DE CONFIRMACIÓN (SEN0708)
+   ========================================================================== */
+.modal-ph-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 2000;
+}
+
+.modal-ph-overlay[hidden] {
+    display: none;
+}
+
+.modal-ph-caja {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg-navbar);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+}
+
+.modal-ph-titulo {
+    margin: 0 0 10px 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.modal-ph-mensaje {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.modal-ph-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-modal {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Botón secundario (Cancelar - gris) */
+.btn-modal-cancelar {
+    background: #475569;
+    color: #f8fafc;
+}
+
+.btn-modal-cancelar:hover {
+    background: #64748b;
+}
+
+/* Botón primario para pausar (rojo) */
+.btn-modal-pausar {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.btn-modal-pausar:hover {
+    background: #b91c1c;
+}
+
+/* Botón primario para activar (verde) */
+.btn-modal-activar {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.btn-modal-activar:hover {
+    background: #15803d;
+}
+
+/* Toast de confirmación */
+.toast-ph {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-navbar);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    z-index: 2100;
+}
+
+@media (max-width: 1100px) {
+    .grid-tecnico-hardware,
+    .grid-tecnico-modbus {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #ayuda-electrica {
+        left: auto;
+        right: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .subseccion-tecnica,
+    .grupo-campo {
+        position: relative;
+    }
+
+    .ayuda-contextual {
+        position: static;
+    }
+
+    .popover-ayuda,
+    .popover-ayuda-izq,
+    #ayuda-electrica {
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 100%;
+    }
+    .ordenar-div {
+        grid-template-columns: 1fr;
+    }
+
+    .fila-limites {
+        grid-template-columns: 1fr;
+    }
+
+    .paso-calibracion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .paso-info {
+        flex: none;
+    }
+
+    .paso-accion {
+        width: 100%;
+    }
+
+    .grid-tecnico-hardware,
+    .grid-tecnico-modbus,
+    .grid-tecnico-registros {
+        grid-template-columns: 1fr;
+    }
+}

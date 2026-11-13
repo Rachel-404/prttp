@@ -1,3 +1,25 @@
+:root {
+    --bg-navbar: #1e293b;
+    --bg-sidebar: #161d2a;
+    --bg-main: #0f172a;
+    --bg-card: #242d3b;
+    --text-main: #f8fafc;
+    --text-muted: #d6d6d6;
+    --hover-bg: #1e293b;
+    --border-color: #334155;
+}
+
+body.tema-claro {
+    --bg-navbar: #d6d6d6;
+    --bg-sidebar: #e2e8f0;
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #334155;
+    --hover-bg: #cbd5e1;
+    --border-color: #cbd5e1;
+}
+
 *,
 *::before,
 *::after {
@@ -12,6 +34,8 @@ body {
     padding: 0;
     overflow: hidden;
     font-family: Roboto, Arial, Helvetica, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
 }
 
 h1,
@@ -44,67 +68,69 @@ a {
     width: 100%;
     height: 100vh;
     height: 100dvh;
+    background-color: var(--bg-main);
 }
 
 #contenedor-navbar {
     grid-area: navbar;
     width: 100%;
     height: 100%;
-    background-color: #1e293b;
-    color: white;
+    background-color: var(--bg-navbar);
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
 }
 
 #contenedor-sidebar {
     grid-area: sidebar;
     width: 100%;
     height: 100%;
-    background-color: #161d2a;
-    color: white;
+    background-color: var(--bg-sidebar);
+    color: var(--text-main);
+    border-right: 1px solid var(--border-color);
     overflow-y: auto;
 }
 
-#contenedor-base {
+#contenedor-base,
+.layout-container>*:not(#contenedor-navbar):not(#contenedor-sidebar) {
     grid-area: main;
     padding: 20px;
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    background: red;
+    background-color: var(--bg-main);
+    color: var(--text-main);
 }
 
-@media (max-width: 768px) {
-    #contenedor-base {
-        width: 100%;
-        background-color: blue;
-    }
-}
-
-/* Adaptación visual al activar tema claro */
-body.tema-claro #contenedor-navbar {
-    background-color: #d6d6d6;
-    color: #1e293b;
-}
-
+/* Adaptación de textos e íconos del navbar y sidebar según tema */
 body.tema-claro .navbar-titulo {
-    color: #1e293b;
+    color: var(--text-main);
 }
 
 body.tema-claro .hmbrgs {
-    background: #1e293b;
+    background: var(--text-main);
 }
 
-body.tema-claro #contenedor-sidebar {
-    background-color: #e2e8f0;
-    color: #1e293b;
+body.tema-claro .btn-menu:hover .hmbrgs {
+    background: #475569;
 }
 
 body.tema-claro .contenedor-opcion,
 body.tema-claro .opcionII {
-    color: #1e293b;
+    color: var(--text-main);
 }
 
 body.tema-claro .contenedor-opcion:hover,
 body.tema-claro .opcionII:hover {
-    background: #cbd5e1;
+    background: var(--hover-bg);
     color: #0f172a;
+}
+
+/*CARD GENERAL*/
+.card {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    min-height: 200px;
+    width: 100%;
+    border-radius: 10px;
 }
