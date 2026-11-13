@@ -4,24 +4,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DASHBOARD</title>
+    <title>Dashboard en Tiempo Real - AXIÓN IOT</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
 </head>
 
 <body>
     <div class="layout-container">
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
+
         <div id="contenedor-base">
-            <h1>hola</h1>
+            <div class="dashboard-grid" aria-label="Monitoreo del cultivo en tiempo real">
+
+                <!-- Tarjeta 1: Conductividad Eléctrica -->
+                <article class="card card-sensor" id="card-ec">
+                    <div class="titulo-card">
+                        <h3>Conductividad Eléctrica (µS/cm)</h3>
+                        <span id="badge-ec" class="badge-conexion conectado" role="status">
+                            <span class="punto-estado" aria-hidden="true"></span>
+                            <span id="texto-badge-ec">Normal</span>
+                        </span>
+                    </div>
+
+                    <div class="cuerpo-sensor">
+                        <p id="valor-ec" class="valor-principal valor-normal">1200 µS/cm</p>
+                        <p id="ref-ec" class="rango-referencia">Rango normal: 800 - 1800 µS/cm</p>
+                    </div>
+
+                    <div class="pie-sensor">
+                        <span id="extra-ec" class="dato-inferior">TDS Estimado: 600 ppm</span>
+                    </div>
+                </article>
+
+                <!-- Tarjeta 2: pH del Agua -->
+                <article class="card card-sensor" id="card-ph">
+                    <div class="titulo-card">
+                        <h3>pH</h3>
+                        <span id="badge-ph" class="badge-conexion conectado" role="status">
+                            <span class="punto-estado" aria-hidden="true"></span>
+                            <span id="texto-badge-ph">Normal</span>
+                        </span>
+                    </div>
+
+                    <div class="cuerpo-sensor">
+                        <p id="valor-ph" class="valor-principal valor-normal">6.10 pH</p>
+                        <p id="ref-ph" class="rango-referencia">Rango normal: 5.50 - 6.50 pH</p>
+                    </div>
+
+                    <div class="pie-sensor">
+                        <span id="extra-ph" class="dato-inferior">Sensor RS485 Industrial</span>
+                    </div>
+                </article>
+
+                <!-- Tarjeta 3: Nivel de Agua -->
+                <article class="card card-sensor" id="card-nivel">
+                    <div class="titulo-card">
+                        <h3>Nivel de agua</h3>
+                        <span id="badge-nivel" class="badge-conexion conectado" role="status">
+                            <span class="punto-estado" aria-hidden="true"></span>
+                            <span id="texto-badge-nivel">Normal</span>
+                        </span>
+                    </div>
+
+                    <div class="cuerpo-sensor">
+                        <p id="valor-nivel" class="valor-principal valor-normal">85 %</p>
+                        <p id="ref-nivel" class="rango-referencia">Nivel normal: 20% - 90%</p>
+                    </div>
+
+                    <div class="pie-sensor">
+                        <span id="extra-nivel" class="dato-inferior">Volumen estimado: 350 Litros</span>
+                    </div>
+                </article>
+
+                <!-- Tarjeta 4: Temperatura del Agua -->
+                <article class="card card-sensor" id="card-temp-agua">
+                    <div class="titulo-card">
+                        <h3>Temperatura del agua</h3>
+                        <span id="badge-temp-agua" class="badge-conexion conectado" role="status">
+                            <span class="punto-estado" aria-hidden="true"></span>
+                            <span id="texto-badge-temp-agua">Normal</span>
+                        </span>
+                    </div>
+
+                    <div class="cuerpo-sensor">
+                        <p id="valor-temp-agua" class="valor-principal valor-normal">21.5 °C</p>
+                        <p id="ref-temp-agua" class="rango-referencia">Rango normal: 18.0 - 24.0 °C</p>
+                    </div>
+
+                    <div class="pie-sensor">
+                        <span id="extra-temp-agua" class="dato-inferior">Compensando pH y EC</span>
+                    </div>
+                </article>
+
+                <!-- Tarjeta 5: Temperatura Lechugas -->
+                <article class="card card-sensor" id="card-temp-lechuga">
+                    <div class="titulo-card">
+                        <h3>Temperatura lechugas</h3>
+                        <span id="badge-temp-lechuga" class="badge-conexion conectado" role="status">
+                            <span class="punto-estado" aria-hidden="true"></span>
+                            <span id="texto-badge-temp-lechuga">Normal</span>
+                        </span>
+                    </div>
+
+                    <div class="cuerpo-sensor">
+                        <p id="valor-temp-lechuga" class="valor-principal valor-normal">22.3 °C</p>
+                        <p id="ref-temp-lechuga" class="rango-referencia">Rango normal: 15.0 - 25.0 °C</p>
+                    </div>
+
+                    <div class="pie-sensor">
+                        <span id="extra-temp-lechuga" class="dato-inferior">Sensor Infrarrojo Foliar</span>
+                    </div>
+                </article>
+
+                <!-- Tarjeta 6: Estado del Microcontrolador -->
+                <article class="card card-sensor card-sistema" id="card-microcontrolador">
+                    <div class="titulo-card">
+                        <h3>Microcontrolador ESP32-S3</h3>
+                        <span id="badge-esp32" class="badge-conexion conectado" role="status">
+                            <span class="punto-estado" aria-hidden="true"></span>
+                            <span id="texto-badge-esp32">Conectado</span>
+                        </span>
+                    </div>
+
+                    <ul class="lista-estado-sistema">
+                        <li class="item-estado-sistema">
+                            <span class="etiqueta-sistema">Señal Wi-Fi:</span>
+                            <strong id="wifi-esp32" class="valor-sistema">Excelente (-58 dBm)</strong>
+                        </li>
+                        <li class="item-estado-sistema">
+                            <span class="etiqueta-sistema">Alimentación:</span>
+                            <strong id="alimentacion-esp32" class="valor-sistema">5V USB-C</strong>
+                        </li>
+                        <li class="item-estado-sistema">
+                            <span class="etiqueta-sistema">Última actualización:</span>
+                            <strong id="actualizacion-esp32" class="valor-sistema">Hace 2 segundos</strong>
+                        </li>
+                    </ul>
+                </article>
+
+            </div>
         </div>
     </div>
 
     <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 
 </html>
