@@ -47,17 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
             idBadge: "badge-temp-agua",
             idTextoBadge: "texto-badge-temp-agua",
             idExtra: "extra-temp-agua"
-        },
-        tempLechuga: {
-            minNormal: 15.0,
-            maxNormal: 25.0,
-            margenAdvertencia: 2.0,
-            unidad: "°C",
-            decimales: 1,
-            idValor: "valor-temp-lechuga",
-            idBadge: "badge-temp-lechuga",
-            idTextoBadge: "texto-badge-temp-lechuga",
-            idExtra: "extra-temp-lechuga"
         }
     };
 
@@ -67,7 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ph: { valor: 6.1, enLinea: true },
         nivel: { valor: 85, litros: 350, enLinea: true },
         tempAgua: { valor: 21.5, enLinea: true },
-        tempLechuga: { valor: 22.3, enLinea: true },
         esp32: {
             conectado: true,
             wifiTexto: "Excelente (-58 dBm)",
