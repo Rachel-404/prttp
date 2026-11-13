@@ -1,0 +1,827 @@
+/* ==========================================================================
+   USUARIOS.CSS - Módulo de Gestión de Usuarios, Roles y Políticas de Seguridad
+   Tema: Escala de Grises Industrial / Neumorfismo Suave (Sin colores neón)
+   ========================================================================== */
+
+body {
+    background-color: #e6e6e6; /* Fondo general claro neutro */
+    color: #000000;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Contenedor principal del módulo */
+.contenedor-modulo-usuarios {
+    width: 92%;
+    max-width: 1280px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    flex: 1;
+}
+
+/* ==========================================================================
+   TARJETA NEUMÓRFICA BASE (#d6d6d6 con relieve elevado suave)
+   ========================================================================== */
+.tarjeta-neumorfica {
+    background: #d6d6d6; /* rgb(214, 214, 214) */
+    border-radius: 18px;
+    border: 1px solid #bfbfbf;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12),
+                inset -4px -4px 10px rgba(255, 255, 255, 0.6);
+    padding: 22px 26px;
+}
+
+/* ==========================================================================
+   1. CABECERA DEL MÓDULO
+   ========================================================================== */
+.cabecera-modulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.cabecera-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 780px;
+}
+
+/* Ícono circular neumórfico (mismo estilo que .icono-perfil) */
+.icono-modulo {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    border-radius: 50%;
+    background: rgb(181, 181, 181);
+    color: #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    border: 1px solid #9e9e9e;
+    box-shadow: -5px 0px 5px rgba(0, 0, 0, 0.2),
+                inset -6px -8px 15px rgba(255, 255, 255, 0.7);
+}
+
+.icono-modulo.icono-pequeno {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    font-size: 17px;
+}
+
+.titulo-modulo {
+    font-size: 20px;
+    font-weight: 800;
+    color: #000000;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.2px;
+}
+
+.descripcion-modulo {
+    font-size: 13.5px;
+    color: #555555;
+    line-height: 1.45;
+    margin: 0;
+}
+
+.codigo-dominio {
+    font-family: "Courier New", Consolas, monospace;
+    font-weight: 700;
+    color: #000000;
+    background: rgb(181, 181, 181);
+    padding: 2px 8px;
+    border-radius: 50px;
+    border: 1px solid #8c8c8c;
+    font-size: 12.5px;
+}
+
+/* Chips de resumen de usuarios a la derecha */
+.resumen-contadores {
+    display: flex;
+    gap: 12px;
+}
+
+.chip-contador {
+    background: #c8c8c8;
+    border: 1px solid #9e9e9e;
+    border-radius: 16px;
+    padding: 10px 18px;
+    min-width: 92px;
+    text-align: center;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.25),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.65);
+    display: flex;
+    flex-direction: column;
+}
+
+.chip-numero {
+    font-family: "Courier New", Consolas, monospace;
+    font-size: 20px;
+    font-weight: 800;
+    color: #000000;
+    line-height: 1.1;
+}
+
+.chip-etiqueta {
+    font-size: 11px;
+    font-weight: 600;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   2. BARRA DE ACCIONES (BUSCADOR, SELECTOR DE ROL Y BOTÓN NUEVO USUARIO)
+   ========================================================================== */
+.barra-acciones {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 24px;
+}
+
+.controles-filtro {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    flex: 1;
+}
+
+/* Contenedor de buscador e icono */
+.campo-busqueda {
+    position: relative;
+    flex: 1;
+    min-width: 260px;
+    max-width: 460px;
+}
+
+.icono-busqueda,
+.icono-filtro {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #555555;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* Inputs y selects con sombra interna hundida y borde redondeado tipo píldora */
+.input-hundido,
+.select-hundido {
+    width: 100%;
+    padding: 11px 16px 11px 40px;
+    background: #e2e2e2;
+    color: #000000;
+    border: 1px solid #9e9e9e;
+    border-radius: 50px;
+    font-size: 13.5px;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.35),
+                inset -2px -2px 6px rgba(255, 255, 255, 0.7);
+    outline: none;
+    transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.input-hundido::placeholder {
+    color: #696969;
+}
+
+.input-hundido:focus,
+.select-hundido:focus {
+    background: #ececec;
+    border-color: #4a4a4a;
+    box-shadow: inset 4px 4px 9px rgba(0, 0, 0, 0.42),
+                0 0 0 2px rgba(105, 105, 105, 0.25);
+}
+
+.campo-select {
+    position: relative;
+    min-width: 210px;
+}
+
+.select-hundido {
+    cursor: pointer;
+    padding-right: 34px;
+}
+
+/* Botón tipo píldora estilo .btn-login (#696969, aliceblue, hover #4a4a4a) */
+.btn-pildora-accion {
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.45);
+    border: 2px solid #4a4a4a;
+    padding: 0 0 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-radius: 50px;
+    background: #696969;
+    color: aliceblue;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.15s ease;
+}
+
+.btn-pildora-accion:hover {
+    background: #4a4a4a;
+}
+
+.btn-pildora-accion:active {
+    transform: scale(0.98);
+}
+
+.icono-circular-btn {
+    background: rgb(181, 181, 181);
+    color: #000000;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    box-shadow: -5px 0px 5px rgba(0, 0, 0, 0.2),
+                inset 5px 6px 8px rgba(224, 224, 224, 0.7);
+    transition: background 0.3s ease;
+}
+
+.btn-pildora-accion:hover .icono-circular-btn {
+    background: rgb(154, 154, 154);
+}
+
+/* ==========================================================================
+   3. TABLA DE USUARIOS (LISTADO)
+   ========================================================================== */
+.contenedor-tabla-usuarios {
+    padding: 18px 22px;
+}
+
+.tabla-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-usuarios {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    text-align: left;
+}
+
+.tabla-usuarios thead th {
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #333333;
+    border-bottom: 2px solid #b5b5b5;
+}
+
+.tabla-usuarios tbody tr {
+    background: rgba(236, 236, 236, 0.65);
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+/* Hover suave (#c4c4c4) sobre las filas */
+.tabla-usuarios tbody tr:hover {
+    background: #c4c4c4;
+}
+
+.tabla-usuarios tbody td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    font-size: 13.5px;
+    color: #333333;
+    border-top: 1px solid #c8c8c8;
+    border-bottom: 1px solid #c8c8c8;
+}
+
+.tabla-usuarios tbody td:first-child {
+    border-left: 1px solid #c8c8c8;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+}
+
+.tabla-usuarios tbody td:last-child {
+    border-right: 1px solid #c8c8c8;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+
+/* Columna Usuario / Nombre */
+.celda-usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-tabla {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: rgb(181, 181, 181);
+    color: #333333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    border: 1px solid #9e9e9e;
+    box-shadow: -4px 0px 5px rgba(0, 0, 0, 0.18),
+                inset -4px -6px 10px rgba(255, 255, 255, 0.7);
+}
+
+.datos-nombre {
+    display: flex;
+    flex-direction: column;
+}
+
+.nombre-principal {
+    font-weight: 700;
+    color: #000000;
+    font-size: 14px;
+}
+
+.subtexto-cargo {
+    font-size: 11.5px;
+    color: #555555;
+    margin-top: 2px;
+}
+
+/* Fuentes monoespaciadas para correos institucionales y datos técnicos */
+.correo-monospace,
+.fecha-monospace {
+    font-family: "Courier New", Consolas, monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #333333;
+}
+
+.correo-monospace {
+    background: rgba(181, 181, 181, 0.45);
+    padding: 4px 10px;
+    border-radius: 50px;
+    border: 1px solid #b5b5b5;
+}
+
+/* Badges de Rol tipo píldora */
+.badge-rol {
+    display: inline-block;
+    padding: 5px 13px;
+    border-radius: 50px;
+    font-family: "Courier New", Consolas, monospace;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+/* Rol 1: SUPER_ADMIN / ASESOR (Gris oscuro #333333 con texto aliceblue) */
+.badge-super-admin {
+    background: #333333;
+    color: aliceblue;
+    border: 1px solid #000000;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.45);
+}
+
+/* Rol 2: ADMIN_OPERADOR (Gris medio #696969 con texto aliceblue) */
+.badge-admin-operador {
+    background: #696969;
+    color: aliceblue;
+    border: 1px solid #4a4a4a;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.35);
+}
+
+/* Rol 3: INVESTIGADOR (Gris claro rgb(181, 181, 181) con borde y texto negro) */
+.badge-investigador {
+    background: rgb(181, 181, 181);
+    color: #000000;
+    border: 1px solid #555555;
+    box-shadow: inset -2px -2px 5px rgba(255, 255, 255, 0.65);
+}
+
+/* Badge de Estado (Activo / Suspendido) */
+.badge-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.badge-estado.estado-activo {
+    background: #e2e2e2;
+    color: #000000;
+    border: 1px solid #8c8c8c;
+}
+
+.badge-estado.estado-suspendido {
+    background: #4a4a4a;
+    color: aliceblue;
+    border: 1px solid #333333;
+}
+
+.punto-estado {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #333333;
+    box-shadow: inset -1px -1px 3px rgba(255, 255, 255, 0.7);
+}
+
+.badge-estado.estado-suspendido .punto-estado {
+    background: rgb(181, 181, 181);
+}
+
+/* Columna Acciones: Botones circulares pequeños con relieve de .icono-perfil */
+.col-acciones {
+    text-align: center;
+}
+
+.grupo-acciones {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-accion-circular {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgb(181, 181, 181);
+    border: 1px solid #8c8c8c;
+    color: #333333;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: -5px 0px 5px rgba(0, 0, 0, 0.2),
+                inset 5px 6px 8px rgba(224, 224, 224, 0.7);
+    transition: background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, transform 0.15s ease;
+}
+
+.btn-accion-circular:hover {
+    background: #4a4a4a;
+    color: aliceblue;
+    border-color: #333333;
+    box-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-accion-circular:active {
+    transform: scale(0.95);
+}
+
+/* Mensaje sin resultados */
+.sin-resultados {
+    text-align: center;
+    padding: 28px 16px;
+    color: #555555;
+    font-size: 14px;
+}
+
+.sin-resultados i {
+    font-size: 26px;
+    color: #696969;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* ==========================================================================
+   4. APARTADO DE CONFIGURACIÓN Y POLÍTICAS DE SEGURIDAD (CSS GRID + TOGGLES)
+   ========================================================================== */
+.seccion-seguridad {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cabecera-seguridad {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #b5b5b5;
+}
+
+.titulo-seguridad-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.titulo-seccion {
+    font-size: 17px;
+    font-weight: 800;
+    color: #000000;
+    margin: 0 0 4px 0;
+}
+
+.subtitulo-seccion {
+    font-size: 12.5px;
+    color: #555555;
+    margin: 0;
+}
+
+.estado-politicas-chip {
+    font-family: "Courier New", Consolas, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    background: #696969;
+    color: aliceblue;
+    padding: 6px 14px;
+    border-radius: 50px;
+    border: 1px solid #4a4a4a;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Cuadrícula (CSS Grid) para las políticas */
+.grid-politicas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 14px;
+}
+
+.item-politica {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 18px;
+    background: #e0e0e0;
+    border: 1px solid #b5b5b5;
+    border-radius: 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07),
+                inset -3px -3px 8px rgba(255, 255, 255, 0.65);
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.item-politica:hover {
+    background: #d0d0d0;
+    border-color: #8c8c8c;
+}
+
+.info-politica {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.encabezado-politica {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.icono-politica {
+    color: #333333;
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+}
+
+.nombre-politica {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #000000;
+}
+
+.detalle-politica {
+    font-size: 12px;
+    color: #555555;
+    margin: 0;
+    padding-left: 27px;
+    line-height: 1.35;
+}
+
+/* Interruptor (Toggle tipo píldora con sombra interna inset y círculo con brillo interior) */
+.toggle-pildora {
+    position: relative;
+    width: 56px;
+    height: 30px;
+    min-width: 56px;
+    border-radius: 50px;
+    background: #b5b5b5; /* Inactivo: #b5b5b5 */
+    border: 1px solid #7a7a7a;
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.35),
+                inset -2px -2px 5px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Estado Activo del Toggle (#696969) */
+.toggle-pildora.activo {
+    background: #696969;
+    border-color: #333333;
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Círculo deslizante con brillo interior en rgb(181, 181, 181) / aliceblue */
+.toggle-circulo {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgb(181, 181, 181);
+    box-shadow: -3px 0px 5px rgba(0, 0, 0, 0.25),
+                inset -4px -5px 10px rgba(255, 255, 255, 0.85);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.3s ease;
+}
+
+.toggle-pildora.activo .toggle-circulo {
+    transform: translateX(25px);
+    background: aliceblue;
+}
+
+/* ==========================================================================
+   5. MODAL NEUMÓRFICO Y TOAST DE NOTIFICACIÓN
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 16px;
+}
+
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal-tarjeta {
+    width: 100%;
+    max-width: 460px;
+    background: #d6d6d6;
+    border: 2px solid #8c8c8c;
+    border-radius: 20px;
+    padding: 22px 24px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35),
+                inset -4px -4px 10px rgba(255, 255, 255, 0.65);
+}
+
+.modal-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #b5b5b5;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.modal-cabecera h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #000000;
+}
+
+.btn-cerrar-modal {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgb(181, 181, 181);
+    border: 1px solid #8c8c8c;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: -3px 0px 5px rgba(0, 0, 0, 0.2),
+                inset -4px -5px 8px rgba(255, 255, 255, 0.7);
+}
+
+.btn-cerrar-modal:hover {
+    background: #4a4a4a;
+    color: aliceblue;
+}
+
+.form-usuario {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.campo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo-form label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #333333;
+}
+
+.campo-form .input-hundido,
+.campo-form .select-hundido {
+    padding-left: 16px;
+}
+
+.ayuda-error {
+    color: #000000;
+    background: #b5b5b5;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn-secundario-modal,
+.btn-guardar-modal {
+    padding: 9px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+.btn-secundario-modal {
+    background: rgb(181, 181, 181);
+    color: #000000;
+    border: 1px solid #8c8c8c;
+}
+
+.btn-secundario-modal:hover {
+    background: #9e9e9e;
+}
+
+.btn-guardar-modal {
+    background: #696969;
+    color: aliceblue;
+    border: 1px solid #4a4a4a;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.35);
+}
+
+.btn-guardar-modal:hover {
+    background: #4a4a4a;
+}
+
+/* Toast de notificación inferior */
+.toast-neumorfico {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #333333;
+    color: aliceblue;
+    padding: 12px 20px;
+    border-radius: 50px;
+    border: 1px solid #696969;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 1300;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .grid-politicas {
+        grid-template-columns: 1fr;
+    }
+
+    .barra-acciones {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .campo-busqueda {
+        max-width: 100%;
+    }
+
+    .btn-pildora-accion {
+        align-self: flex-end;
+    }
+}
+

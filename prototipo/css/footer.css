@@ -1,0 +1,90 @@
+/* ==========================================================================
+   FOOTER.CSS - Pie de Página Institucional AXIÓN - IOT (FISI - UNSM)
+   Estilo: Escala de grises industrial (#d6d6d6), texto 12px (#4a4a4a), enlaces #333333
+   ========================================================================== */
+
+#footer-container {
+    width: 100%;
+    margin-top: auto; /* Empuja el footer al fondo de la pantalla cuando hay poco contenido */
+}
+
+.footer-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+    padding: 15px 40px;
+    margin-top: 30px;
+    background: #d6d6d6; /* rgb(214, 214, 214) - Coherente con .header y .menu-lateral */
+    color: #4a4a4a;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    border-top: 1px solid #b5b5b5;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06),
+                inset 0 2px 4px rgba(255, 255, 255, 0.55);
+    box-sizing: border-box;
+}
+
+.footer-seccion {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.footer-seccion p {
+    margin: 0;
+    color: #4a4a4a;
+}
+
+.footer-seccion strong {
+    color: #333333;
+    font-weight: 700;
+}
+
+.footer-separador {
+    color: #696969;
+    margin: 0 4px;
+    user-select: none;
+}
+
+/* Enlaces sutiles a la derecha en #333333 con hover a negro y subrayado/negrita */
+.footer-link {
+    color: #333333;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease, font-weight 0.15s ease;
+}
+
+.footer-link:hover {
+    color: #000000;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.footer-version {
+    font-family: "Courier New", Consolas, monospace;
+    font-size: 11.5px;
+    background: rgba(181, 181, 181, 0.45);
+    padding: 2px 8px;
+    border-radius: 50px;
+    border: 1px solid #b5b5b5;
+}
+
+/* Responsividad en pantallas medianas y móviles */
+@media (max-width: 960px) {
+    .footer-principal {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px 20px;
+        justify-content: center;
+    }
+
+    .footer-seccion {
+        justify-content: center;
+    }
+}
+
