@@ -326,36 +326,35 @@
 }
 
 /* ==========================================================================
-   BADGES DE ESTADO Y CAJA DE ESTADO EN RESPALDOS (SOLO CSS, CERO AZUL/MORADO)
+   BOTONES DE ESTADO Y CAJA DE ESTADO EN RESPALDOS
    ========================================================================== */
-.badge-estado-reporte {
+.txt-descr {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 5px 12px;
+    justify-content: center;
     border-radius: 50px;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-main);
-    color: var(--text-main);
+    padding: 5px 14px;
     font-family: inherit;
     font-size: 12px;
     font-weight: 700;
+    border: 1px solid transparent;
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    outline: none;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
-.badge-estado-reporte:hover {
+.txt-descr:hover {
     opacity: 0.9;
 }
 
-.badge-estado-reporte.activo .punto-estado {
-    background-color: #22c55e;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+.txt-descr.activo {
+    background-color: #16a34a;
+    color: #ffffff;
 }
 
-.badge-estado-reporte.inactivo .punto-estado {
-    background-color: #ef4444;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+.txt-descr.inactivo {
+    background-color: #dc2626;
+    color: #ffffff;
 }
 
 .caja-estado-respaldo {
