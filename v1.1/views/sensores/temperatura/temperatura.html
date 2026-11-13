@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración Temperatura del Agua</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/header.css">
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/temperatura.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <div id="contenedor-base">
+            <div class="ordenar-div">
+
+                <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Cultivo -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Alertas y Control del Cultivo</h3>
+                        <button type="button" id="btn-estado-temp" class="txt-descr activo" aria-pressed="true">
+                            <span id="estado-temp">Activo</span>
+                        </button>
+                    </div>
+
+                    <form id="form-control-temp" class="cuerpo-card" novalidate>
+                        <!-- 2. Frecuencia de Lectura -->
+                        <div class="grupo-campo">
+                            <label for="frecuencia-lectura-temp" class="etiqueta-campo">Frecuencia de Lectura</label>
+                            <select id="frecuencia-lectura-temp" name="frecuenciaLectura" class="campo-control">
+                                <option value="5">Cada 5 segundos</option>
+                                <option value="10" selected>Cada 10 segundos</option>
+                                <option value="30">Cada 30 segundos</option>
+                                <option value="60">Cada 1 minuto</option>
+                                <option value="300">Cada 5 minutos</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Umbrales de Alerta Térmica del Agua -->
+                        <div class="fila-dos-cols">
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="temp-minimo-agua" class="etiqueta-campo">Temp. Mínima Agua (°C)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-temp-min"
+                                            aria-label="Información sobre Temp. Mínima Agua"
+                                        >
+                                            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                        </button>
+                                        <div id="ayuda-temp-min" class="popover-ayuda" role="region" hidden>
+                                            <p class="texto-guia">Evita estrés por frío en las raíces (rango físico PT100: 0 a 400 °C).</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="temp-minimo-agua"
+                                    name="tempMinimaAgua"
+                                    class="campo-control"
+                                    min="0.0"
+                                    max="400.0"
+                                    step="0.1"
+                                    value="18.0"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <div class="etiqueta-con-ayuda">
+                                    <label for="temp-maximo-agua" class="etiqueta-campo">Temp. Máxima Agua (°C)</label>
+                                    <span class="ayuda-contextual">
+                                        <button
+                                            type="button"
+                                            class="btn-ayuda-campo"
+                                            aria-expanded="false"
+                                            aria-controls="ayuda-temp-max"
+                                            aria-label="Información sobre Temp. Máxima Agua"
+                                        >
+                                            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                        </button>
+                                        <div id="ayuda-temp-max" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                            <p class="texto-guia">Previene pudrición de raíz y falta de oxígeno disuelto.</p>
+                                        </div>
+                                    </span>
+                                </div>
+                                <input
+                                    type="number"
+                                    id="temp-maximo-agua"
+                                    name="tempMaximaAgua"
+                                    class="campo-control"
+                                    min="0.0"
+                                    max="400.0"
+                                    step="0.1"
+                                    value="24.0"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <!-- 4. Sincronización con Otros Módulos -->
+                        <div class="fila-switch">
+                            <div class="etiqueta-con-ayuda">
+                                <label for="btn-compensar-otros" class="etiqueta-campo">Compensar temperatura a otros sensores (EC y pH)</label>
+                                <span class="ayuda-contextual">
+                                    <button
+                                        type="button"
+                                        class="btn-ayuda-campo"
+                                        aria-expanded="false"
+                                        aria-controls="ayuda-temp-sync"
+                                        aria-label="Información sobre sincronización térmica"
+                                    >
+                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                    </button>
+                                    <div id="ayuda-temp-sync" class="popover-ayuda" role="region" hidden>
+                                        <p class="texto-guia">Provee la temperatura real del agua en tiempo real para corregir las lecturas de conductividad (TDS V1.0) y pH.</p>
+                                    </div>
+                                </span>
+                            </div>
+                            <button type="button" id="btn-compensar-otros" class="txt-descr activo" aria-pressed="true">
+                                <span id="texto-compensar-otros">Activada</span>
+                            </button>
+                        </div>
+
+                        <p id="error-control-temp" class="mensaje-error-form" role="alert" hidden></p>
+
+                        <!-- 5. Pie de tarjeta -->
+                        <div class="acciones-card">
+                            <button type="submit" id="btn-guardar-control-temp" class="btn-modal btn-modal-activar">
+                                Guardar Configuración
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- BLOQUE 2 (Tarjeta Superior Derecha): Calibración de Temperatura -->
+                <div class="card">
+                    <div class="titulo-card">
+                        <h3>Calibración de Temperatura</h3>
+                    </div>
+
+                    <div class="cuerpo-card">
+                        <!-- 1. Encabezado y Registro -->
+                        <div class="registro-mantenimiento">
+                            <p class="texto-registro">
+                                Última calibración realizada: <strong id="ultima-calibracion-temp">Hace 15 días</strong>
+                            </p>
+                            <p class="texto-guia">Se recomienda verificar cada 60 días.</p>
+                        </div>
+
+                        <!-- 2. Sub-tarjeta de Ajuste de Desviación -->
+                        <div class="paso-calibracion">
+                            <div class="paso-info">
+                                <p class="etiqueta-campo">Ajuste de Desviación (Offset)</p>
+                                <p class="texto-guia">
+                                    Si al comparar con un termómetro patrón certificado notas una diferencia fija, ingresa el valor de corrección en grados Celsius.
+                                </p>
+
+                                <div class="fila-calibracion-temp">
+                                    <div class="grupo-campo campo-calibracion-temp">
+                                        <label for="offset-temp-calibracion" class="etiqueta-campo">Desviación / Offset (°C)</label>
+                                        <input
+                                            type="number"
+                                            id="offset-temp-calibracion"
+                                            name="offsetTemperatura"
+                                            class="campo-control"
+                                            min="-20.0"
+                                            max="20.0"
+                                            step="0.1"
+                                            value="0.0"
+                                            required
+                                        />
+                                    </div>
+                                    <div class="paso-accion">
+                                        <button type="button" id="btn-aplicar-ajuste-temp" class="btn-modal btn-modal-activar">
+                                            Aplicar Ajuste
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <p id="error-calibracion-temp" class="mensaje-error-form" role="alert" hidden></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 3 (Acordeón Inferior Colapsado): Configuración Técnica y Conexión -->
+                <div class="card card-acordeon" id="bloque-tecnico-temp">
+                    <button
+                        type="button"
+                        id="btn-acordeon-tecnico-temp"
+                        class="titulo-card acordeon-tecnico-toggle"
+                        aria-expanded="false"
+                        aria-controls="panel-tecnico-temp"
+                    >
+                        <h3>Configuración Técnica y Conexión (Solo Técnicos)</h3>
+                        <span class="material-symbols-outlined flecha-desplegable" aria-hidden="true">expand_more</span>
+                    </button>
+
+                    <div id="panel-tecnico-temp" class="acordeon-tecnico-panel">
+                        <div class="acordeon-tecnico-inner">
+                            <form id="form-tecnico-temp" class="cuerpo-card" novalidate>
+
+                                <!-- 1. Subsección A: Cableado e Interfaz con ESP32-S3 -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección A: Cableado e Interfaz con ESP32-S3</legend>
+
+                                    <div class="grid-tecnico-tres">
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-conexion" class="etiqueta-campo">Tipo de Conexión</label>
+                                            <select id="tec-temp-conexion" name="tipoConexion" class="campo-control">
+                                                <option value="3_hilos" selected>3 Hilos (Compensación de cable activa)</option>
+                                                <option value="2_hilos">2 Hilos</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-longitud" class="etiqueta-campo">Longitud del Cable Instalado</label>
+                                            <select id="tec-temp-longitud" name="longitudCable" class="campo-control">
+                                                <option value="1m">1m</option>
+                                                <option value="2m" selected>2m</option>
+                                                <option value="3m">3m</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-interfaz" class="etiqueta-campo">Interfaz / Módulo Lector</label>
+                                            <select id="tec-temp-interfaz" name="interfazLector" class="campo-control">
+                                                <option value="SPI_MAX31865" selected>SPI - Digitalizador MAX31865</option>
+                                                <option value="ANALOG_ADC">Analógico (Transmisor ADC)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="grupo-campo">
+                                        <label for="tec-temp-pines" class="etiqueta-campo">Pines ESP32-S3</label>
+                                        <input
+                                            type="text"
+                                            id="tec-temp-pines"
+                                            name="pinesEsp32"
+                                            class="campo-control"
+                                            value="CS: GPIO 5, SCK: GPIO 18, MISO: GPIO 19, MOSI: GPIO 23"
+                                            required
+                                        />
+                                    </div>
+                                </fieldset>
+
+                                <!-- 2. Subsección B: Constantes Físicas del Platino (Callendar-Van Dusen) y Filtrado -->
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Subsección B: Constantes Físicas del Platino (Callendar-Van Dusen) y Filtrado</legend>
+
+                                    <div class="grid-tecnico-cuatro">
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-rref" class="etiqueta-campo">Resistencia de Referencia Rref (Ω)</label>
+                                            <input type="number" id="tec-temp-rref" name="rrefOhmios" class="campo-control" min="100" max="1000" step="0.1" value="430.0" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-temp-r0" class="etiqueta-campo">Resistencia Base a 0°C R0 (Ω)</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-temp-r0"
+                                                        aria-label="Información sobre Resistencia Base R0"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-temp-r0" class="popover-ayuda" role="region" hidden>
+                                                        <p class="texto-guia">Estándar PT100 (100.0 Ω a 0 °C).</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-temp-r0" name="r0Ohmios" class="campo-control" min="50" max="1000" step="0.1" value="100.0" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <div class="etiqueta-con-ayuda">
+                                                <label for="tec-temp-alpha" class="etiqueta-campo">Coeficiente Térmico α</label>
+                                                <span class="ayuda-contextual">
+                                                    <button
+                                                        type="button"
+                                                        class="btn-ayuda-campo"
+                                                        aria-expanded="false"
+                                                        aria-controls="ayuda-temp-alpha"
+                                                        aria-label="Información sobre Coeficiente Térmico"
+                                                    >
+                                                        <span class="material-symbols-outlined" aria-hidden="true">help</span>
+                                                    </button>
+                                                    <div id="ayuda-temp-alpha" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
+                                                        <p class="texto-guia">Norma IEC 60751 para sondas RTD de platino (0.00385).</p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <input type="number" id="tec-temp-alpha" name="coeficienteAlpha" class="campo-control" min="0.001" max="0.01" step="0.00001" value="0.00385" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-filtro" class="etiqueta-campo">Filtro de Red Eléctrica</label>
+                                            <select id="tec-temp-filtro" name="filtroRed" class="campo-control">
+                                                <option value="60Hz" selected>60 Hz (Perú / América)</option>
+                                                <option value="50Hz">50 Hz (Europa)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <p id="error-tecnico-temp" class="mensaje-error-form" role="alert" hidden></p>
+
+                                <!-- 3. Pie del acordeón técnico -->
+                                <div class="acciones-card acciones-tecnicas">
+                                    <button type="button" id="btn-restaurar-fabrica-temp" class="btn-modal btn-modal-cancelar">
+                                        Restaurar valores de fábrica
+                                    </button>
+                                    <button type="submit" id="btn-guardar-tecnico-temp" class="btn-modal btn-modal-activar">
+                                        Guardar Configuración Técnica
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación operativa (PT100 3 Hilos) -->
+    <div id="modal-confirmacion-temp" class="modal-temp-overlay" hidden>
+        <div class="modal-temp-caja" role="dialog" aria-modal="true" aria-labelledby="modal-temp-titulo" aria-describedby="modal-temp-mensaje">
+            <h4 id="modal-temp-titulo" class="modal-temp-titulo"></h4>
+            <p id="modal-temp-mensaje" class="modal-temp-mensaje"></p>
+            <div class="modal-temp-acciones">
+                <button type="button" id="btn-modal-cancelar-temp" class="btn-modal btn-modal-cancelar">Cancelar</button>
+                <button type="button" id="btn-modal-aceptar-temp" class="btn-modal btn-modal-pausar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve de orden enviada -->
+    <div id="toast-temp" class="toast-temp" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../../js/main.js"></script>
+    <script src="../../../js/temperatura.js"></script>
+</body>
+
+</html>
+
