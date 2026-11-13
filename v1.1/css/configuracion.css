@@ -1,0 +1,364 @@
+.encabezado-config {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.encabezado-config h1 {
+    font-size: var(--font-size-title);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.subtitulo-pagina {
+    font-size: var(--font-size-base);
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   LAYOUT VERTICAL DE UNA SOLA COLUMNA (TARJETAS APILADAS ANCHO COMPLETO)
+   ========================================================================== */
+.config-columna-unica {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.card-config-ancha {
+    width: 100%;
+    min-height: unset;
+}
+
+.titulo-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-main);
+    border-bottom: 1px solid #4c596f;
+    padding: 15px 20px 10px 20px;
+    width: 100%;
+}
+
+.titulo-card h3 {
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.cuerpo-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px 20px 20px 20px;
+    width: 100%;
+}
+
+/* Grilla interna equilibrada para evitar inputs estirados en tarjetas anchas */
+.grid-cuenta-campos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+    align-items: end;
+}
+
+.campo-tema-limitado {
+    max-width: 420px;
+}
+
+.subgrupo-tipografia {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.subtitulo-bloque {
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.grid-tipografia-tres {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    align-items: end;
+}
+
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.etiqueta-campo {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.campo-control {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.campo-control:focus {
+    border-color: var(--text-muted);
+}
+
+.campo-con-unidad {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.campo-con-unidad:focus-within {
+    border-color: var(--text-muted);
+}
+
+.campo-sin-borde-unidad {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    flex: 1;
+    min-width: 0;
+}
+
+.unidad-input {
+    padding: 0 12px 0 8px;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-muted);
+    user-select: none;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   PERFIL ADMINISTRATIVO (AVATAR CSS PURO)
+   ========================================================================== */
+.perfil-admin {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    max-width: 520px;
+}
+
+.avatar-admin {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #16a34a;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.datos-perfil-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rol-admin {
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.correo-admin {
+    font-size: var(--font-size-base);
+    color: var(--text-muted);
+    word-break: break-word;
+}
+
+/* ==========================================================================
+   ACCIONES, ENLACES Y BOTONES
+   ========================================================================== */
+[hidden] {
+    display: none !important;
+}
+
+.mensaje-error-form {
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #991b1b;
+    background-color: #7f1d1d;
+    color: #fee2e2;
+    font-size: var(--font-size-base);
+}
+
+.acciones-card {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 4px;
+}
+
+.acciones-cuenta {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.enlace-seguridad {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.enlace-seguridad:hover {
+    color: var(--text-main);
+    text-decoration: underline;
+}
+
+.icono-llave-svg {
+    flex-shrink: 0;
+}
+
+.btn-modal {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-modal-activar {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.btn-modal-activar:hover {
+    background: #15803d;
+}
+
+.btn-modal-advertencia {
+    background: #d97706;
+    color: #ffffff;
+}
+
+.btn-modal-advertencia:hover {
+    background: #b45309;
+}
+
+/* ==========================================================================
+   MODAL Y TOAST
+   ========================================================================== */
+.modal-config-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 2000;
+}
+
+.modal-config-caja {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-navbar);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.modal-config-titulo {
+    margin: 0;
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.modal-config-mensaje {
+    margin: 0;
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.modal-config-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.toast-config {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-navbar);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    z-index: 2100;
+}
+
+@media (max-width: 1024px) {
+    .grid-tipografia-tres {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-cuenta-campos,
+    .grid-tipografia-tres {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-tema-limitado,
+    .perfil-admin {
+        max-width: 100%;
+    }
+}

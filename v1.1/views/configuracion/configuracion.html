@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración General - AXIÓN IOT</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/header.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/configuracion.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <div id="contenedor-base">
+            <div class="encabezado-config">
+                <h1>Configuración General</h1>
+                <p class="subtitulo-pagina">Gestiona la cuenta administrativa y personaliza la apariencia del sistema.</p>
+            </div>
+
+            <div class="config-columna-unica">
+
+                <!-- SECCIÓN 1 (Arriba): Cuenta Administrativa (Admin Único) -->
+                <article class="card card-config-ancha">
+                    <div class="titulo-card">
+                        <h3>Cuenta Administrativa (Admin Único)</h3>
+                    </div>
+
+                    <form id="form-cuenta-admin" class="cuerpo-card" novalidate>
+                        <!-- Perfil de Usuario -->
+                        <div class="perfil-admin">
+                            <div class="avatar-admin" aria-hidden="true">AU</div>
+                            <div class="datos-perfil-admin">
+                                <p class="rol-admin">Administrador Único</p>
+                                <p id="perfil-correo-display" class="correo-admin">admin@universidad.edu</p>
+                            </div>
+                        </div>
+
+                        <!-- Inputs de Configuración de Cuenta y Seguridad en grilla equilibrada -->
+                        <div class="grid-cuenta-campos">
+                            <div class="grupo-campo">
+                                <label for="nombre-visible" class="etiqueta-campo">Nombre Visible</label>
+                                <input
+                                    type="text"
+                                    id="nombre-visible"
+                                    name="nombreVisible"
+                                    class="campo-control"
+                                    value="Ing. Soporte Principal"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="correo-alertas" class="etiqueta-campo">Correo de Alertas (Notificaciones del sistema)</label>
+                                <input
+                                    type="email"
+                                    id="correo-alertas"
+                                    name="correoAlertas"
+                                    class="campo-control"
+                                    value="admin@universidad.edu"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="expiracion-sesion" class="etiqueta-campo">Expiración de Sesión (Minutos de inactividad)</label>
+                                <input
+                                    type="number"
+                                    id="expiracion-sesion"
+                                    name="expiracionSesion"
+                                    class="campo-control"
+                                    min="1"
+                                    max="1440"
+                                    step="1"
+                                    value="30"
+                                    required
+                                />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="password-actual" class="etiqueta-campo">Contraseña Actual</label>
+                                <input
+                                    type="password"
+                                    id="password-actual"
+                                    name="passwordActual"
+                                    class="campo-control"
+                                    placeholder="Requerida para guardar cambios"
+                                    autocomplete="current-password"
+                                />
+                            </div>
+                        </div>
+
+                        <p id="error-cuenta-admin" class="mensaje-error-form" role="alert" hidden></p>
+
+                        <!-- Acciones en el pie de la tarjeta -->
+                        <div class="acciones-card acciones-cuenta">
+                            <a href="#" id="enlace-regenerar-seguridad" class="enlace-seguridad">
+                                <svg class="icono-llave-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                                </svg>
+                                <span>Regenerar Token / Cambiar Contraseña</span>
+                            </a>
+
+                            <button type="submit" id="btn-guardar-cuenta" class="btn-modal btn-modal-activar">
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </article>
+
+                <!-- SECCIÓN 2 (Abajo): Apariencia y Accesibilidad -->
+                <article class="card card-config-ancha">
+                    <div class="titulo-card">
+                        <h3>Apariencia y Accesibilidad</h3>
+                    </div>
+
+                    <form id="form-apariencia" class="cuerpo-card" novalidate>
+                        <div class="grupo-campo campo-tema-limitado">
+                            <label for="select-tema-general" class="etiqueta-campo">Tema de la Interfaz</label>
+                            <select id="select-tema-general" name="tema" class="campo-control">
+                                <option value="oscuro" selected>Modo Oscuro (Actual)</option>
+                                <option value="claro">Modo Claro</option>
+                                <option value="sistema">Sincronizar con el Sistema</option>
+                            </select>
+                        </div>
+
+                        <div class="subgrupo-tipografia">
+                            <h4 class="subtitulo-bloque">Configuración Tipográfica</h4>
+
+                            <div class="grid-tipografia-tres">
+                                <div class="grupo-campo">
+                                    <label for="input-font-title" class="etiqueta-campo">Tamaño de Títulos Principales</label>
+                                    <div class="campo-con-unidad">
+                                        <input
+                                            type="number"
+                                            id="input-font-title"
+                                            name="fontTitlePx"
+                                            class="campo-control campo-sin-borde-unidad"
+                                            min="16"
+                                            max="48"
+                                            step="1"
+                                            value="24"
+                                            required
+                                        />
+                                        <span class="unidad-input" aria-hidden="true">px</span>
+                                    </div>
+                                </div>
+
+                                <div class="grupo-campo">
+                                    <label for="input-font-subtitle" class="etiqueta-campo">Tamaño de Subtítulos</label>
+                                    <div class="campo-con-unidad">
+                                        <input
+                                            type="number"
+                                            id="input-font-subtitle"
+                                            name="fontSubtitlePx"
+                                            class="campo-control campo-sin-borde-unidad"
+                                            min="12"
+                                            max="32"
+                                            step="1"
+                                            value="18"
+                                            required
+                                        />
+                                        <span class="unidad-input" aria-hidden="true">px</span>
+                                    </div>
+                                </div>
+
+                                <div class="grupo-campo">
+                                    <label for="input-font-base" class="etiqueta-campo">Tamaño del Texto General</label>
+                                    <div class="campo-con-unidad">
+                                        <input
+                                            type="number"
+                                            id="input-font-base"
+                                            name="fontBasePx"
+                                            class="campo-control campo-sin-borde-unidad"
+                                            min="10"
+                                            max="24"
+                                            step="1"
+                                            value="14"
+                                            required
+                                        />
+                                        <span class="unidad-input" aria-hidden="true">px</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="acciones-card">
+                            <button type="submit" id="btn-aplicar-apariencia" class="btn-modal btn-modal-activar">
+                                Aplicar Apariencia
+                            </button>
+                        </div>
+                    </form>
+                </article>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de aviso / validación / éxito -->
+    <div id="modal-config-general" class="modal-config-overlay" hidden>
+        <div class="modal-config-caja" role="dialog" aria-modal="true" aria-labelledby="modal-config-titulo" aria-describedby="modal-config-mensaje">
+            <h4 id="modal-config-titulo" class="modal-config-titulo"></h4>
+            <p id="modal-config-mensaje" class="modal-config-mensaje"></p>
+            <div class="modal-config-acciones">
+                <button type="button" id="btn-modal-cerrar-config" class="btn-modal btn-modal-activar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve -->
+    <div id="toast-config" class="toast-config" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/configuracion.js"></script>
+</body>
+
+</html>

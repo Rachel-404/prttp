@@ -7,6 +7,9 @@
     --text-muted: #d6d6d6;
     --hover-bg: #1e293b;
     --border-color: #334155;
+    --font-size-title: 24px;
+    --font-size-subtitle: 18px;
+    --font-size-base: 14px;
 }
 
 body.tema-claro {
@@ -34,13 +37,23 @@ body {
     padding: 0;
     overflow: hidden;
     font-family: Roboto, Arial, Helvetica, sans-serif;
+    font-size: var(--font-size-base);
     background-color: var(--bg-main);
     color: var(--text-main);
 }
 
 h1,
-h2,
+h2 {
+    margin: 0;
+    font-size: var(--font-size-title);
+}
+
 h3,
+h4 {
+    margin: 0;
+    font-size: var(--font-size-subtitle);
+}
+
 p {
     margin: 0;
 }

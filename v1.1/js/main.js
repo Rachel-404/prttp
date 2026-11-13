@@ -4,11 +4,33 @@ const BASE_URL = document.currentScript
     : "./";
 
 const CLAVE_TEMA = "axion_tema";
+const CLAVE_TIPOGRAFIA = "axion_tipografia";
+
+function resolverTemaClaro(modo) {
+    if (modo === "sistema") {
+        return Boolean(window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches);
+    }
+    return modo === "claro";
+}
+
+function aplicarTipografiaGuardada() {
+    try {
+        const raw = localStorage.getItem(CLAVE_TIPOGRAFIA);
+        if (!raw) return;
+        const prefs = JSON.parse(raw);
+        if (prefs.title) document.documentElement.style.setProperty("--font-size-title", prefs.title);
+        if (prefs.subtitle) document.documentElement.style.setProperty("--font-size-subtitle", prefs.subtitle);
+        if (prefs.base) document.documentElement.style.setProperty("--font-size-base", prefs.base);
+    } catch (e) {
+        console.warn("No se pudo aplicar la tipografía guardada:", e);
+    }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Aplica el tema guardado en localStorage antes de cargar fragmentos
-    const temaGuardado = localStorage.getItem(CLAVE_TEMA) === "claro";
-    document.body.classList.toggle("tema-claro", temaGuardado);
+    // Aplica el tema y tipografía guardados en localStorage antes de cargar fragmentos
+    const modoGuardado = localStorage.getItem(CLAVE_TEMA) || "oscuro";
+    document.body.classList.toggle("tema-claro", resolverTemaClaro(modoGuardado));
+    aplicarTipografiaGuardada();
 
     const resolverRutasRelativas = (contenedor) => {
         const esUrlExternaOAncla = (valor) =>
