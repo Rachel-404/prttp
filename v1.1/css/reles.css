@@ -1,0 +1,476 @@
+.reles-columna-unica {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.card-reles {
+    width: 100%;
+    min-height: unset;
+}
+
+.titulo-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: var(--text-main);
+    font-size: 14px;
+    border-bottom: 1px solid #4c596f;
+    padding: 15px 20px 12px 20px;
+    width: 100%;
+}
+
+.titulo-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.encabezado-reles {
+    gap: 16px;
+}
+
+.control-modo-global {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.selector-modo-reles {
+    width: auto;
+    min-width: 240px;
+}
+
+.cuerpo-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px 20px 20px 20px;
+    width: 100%;
+}
+
+.aviso-modo-auto {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+/* ==========================================================================
+   CUADRÍCULA DE 6 TARJETAS INDIVIDUALES DE RELÉS
+   ========================================================================== */
+.grid-reles-canales {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    width: 100%;
+}
+
+.tarjeta-canal-rele {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.cabecera-canal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.etiqueta-canal-num {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+}
+
+.estado-rele-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    white-space: nowrap;
+}
+
+.punto-estado-rele {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.estado-rele-badge.encendido {
+    color: #22c55e;
+}
+
+.estado-rele-badge.encendido .punto-estado-rele {
+    background-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.estado-rele-badge.apagado {
+    color: #94a3b8;
+}
+
+.estado-rele-badge.apagado .punto-estado-rele {
+    background-color: #64748b;
+}
+
+body.tema-claro .estado-rele-badge.encendido {
+    color: #16a34a;
+}
+
+body.tema-claro .estado-rele-badge.apagado {
+    color: #64748b;
+}
+
+.cuerpo-canal {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-nombre-rele {
+    font-weight: 600;
+    background-color: var(--bg-card);
+}
+
+.pie-canal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.texto-accion-rele {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* Toggle Switch CSS Puro (Verde activo / Gris inactivo) */
+.switch-rele {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.switch-rele input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider-rele {
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    background-color: #475569;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.slider-rele::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    transition: transform 0.2s ease;
+}
+
+.switch-rele input:checked + .slider-rele {
+    background-color: #16a34a;
+}
+
+.switch-rele input:checked + .slider-rele::before {
+    transform: translateX(22px);
+}
+
+.switch-rele input:disabled + .slider-rele {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   CONTROLES COMPARTIDOS Y ACORDEÓN TÉCNICO (BLOQUE 2)
+   ========================================================================== */
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.etiqueta-campo {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.campo-control {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.campo-control:focus {
+    border-color: var(--text-muted);
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.mensaje-error-form {
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #991b1b;
+    background-color: #7f1d1d;
+    color: #fee2e2;
+    font-size: 13px;
+}
+
+.card-acordeon {
+    min-height: unset;
+}
+
+.acordeon-tecnico-toggle {
+    background: transparent;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.card-acordeon:not(.abierto) .acordeon-tecnico-toggle {
+    border-bottom-color: transparent;
+}
+
+.card-acordeon.abierto .flecha-desplegable {
+    transform: rotate(180deg);
+}
+
+.acordeon-tecnico-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition: grid-template-rows 0.35s ease, opacity 0.25s ease, visibility 0s linear 0.35s;
+}
+
+.card-acordeon.abierto .acordeon-tecnico-panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition: grid-template-rows 0.35s ease, opacity 0.25s ease, visibility 0s;
+}
+
+.acordeon-tecnico-inner {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.subseccion-tecnica {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-main);
+}
+
+.subtitulo-tecnico {
+    padding: 0 6px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.grid-pines-reles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+
+.campo-logica-disparo {
+    max-width: 380px;
+}
+
+.acciones-card {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+}
+
+.acciones-tecnicas {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   MODAL Y TOAST
+   ========================================================================== */
+.modal-reles-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 2000;
+}
+
+.modal-reles-caja {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-navbar);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.modal-reles-titulo {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.modal-reles-mensaje {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.modal-reles-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.btn-modal {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-modal-cancelar {
+    background: #475569;
+    color: #f8fafc;
+}
+
+.btn-modal-cancelar:hover {
+    background: #64748b;
+}
+
+.btn-modal-pausar {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.btn-modal-pausar:hover {
+    background: #b91c1c;
+}
+
+.btn-modal-activar {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.btn-modal-activar:hover {
+    background: #15803d;
+}
+
+.toast-reles {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-navbar);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    z-index: 2100;
+}
+
+@media (max-width: 1150px) {
+    .grid-reles-canales,
+    .grid-pines-reles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .grid-reles-canales,
+    .grid-pines-reles {
+        grid-template-columns: 1fr;
+    }
+
+    .selector-modo-reles,
+    .campo-logica-disparo {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+

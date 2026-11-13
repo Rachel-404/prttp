@@ -197,5 +197,50 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.detail) actualizarDashboardAxion(e.detail);
     });
 
+    // Sincronización del estado de los 6 relés desde localStorage / módulo reles.js
+    const CLAVE_RELES_ESTADO = "axion_reles_estado";
+    const ESTADOS_RELES_DEFAULT = [
+        { canal: 1, nombre: "Electrobomba 1 (Recirculación Principal)", encendido: true },
+        { canal: 2, nombre: "Electrobomba 2 (Dosificación / Oxigenación)", encendido: false },
+        { canal: 3, nombre: "Electrobomba 3 (Llenado / Auxiliar)", encendido: false },
+        { canal: 4, nombre: "Reflector (Iluminación del Cultivo)", encendido: true },
+        { canal: 5, nombre: "Canal Reserva 1 (Disponible)", encendido: false },
+        { canal: 6, nombre: "Canal Reserva 2 (Disponible)", encendido: false }
+    ];
+
+    function renderizarEquiposDashboard() {
+        let canales = ESTADOS_RELES_DEFAULT;
+        try {
+            const raw = localStorage.getItem(CLAVE_RELES_ESTADO);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed.canales) && parsed.canales.length === 6) {
+                    canales = parsed.canales;
+                }
+            }
+        } catch (err) {
+            console.warn("No se pudo leer el estado de relés:", err);
+        }
+
+        canales.forEach((item) => {
+            const badge = document.getElementById(`dash-estado-rele-${item.canal}`);
+            const fila = document.querySelector(`.item-equipo[data-canal="${item.canal}"] .nombre-equipo`);
+            if (fila && item.nombre) {
+                fila.textContent = `${item.canal}. ${item.nombre}`;
+            }
+            if (!badge) return;
+            const activo = Boolean(item.encendido);
+            badge.classList.toggle("encendido", activo);
+            badge.classList.toggle("apagado", !activo);
+            const txt = badge.querySelector(".texto-estado-equipo");
+            if (txt) txt.textContent = activo ? "Encendido" : "Apagado";
+        });
+    }
+
+    window.addEventListener("storage", (e) => {
+        if (e.key === CLAVE_RELES_ESTADO) renderizarEquiposDashboard();
+    });
+
+    renderizarEquiposDashboard();
     renderizarTodo();
 });

@@ -148,6 +148,61 @@
 
             </div>
 
+            <!-- Sección: Estado de Equipos y Actuadores (Módulo de 6 Relés) -->
+            <section class="card card-equipos" aria-label="Estado de equipos y actuadores">
+                <div class="titulo-card encabezado-equipos">
+                    <h3>Estado de Equipos y Actuadores</h3>
+                    <a href="views/reles/reles.html" class="enlace-gestionar-equipos">
+                        <span>Gestionar equipos</span>
+                    </a>
+                </div>
+
+                <div class="grid-equipos-dashboard" id="grid-equipos-dashboard">
+                    <div class="item-equipo" data-canal="1">
+                        <span class="nombre-equipo">1. Electrobomba 1 (Recirculación Principal)</span>
+                        <span class="estado-equipo apagado" id="dash-estado-rele-1">
+                            <span class="punto-estado-equipo" aria-hidden="true"></span>
+                            <span class="texto-estado-equipo">Apagado</span>
+                        </span>
+                    </div>
+                    <div class="item-equipo" data-canal="2">
+                        <span class="nombre-equipo">2. Electrobomba 2 (Dosificación / Oxigenación)</span>
+                        <span class="estado-equipo apagado" id="dash-estado-rele-2">
+                            <span class="punto-estado-equipo" aria-hidden="true"></span>
+                            <span class="texto-estado-equipo">Apagado</span>
+                        </span>
+                    </div>
+                    <div class="item-equipo" data-canal="3">
+                        <span class="nombre-equipo">3. Electrobomba 3 (Llenado / Auxiliar)</span>
+                        <span class="estado-equipo apagado" id="dash-estado-rele-3">
+                            <span class="punto-estado-equipo" aria-hidden="true"></span>
+                            <span class="texto-estado-equipo">Apagado</span>
+                        </span>
+                    </div>
+                    <div class="item-equipo" data-canal="4">
+                        <span class="nombre-equipo">4. Reflector (Iluminación del Cultivo)</span>
+                        <span class="estado-equipo apagado" id="dash-estado-rele-4">
+                            <span class="punto-estado-equipo" aria-hidden="true"></span>
+                            <span class="texto-estado-equipo">Apagado</span>
+                        </span>
+                    </div>
+                    <div class="item-equipo" data-canal="5">
+                        <span class="nombre-equipo">5. Canal Reserva 1 (Disponible)</span>
+                        <span class="estado-equipo apagado" id="dash-estado-rele-5">
+                            <span class="punto-estado-equipo" aria-hidden="true"></span>
+                            <span class="texto-estado-equipo">Apagado</span>
+                        </span>
+                    </div>
+                    <div class="item-equipo" data-canal="6">
+                        <span class="nombre-equipo">6. Canal Reserva 2 (Disponible)</span>
+                        <span class="estado-equipo apagado" id="dash-estado-rele-6">
+                            <span class="punto-estado-equipo" aria-hidden="true"></span>
+                            <span class="texto-estado-equipo">Apagado</span>
+                        </span>
+                    </div>
+                </div>
+            </section>
+
             <!-- Sección de Tendencias Rápidas (Ancho completo 100%) -->
             <section class="card card-tendencias" aria-label="Tendencias rápidas de las últimas 24 horas">
                 <div class="titulo-card encabezado-tendencias">

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Equipos y Relés - AXIÓN IOT</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/header.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/reles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <div id="contenedor-base">
+            <div class="reles-columna-unica">
+
+                <!-- BLOQUE 1 (Superior): Control Manual y Modo de Operación -->
+                <section class="card card-reles" aria-label="Control manual y modo de operación">
+                    <div class="titulo-card encabezado-reles">
+                        <h3>Control Manual y Modo de Operación</h3>
+                        <div class="control-modo-global">
+                            <label for="modo-operacion-reles" class="etiqueta-campo">Modo:</label>
+                            <select id="modo-operacion-reles" class="campo-control selector-modo-reles">
+                                <option value="manual" selected>Modo Manual</option>
+                                <option value="automatico">Modo Automático (Temporizador)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="cuerpo-card">
+                        <p id="aviso-modo-automatico" class="aviso-modo-auto" hidden>
+                            Modo Automático (Temporizador) activo: el control manual de los relés está bloqueado temporalmente para evitar conflictos con la programación del ESP32-S3.
+                        </p>
+
+                        <!-- Cuadrícula de 6 tarjetas individuales (Relé 1 al Relé 6) -->
+                        <div class="grid-reles-canales" id="grid-reles-canales"></div>
+                    </div>
+                </section>
+
+                <!-- BLOQUE 2 (Acordeón Inferior Colapsado): Configuración Técnica de Pines -->
+                <section class="card card-acordeon" id="bloque-tecnico-reles" aria-label="Configuración técnica de pines">
+                    <button
+                        type="button"
+                        id="btn-acordeon-tecnico-reles"
+                        class="titulo-card acordeon-tecnico-toggle"
+                        aria-expanded="false"
+                        aria-controls="panel-tecnico-reles"
+                    >
+                        <h3>Configuración Técnica de Pines (Solo Técnicos)</h3>
+                        <span class="material-symbols-outlined flecha-desplegable" aria-hidden="true">expand_more</span>
+                    </button>
+
+                    <div id="panel-tecnico-reles" class="acordeon-tecnico-panel">
+                        <div class="acordeon-tecnico-inner">
+                            <form id="form-tecnico-reles" class="cuerpo-card" novalidate>
+
+                                <fieldset class="subseccion-tecnica">
+                                    <legend class="subtitulo-tecnico">Asignación de Pines GPIO (ESP32-S3) y Lógica de Disparo</legend>
+
+                                    <div class="grid-pines-reles">
+                                        <div class="grupo-campo">
+                                            <label for="pin-rele-1" class="etiqueta-campo">Relé 1 (Electrobomba 1)</label>
+                                            <input type="text" id="pin-rele-1" name="pinRele1" class="campo-control" value="GPIO 4" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="pin-rele-2" class="etiqueta-campo">Relé 2 (Electrobomba 2)</label>
+                                            <input type="text" id="pin-rele-2" name="pinRele2" class="campo-control" value="GPIO 5" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="pin-rele-3" class="etiqueta-campo">Relé 3 (Electrobomba 3)</label>
+                                            <input type="text" id="pin-rele-3" name="pinRele3" class="campo-control" value="GPIO 6" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="pin-rele-4" class="etiqueta-campo">Relé 4 (Reflector)</label>
+                                            <input type="text" id="pin-rele-4" name="pinRele4" class="campo-control" value="GPIO 7" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="pin-rele-5" class="etiqueta-campo">Relé 5 (Reserva 1)</label>
+                                            <input type="text" id="pin-rele-5" name="pinRele5" class="campo-control" value="GPIO 15" required />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="pin-rele-6" class="etiqueta-campo">Relé 6 (Reserva 2)</label>
+                                            <input type="text" id="pin-rele-6" name="pinRele6" class="campo-control" value="GPIO 16" required />
+                                        </div>
+                                    </div>
+
+                                    <div class="grupo-campo campo-logica-disparo">
+                                        <label for="tec-rele-logica" class="etiqueta-campo">Lógica de Disparo del Módulo</label>
+                                        <select id="tec-rele-logica" name="logicaDisparo" class="campo-control">
+                                            <option value="low" selected>Activo en Bajo / Low-Level Trigger</option>
+                                            <option value="high">Activo en Alto / High-Level Trigger</option>
+                                        </select>
+                                    </div>
+                                </fieldset>
+
+                                <p id="error-tecnico-reles" class="mensaje-error-form" role="alert" hidden></p>
+
+                                <div class="acciones-card acciones-tecnicas">
+                                    <button type="button" id="btn-restaurar-fabrica-reles" class="btn-modal btn-modal-cancelar">
+                                        Restaurar valores de fábrica
+                                    </button>
+                                    <button type="submit" id="btn-guardar-tecnico-reles" class="btn-modal btn-modal-activar">
+                                        Guardar Configuración Técnica
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación operativa -->
+    <div id="modal-confirmacion-reles" class="modal-reles-overlay" hidden>
+        <div class="modal-reles-caja" role="dialog" aria-modal="true" aria-labelledby="modal-reles-titulo" aria-describedby="modal-reles-mensaje">
+            <h4 id="modal-reles-titulo" class="modal-reles-titulo"></h4>
+            <p id="modal-reles-mensaje" class="modal-reles-mensaje"></p>
+            <div class="modal-reles-acciones">
+                <button type="button" id="btn-modal-cancelar-reles" class="btn-modal btn-modal-cancelar">Cancelar</button>
+                <button type="button" id="btn-modal-aceptar-reles" class="btn-modal btn-modal-activar">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación breve de orden enviada -->
+    <div id="toast-reles" class="toast-reles" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/reles.js"></script>
+</body>
+
+</html>
+
