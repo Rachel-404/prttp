@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard en Tiempo Real - AXIÓN IOT</title>
+    <title>AXIÓN - IOT | Dashboard de Monitoreo Hidropónico</title>
+    <meta name="description" content="Panel principal de monitoreo en tiempo real para cultivos hidropónicos AXIÓN - IOT: pH, conductividad eléctrica (EC), nivel de agua, temperatura, actuadores y tendencias.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://axion-iot.local/index.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Dashboard de Monitoreo Hidropónico">
+    <meta property="og:description" content="Supervisa en tiempo real sensores de pH, EC, nivel de agua, temperatura, actuadores y gráficas de tendencia de tu sistema hidropónico.">
+    <meta property="og:url" content="https://axion-iot.local/index.html">
+    <meta property="og:image" content="assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Dashboard de Monitoreo Hidropónico">
+    <meta name="twitter:description" content="Supervisa en tiempo real sensores de pH, EC, nivel de agua, temperatura y actuadores en tu cultivo hidropónico.">
+    <meta name="twitter:image" content="assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Sistema IoT para monitoreo y control automatizado de cultivos hidropónicos con ESP32-S3."
+        }
+    </script>
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -17,100 +48,102 @@
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
 
-        <div id="contenedor-base">
-            <div class="dashboard-grid" aria-label="Monitoreo del cultivo en tiempo real">
+        <main id="contenedor-base">
+            <h1 class="sr-only">AXIÓN - IOT — Dashboard de Monitoreo Hidropónico en Tiempo Real</h1>
+
+            <section class="dashboard-grid" aria-label="Monitoreo del cultivo en tiempo real">
 
                 <!-- Tarjeta 1: Conductividad Eléctrica -->
                 <article class="card card-sensor" id="card-ec">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Conductividad Eléctrica (µS/cm)</h3>
-                        <span id="badge-ec" class="badge-conexion conectado" role="status">
+                        <span id="badge-ec" class="badge-conexion conectado" role="status" aria-live="polite">
                             <span class="punto-estado" aria-hidden="true"></span>
                             <span id="texto-badge-ec">Normal</span>
                         </span>
-                    </div>
+                    </header>
 
-                    <div class="cuerpo-sensor">
+                    <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-ec" class="valor-principal valor-normal">1200 µS/cm</p>
                         <p id="ref-ec" class="rango-referencia">Rango normal: 800 - 1800 µS/cm</p>
                     </div>
 
-                    <div class="pie-sensor">
+                    <footer class="pie-sensor">
                         <span id="extra-ec" class="dato-inferior">TDS Estimado: 600 ppm</span>
-                    </div>
+                    </footer>
                 </article>
 
                 <!-- Tarjeta 2: pH del Agua -->
                 <article class="card card-sensor" id="card-ph">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>pH</h3>
-                        <span id="badge-ph" class="badge-conexion conectado" role="status">
+                        <span id="badge-ph" class="badge-conexion conectado" role="status" aria-live="polite">
                             <span class="punto-estado" aria-hidden="true"></span>
                             <span id="texto-badge-ph">Normal</span>
                         </span>
-                    </div>
+                    </header>
 
-                    <div class="cuerpo-sensor">
+                    <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-ph" class="valor-principal valor-normal">6.10 pH</p>
                         <p id="ref-ph" class="rango-referencia">Rango normal: 5.50 - 6.50 pH</p>
                     </div>
 
-                    <div class="pie-sensor">
+                    <footer class="pie-sensor">
                         <span id="extra-ph" class="dato-inferior">Sensor RS485 Industrial</span>
-                    </div>
+                    </footer>
                 </article>
 
                 <!-- Tarjeta 3: Nivel de Agua -->
                 <article class="card card-sensor" id="card-nivel">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Nivel de agua</h3>
-                        <span id="badge-nivel" class="badge-conexion conectado" role="status">
+                        <span id="badge-nivel" class="badge-conexion conectado" role="status" aria-live="polite">
                             <span class="punto-estado" aria-hidden="true"></span>
                             <span id="texto-badge-nivel">Normal</span>
                         </span>
-                    </div>
+                    </header>
 
-                    <div class="cuerpo-sensor">
+                    <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-nivel" class="valor-principal valor-normal">85 %</p>
                         <p id="ref-nivel" class="rango-referencia">Nivel normal: 20% - 90%</p>
                     </div>
 
-                    <div class="pie-sensor">
+                    <footer class="pie-sensor">
                         <span id="extra-nivel" class="dato-inferior">Volumen estimado: 350 Litros</span>
-                    </div>
+                    </footer>
                 </article>
 
                 <!-- Tarjeta 4: Temperatura del Agua -->
                 <article class="card card-sensor" id="card-temp-agua">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Temperatura del agua</h3>
-                        <span id="badge-temp-agua" class="badge-conexion conectado" role="status">
+                        <span id="badge-temp-agua" class="badge-conexion conectado" role="status" aria-live="polite">
                             <span class="punto-estado" aria-hidden="true"></span>
                             <span id="texto-badge-temp-agua">Normal</span>
                         </span>
-                    </div>
+                    </header>
 
-                    <div class="cuerpo-sensor">
+                    <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-temp-agua" class="valor-principal valor-normal">21.5 °C</p>
                         <p id="ref-temp-agua" class="rango-referencia">Rango normal: 18.0 - 24.0 °C</p>
                     </div>
 
-                    <div class="pie-sensor">
+                    <footer class="pie-sensor">
                         <span id="extra-temp-agua" class="dato-inferior">Compensando pH y EC</span>
-                    </div>
+                    </footer>
                 </article>
 
                 <!-- Tarjeta 5: Estado del Microcontrolador -->
                 <article class="card card-sensor card-sistema" id="card-microcontrolador">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Microcontrolador ESP32-S3</h3>
-                        <span id="badge-esp32" class="badge-conexion conectado" role="status">
+                        <span id="badge-esp32" class="badge-conexion conectado" role="status" aria-live="polite">
                             <span class="punto-estado" aria-hidden="true"></span>
                             <span id="texto-badge-esp32">Conectado</span>
                         </span>
-                    </div>
+                    </header>
 
-                    <ul class="lista-estado-sistema">
+                    <ul class="lista-estado-sistema" aria-live="polite">
                         <li class="item-estado-sistema">
                             <span class="etiqueta-sistema">Señal Wi-Fi:</span>
                             <strong id="wifi-esp32" class="valor-sistema">Excelente (-58 dBm)</strong>
@@ -126,18 +159,18 @@
                     </ul>
                 </article>
 
-            </div>
+            </section>
 
             <!-- Sección: Estado de Equipos y Actuadores (Módulo de 6 Relés) -->
             <section class="card card-equipos" aria-label="Estado de equipos y actuadores">
-                <div class="titulo-card encabezado-equipos">
+                <header class="titulo-card encabezado-equipos">
                     <h3>Estado de Equipos y Actuadores</h3>
                     <a href="views/reles/reles.html" class="enlace-gestionar-equipos">
                         <span>Gestionar equipos</span>
                     </a>
-                </div>
+                </header>
 
-                <div class="grid-equipos-dashboard" id="grid-equipos-dashboard">
+                <div class="grid-equipos-dashboard" id="grid-equipos-dashboard" aria-live="polite">
                     <div class="item-equipo" data-canal="1">
                         <span class="nombre-equipo">1. Electrobomba 1 (Recirculación Principal)</span>
                         <span class="estado-equipo apagado" id="dash-estado-rele-1">
@@ -185,7 +218,7 @@
 
             <!-- Sección de Tendencias Rápidas (Ancho completo 100%) -->
             <section class="card card-tendencias" aria-label="Tendencias rápidas de las últimas 24 horas">
-                <div class="titulo-card encabezado-tendencias">
+                <header class="titulo-card encabezado-tendencias">
                     <h3>Tendencia de las últimas 24 horas</h3>
                     <div class="controles-tendencias">
                         <label for="selector-tendencia" class="sr-only">Variable a graficar</label>
@@ -195,17 +228,17 @@
                             <option value="nivel_agua">Nivel de Agua</option>
                         </select>
                     </div>
-                </div>
+                </header>
 
                 <div class="cuerpo-tendencias">
                     <div class="contenedor-canvas-tendencias">
-                        <canvas id="grafica-tendencias" aria-label="Gráfica de tendencia de las últimas 24 horas"></canvas>
+                        <canvas id="grafica-tendencias" role="img" aria-label="Gráfica de tendencia de las últimas 24 horas"></canvas>
                     </div>
 
                     <div id="leyenda-tendencias" class="leyenda-tendencias" aria-label="Leyenda de la gráfica"></div>
                 </div>
             </section>
-        </div>
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>

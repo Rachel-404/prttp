@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración General - AXIÓN IOT</title>
+    <title>AXIÓN - IOT | Configuración General</title>
+    <meta name="description" content="Administración de la cuenta del sistema y personalización visual (tema claro/oscuro y tamaños tipográficos) en AXIÓN - IOT.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://axion-iot.local/views/configuracion/configuracion.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Configuración General">
+    <meta property="og:description" content="Gestiona la cuenta administrativa y personaliza la apariencia y accesibilidad del sistema AXIÓN - IOT.">
+    <meta property="og:url" content="https://axion-iot.local/views/configuracion/configuracion.html">
+    <meta property="og:image" content="../../assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Configuración General">
+    <meta name="twitter:description" content="Gestiona la cuenta administrativa y personaliza la apariencia del sistema AXIÓN - IOT.">
+    <meta name="twitter:image" content="../../assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Módulo de configuración general y accesibilidad del sistema hidropónico AXIÓN - IOT."
+        }
+    </script>
+
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/header.css">
     <link rel="stylesheet" href="../../css/sidebar.css">
     <link rel="stylesheet" href="../../css/configuracion.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -17,19 +48,19 @@
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
 
-        <div id="contenedor-base">
-            <div class="encabezado-config">
+        <main id="contenedor-base">
+            <header class="encabezado-config">
                 <h1>Configuración General</h1>
                 <p class="subtitulo-pagina">Gestiona la cuenta administrativa y personaliza la apariencia del sistema.</p>
-            </div>
+            </header>
 
             <div class="config-columna-unica">
 
                 <!-- SECCIÓN 1 (Arriba): Cuenta Administrativa (Admin Único) -->
                 <article class="card card-config-ancha">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Cuenta Administrativa (Admin Único)</h3>
-                    </div>
+                    </header>
 
                     <form id="form-cuenta-admin" class="cuerpo-card" novalidate>
                         <!-- Perfil de Usuario -->
@@ -98,7 +129,7 @@
                         <p id="error-cuenta-admin" class="mensaje-error-form" role="alert" hidden></p>
 
                         <!-- Acciones en el pie de la tarjeta -->
-                        <div class="acciones-card acciones-cuenta">
+                        <footer class="acciones-card acciones-cuenta">
                             <a href="#" id="enlace-regenerar-seguridad" class="enlace-seguridad">
                                 <svg class="icono-llave-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
@@ -109,15 +140,15 @@
                             <button type="submit" id="btn-guardar-cuenta" class="btn-modal btn-modal-activar">
                                 Guardar Cambios
                             </button>
-                        </div>
+                        </footer>
                     </form>
                 </article>
 
                 <!-- SECCIÓN 2 (Abajo): Apariencia y Accesibilidad -->
                 <article class="card card-config-ancha">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Apariencia y Accesibilidad</h3>
-                    </div>
+                    </header>
 
                     <form id="form-apariencia" class="cuerpo-card" novalidate>
                         <div class="grupo-campo campo-tema-limitado">
@@ -189,21 +220,21 @@
                             </div>
                         </div>
 
-                        <div class="acciones-card">
+                        <footer class="acciones-card">
                             <button type="submit" id="btn-aplicar-apariencia" class="btn-modal btn-modal-activar">
                                 Aplicar Apariencia
                             </button>
-                        </div>
+                        </footer>
                     </form>
                 </article>
 
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Modal de aviso / validación / éxito -->
     <div id="modal-config-general" class="modal-config-overlay" hidden>
-        <div class="modal-config-caja" role="dialog" aria-modal="true" aria-labelledby="modal-config-titulo" aria-describedby="modal-config-mensaje">
+        <div class="modal-config-caja" role="dialog" aria-modal="true" aria-labelledby="modal-config-titulo" aria-describedby="modal-config-mensaje" aria-live="polite">
             <h4 id="modal-config-titulo" class="modal-config-titulo"></h4>
             <p id="modal-config-mensaje" class="modal-config-mensaje"></p>
             <div class="modal-config-acciones">

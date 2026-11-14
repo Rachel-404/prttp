@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración Temperatura y Humedad Ambiental</title>
+    <title>AXIÓN - IOT | Sensor de Temperatura y Humedad Ambiental (DHT22)</title>
+    <meta name="description" content="Configuración de alertas del microclima, calibración ambiental y parámetros GPIO del sensor DHT22 conectado al ESP32-S3 en AXIÓN - IOT.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://axion-iot.local/views/sensores/temperatura_humedad/temperatura_humedad.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Sensor de Temperatura y Humedad Ambiental (DHT22)">
+    <meta property="og:description" content="Control del microclima, umbrales de temperatura/humedad relativa y calibración del sensor DHT22 en AXIÓN - IOT.">
+    <meta property="og:url" content="https://axion-iot.local/views/sensores/temperatura_humedad/temperatura_humedad.html">
+    <meta property="og:image" content="../../../assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Sensor de Temperatura y Humedad Ambiental (DHT22)">
+    <meta name="twitter:description" content="Configuración de umbrales del microclima y calibración del sensor DHT22 en AXIÓN - IOT.">
+    <meta name="twitter:image" content="../../../assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Configuración y calibración del sensor ambiental de temperatura y humedad DHT22 en AXIÓN - IOT."
+        }
+    </script>
+
     <link rel="stylesheet" href="../../../css/style.css">
     <link rel="stylesheet" href="../../../css/header.css">
     <link rel="stylesheet" href="../../../css/sidebar.css">
     <link rel="stylesheet" href="../../../css/temperatura_humedad.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -17,17 +48,18 @@
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
 
-        <div id="contenedor-base">
+        <main id="contenedor-base">
+            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;">Configuración del Sensor de Temperatura y Humedad Ambiental (DHT22) — AXIÓN - IOT</h1>
             <div class="ordenar-div">
 
                 <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Microclima -->
                 <div class="card">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Alertas y Control del Microclima</h3>
-                        <button type="button" id="btn-estado-dht22" class="txt-descr activo" aria-pressed="true">
+                        <button type="button" id="btn-estado-dht22" class="txt-descr activo" aria-pressed="true" aria-live="polite">
                             <span id="estado-dht22">Activo</span>
                         </button>
-                    </div>
+                    </header>
 
                     <form id="form-control-dht22" class="cuerpo-card" novalidate>
                         <!-- Frecuencia de Lectura -->
@@ -47,7 +79,7 @@
                             <div class="grupo-campo">
                                 <div class="etiqueta-con-ayuda">
                                     <label for="temp-min-aire" class="etiqueta-campo">Temp. Mínima Aire (°C)</label>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -64,7 +96,7 @@
                                         <div id="ayuda-temp-min-aire" class="popover-ayuda" role="region" hidden>
                                             <p class="texto-guia">Evita estrés por frío ambiental en el cultivo.</p>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -82,7 +114,7 @@
                             <div class="grupo-campo">
                                 <div class="etiqueta-con-ayuda">
                                     <label for="temp-max-aire" class="etiqueta-campo">Temp. Máxima Aire (°C)</label>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -99,7 +131,7 @@
                                         <div id="ayuda-temp-max-aire" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                             <p class="texto-guia">Alerta por exceso de calor en el invernadero.</p>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -120,7 +152,7 @@
                             <div class="grupo-campo">
                                 <div class="etiqueta-con-ayuda">
                                     <label for="humedad-min-aire" class="etiqueta-campo">Humedad Mínima (%)</label>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -137,7 +169,7 @@
                                         <div id="ayuda-humedad-min" class="popover-ayuda" role="region" hidden>
                                             <p class="texto-guia">Evita aire excesivamente seco que deshidrate las hojas.</p>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -155,7 +187,7 @@
                             <div class="grupo-campo">
                                 <div class="etiqueta-con-ayuda">
                                     <label for="humedad-max-aire" class="etiqueta-campo">Humedad Máxima (%)</label>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -172,7 +204,7 @@
                                         <div id="ayuda-humedad-max" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                             <p class="texto-guia">Previene aparición de hongos por exceso de condensación.</p>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -191,25 +223,25 @@
                         <p id="error-control-dht22" class="mensaje-error-form" role="alert" hidden></p>
 
                         <!-- Pie de tarjeta -->
-                        <div class="acciones-card">
+                        <footer class="acciones-card">
                             <button type="submit" id="btn-guardar-control-dht22" class="btn-modal btn-modal-activar">
                                 Guardar Configuración
                             </button>
-                        </div>
+                        </footer>
                     </form>
                 </div>
 
                 <!-- BLOQUE 2 (Tarjeta Superior Derecha): Calibración de Temperatura y Humedad -->
                 <div class="card">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Calibración de Temperatura y Humedad</h3>
-                    </div>
+                    </header>
 
                     <div class="cuerpo-card">
                         <!-- Encabezado y Registro -->
                         <div class="registro-mantenimiento">
                             <p class="texto-registro">
-                                Última verificación realizada: <strong id="ultima-verificacion-dht22">Hace 15 días</strong>
+                                Última verificación realizada: <strong id="ultima-verificacion-dht22" aria-live="polite">Hace 15 días</strong>
                             </p>
                             <p class="texto-guia">Se recomienda verificar cada 60 días</p>
                         </div>
@@ -385,14 +417,14 @@
                                 <p id="error-tecnico-dht22" class="mensaje-error-form" role="alert" hidden></p>
 
                                 <!-- Pie del acordeón técnico -->
-                                <div class="acciones-card acciones-tecnicas">
+                                <footer class="acciones-card acciones-tecnicas">
                                     <button type="button" id="btn-restaurar-fabrica-dht22" class="btn-modal btn-modal-cancelar">
                                         Restaurar valores de fábrica
                                     </button>
                                     <button type="submit" id="btn-guardar-tecnico-dht22" class="btn-modal btn-modal-activar">
                                         Guardar Configuración Técnica
                                     </button>
-                                </div>
+                                </footer>
 
                             </form>
                         </div>
@@ -400,12 +432,12 @@
                 </div>
 
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Modal de confirmación operativa (DHT22) -->
     <div id="modal-confirmacion-dht22" class="modal-dht22-overlay" hidden>
-        <div class="modal-dht22-caja" role="dialog" aria-modal="true" aria-labelledby="modal-dht22-titulo" aria-describedby="modal-dht22-mensaje">
+        <div class="modal-dht22-caja" role="dialog" aria-modal="true" aria-labelledby="modal-dht22-titulo" aria-describedby="modal-dht22-mensaje" aria-live="polite">
             <h4 id="modal-dht22-titulo" class="modal-dht22-titulo"></h4>
             <p id="modal-dht22-mensaje" class="modal-dht22-mensaje"></p>
             <div class="modal-dht22-acciones">

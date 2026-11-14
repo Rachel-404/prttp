@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración Nivel de Agua</title>
+    <title>AXIÓN - IOT | Sensor de Nivel de Agua</title>
+    <meta name="description" content="Configuración de umbrales del tanque hidropónico, calibración cero/fondo y ajuste técnico del sensor de nivel de agua LMP633-NCN en AXIÓN - IOT.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://axion-iot.local/views/sensores/nivel-agua/index.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Sensor de Nivel de Agua">
+    <meta property="og:description" content="Administra alarmas de nivel mínimo y máximo del reservorio y calibración del sensor hidrostático en AXIÓN - IOT.">
+    <meta property="og:url" content="https://axion-iot.local/views/sensores/nivel-agua/index.html">
+    <meta property="og:image" content="../../../assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Sensor de Nivel de Agua">
+    <meta name="twitter:description" content="Configuración de niveles críticos del tanque y calibración hidrostática en AXIÓN - IOT.">
+    <meta name="twitter:image" content="../../../assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Módulo de configuración del sensor de nivel de agua del reservorio hidropónico en AXIÓN - IOT."
+        }
+    </script>
+
     <link rel="stylesheet" href="../../../css/style.css">
     <link rel="stylesheet" href="../../../css/header.css">
     <link rel="stylesheet" href="../../../css/sidebar.css">
     <link rel="stylesheet" href="../../../css/nivel-agua.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -17,17 +48,18 @@
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
 
-        <div id="contenedor-base">
+        <main id="contenedor-base">
+            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;">Configuración del Sensor de Nivel de Agua — AXIÓN - IOT</h1>
             <div class="ordenar-div">
 
                 <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Tanque -->
                 <div class="card">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Alertas y Control del Tanque</h3>
-                        <button type="button" id="btn-estado-na" class="txt-descr activo" aria-pressed="true">
+                        <button type="button" id="btn-estado-na" class="txt-descr activo" aria-pressed="true" aria-live="polite">
                             <span id="estado-na">Activo</span>
                         </button>
-                    </div>
+                    </header>
 
                     <form id="form-control-na" class="cuerpo-card" novalidate>
                         <!-- 2. Frecuencia y Unidad de Visualización -->
@@ -58,7 +90,7 @@
                             <div class="grupo-campo">
                                 <div class="etiqueta-con-ayuda">
                                     <label for="nivel-minimo-na" class="etiqueta-campo">Nivel Mínimo Crítico (cm)</label>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -71,7 +103,7 @@
                                         <div id="ayuda-na-min" class="popover-ayuda" role="region" hidden>
                                             <p class="texto-guia">Protege la bomba de agua contra trabajo en seco.</p>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -88,7 +120,7 @@
                             <div class="grupo-campo">
                                 <div class="etiqueta-con-ayuda">
                                     <label for="nivel-maximo-na" class="etiqueta-campo">Nivel Máximo Alerta (cm)</label>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -101,7 +133,7 @@
                                         <div id="ayuda-na-max" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                             <p class="texto-guia">Evita desbordamientos en el reservorio.</p>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -119,19 +151,19 @@
                         <p id="error-control-na" class="mensaje-error-form" role="alert" hidden></p>
 
                         <!-- 4. Pie de tarjeta -->
-                        <div class="acciones-card">
+                        <footer class="acciones-card">
                             <button type="submit" id="btn-guardar-control-na" class="btn-modal btn-modal-activar">
                                 Guardar Configuración
                             </button>
-                        </div>
+                        </footer>
                     </form>
                 </div>
 
                 <!-- BLOQUE 2 (Tarjeta Superior Derecha): Dimensiones del Tanque y Ajuste Cero -->
                 <div class="card">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Dimensiones del Tanque y Ajuste Cero</h3>
-                    </div>
+                    </header>
 
                     <div class="cuerpo-card">
                         <!-- 1. Geometría del Reservorio -->
@@ -273,7 +305,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-na-divisor" class="etiqueta-campo">Factor Divisor de Tensión</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -286,7 +318,7 @@
                                                     <div id="ayuda-na-divisor" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                                         <p class="texto-guia">Relación del divisor resistivo para adaptar la señal 0.5–4.5 V al máximo de 3.3 V del ADC del ESP32-S3.</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-na-divisor" name="factorDivisorTension" class="campo-control" min="0.1" max="10" step="0.01" value="0.66" required />
                                         </div>
@@ -329,7 +361,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-na-densidad" class="etiqueta-campo">Densidad del Líquido ρ (kg/m³)</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -342,7 +374,7 @@
                                                     <div id="ayuda-na-densidad" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                                         <p class="texto-guia">Ajustado para agua con sales nutrientes hidropónicas.</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-na-densidad" name="densidadKgM3" class="campo-control" min="500" max="2000" step="1" value="1005" required />
                                         </div>
@@ -350,7 +382,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-na-damping" class="etiqueta-campo">Tiempo de Amortiguamiento / Damping (segundos)</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -363,7 +395,7 @@
                                                     <div id="ayuda-na-damping" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                                         <p class="texto-guia">Filtra el oleaje del agua en el reservorio (0 a 100 s).</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-na-damping" name="dampingSeg" class="campo-control" min="0" max="100" step="1" value="2" required />
                                         </div>
@@ -386,7 +418,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-na-offset" class="etiqueta-campo">Offset Mecánico Total (mm)</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -399,7 +431,7 @@
                                                     <div id="ayuda-na-offset" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                                         <p class="texto-guia">Permite sumar altura extra si lleva contrapeso P5/P6.</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-na-offset" name="offsetMecanicoMm" class="campo-control" min="0" max="500" step="0.5" value="7.5" required />
                                         </div>
@@ -409,14 +441,14 @@
                                 <p id="error-tecnico-na" class="mensaje-error-form" role="alert" hidden></p>
 
                                 <!-- 4. Pie del acordeón técnico -->
-                                <div class="acciones-card acciones-tecnicas">
+                                <footer class="acciones-card acciones-tecnicas">
                                     <button type="button" id="btn-restaurar-fabrica-na" class="btn-modal btn-modal-cancelar">
                                         Restaurar valores de fábrica
                                     </button>
                                     <button type="submit" id="btn-guardar-tecnico-na" class="btn-modal btn-modal-activar">
                                         Guardar Configuración Técnica
                                     </button>
-                                </div>
+                                </footer>
 
                             </form>
                         </div>
@@ -424,12 +456,12 @@
                 </div>
 
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Modal de confirmación operativa (LMP633-NCN) -->
     <div id="modal-confirmacion-na" class="modal-na-overlay" hidden>
-        <div class="modal-na-caja" role="dialog" aria-modal="true" aria-labelledby="modal-na-titulo" aria-describedby="modal-na-mensaje">
+        <div class="modal-na-caja" role="dialog" aria-modal="true" aria-labelledby="modal-na-titulo" aria-describedby="modal-na-mensaje" aria-live="polite">
             <h4 id="modal-na-titulo" class="modal-na-titulo"></h4>
             <p id="modal-na-mensaje" class="modal-na-mensaje"></p>
             <div class="modal-na-acciones">

@@ -1,9 +1,9 @@
 <div class="vista-historial">
     <!-- Tarjeta 1: Filtros de Consulta Histórica -->
     <article class="card">
-        <div class="titulo-card">
+        <header class="titulo-card">
             <h3>Filtros de Consulta Histórica</h3>
-        </div>
+        </header>
 
         <form id="form-filtros-historial" class="cuerpo-card" novalidate>
             <div class="grid-filtros-fecha">
@@ -60,7 +60,7 @@
 
             <p id="error-filtros-historial" class="mensaje-error-form" role="alert" hidden></p>
 
-            <div class="acciones-card">
+            <footer class="acciones-card">
                 <button type="submit" id="btn-consultar-historial" class="btn-modal btn-modal-activar btn-con-icono">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="11" cy="11" r="8"></circle>
@@ -68,20 +68,20 @@
                     </svg>
                     <span>Consultar Historial</span>
                 </button>
-            </div>
+            </footer>
         </form>
     </article>
 
     <!-- Tarjeta 2: Evolución Histórica y Tabla de Registros -->
     <article class="card">
-        <div class="titulo-card">
+        <header class="titulo-card">
             <h3>Evolución Histórica y Tabla de Registros</h3>
-            <span id="resumen-consulta-historial" class="texto-guia">Mostrando registros del rango seleccionado</span>
-        </div>
+            <span id="resumen-consulta-historial" class="texto-guia" aria-live="polite">Mostrando registros del rango seleccionado</span>
+        </header>
 
         <div class="cuerpo-card">
             <div class="contenedor-canvas-historial">
-                <canvas id="grafica-historial-reportes" aria-label="Gráfica de evolución histórica de variables del cultivo"></canvas>
+                <canvas id="grafica-historial-reportes" role="img" aria-label="Gráfica de evolución histórica de variables del cultivo"></canvas>
             </div>
 
             <div class="contenedor-tabla-registros">
@@ -94,25 +94,25 @@
                             <th>Estado</th>
                         </tr>
                     </thead>
-                    <tbody id="tbody-registros-historial"></tbody>
+                    <tbody id="tbody-registros-historial" aria-live="polite"></tbody>
                 </table>
             </div>
 
-            <div class="paginacion-historial" aria-label="Paginación de registros">
-                <span id="info-paginacion-historial" class="texto-guia">Página 1 de 1</span>
+            <footer class="paginacion-historial" aria-label="Paginación de registros">
+                <span id="info-paginacion-historial" class="texto-guia" aria-live="polite">Página 1 de 1</span>
                 <div class="controles-paginacion">
                     <button type="button" id="btn-pagina-anterior" class="btn-modal btn-modal-cancelar">Anterior</button>
                     <button type="button" id="btn-pagina-siguiente" class="btn-modal btn-modal-cancelar">Siguiente</button>
                 </div>
-            </div>
+            </footer>
         </div>
     </article>
 
     <!-- Tarjeta 3: Exportación Manual de Reportes -->
     <article class="card">
-        <div class="titulo-card">
+        <header class="titulo-card">
             <h3>Exportación Manual de Reportes</h3>
-        </div>
+        </header>
 
         <div class="cuerpo-card">
             <p class="texto-guia">

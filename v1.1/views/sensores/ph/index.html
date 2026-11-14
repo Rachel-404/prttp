@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuracion PH</title>
+    <title>AXIÓN - IOT | Sensor de pH</title>
+    <meta name="description" content="Configuración de alertas, frecuencia de lectura, calibración de dos puntos (pH 6.86, 4.00, 9.18) y parámetros RS485 Modbus del sensor de pH en AXIÓN - IOT.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensor pH, RS485, Modbus, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://axion-iot.local/views/sensores/ph/index.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Sensor de pH">
+    <meta property="og:description" content="Configura umbrales de acidez, calibración de dos puntos y comunicación RS485 para el sensor de pH en AXIÓN - IOT.">
+    <meta property="og:url" content="https://axion-iot.local/views/sensores/ph/index.html">
+    <meta property="og:image" content="../../../assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Sensor de pH">
+    <meta name="twitter:description" content="Configuración y calibración del sensor de pH hidropónico en AXIÓN - IOT.">
+    <meta name="twitter:image" content="../../../assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Configuración operativa, calibración y parámetros RS485 del sensor de pH en AXIÓN - IOT."
+        }
+    </script>
+
     <link rel="stylesheet" href="../../../css/style.css">
     <link rel="stylesheet" href="../../../css/header.css">
     <link rel="stylesheet" href="../../../css/sidebar.css">
     <link rel="stylesheet" href="../../../css/ph.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -17,18 +48,19 @@
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
 
-        <div id="contenedor-base">
+        <main id="contenedor-base">
+            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;">Configuración del Sensor de pH — AXIÓN - IOT</h1>
             <div class="ordenar-div">
 
             <!-- Bloque 1: Alertas y Control del Cultivo -->
             <div class="card">
                 <!-- 1. Control de Estado del Sensor -->
-                <div class="titulo-card">
+                <header class="titulo-card">
                     <h3>Alertas y Control del Cultivo</h3>
-                    <button type="button" id="btn-estado" class="txt-descr activo" aria-pressed="true">
+                    <button type="button" id="btn-estado" class="txt-descr activo" aria-pressed="true" aria-live="polite">
                         <span id="estado">Activo</span>
                     </button>
-                </div>
+                </header>
 
                 <form id="form-control-cultivo" class="cuerpo-card" novalidate>
                     <!-- 2. Frecuencia de Lectura (Polling Rate) -->
@@ -102,25 +134,25 @@
                     <p id="error-control-cultivo" class="mensaje-error-form" role="alert" hidden></p>
 
                     <!-- 5. Guardado -->
-                    <div class="acciones-card">
+                    <footer class="acciones-card">
                         <button type="submit" id="btn-guardar-control" class="btn-modal btn-modal-activar">
                             Guardar Configuración
                         </button>
-                    </div>
+                    </footer>
                 </form>
             </div>
 
             <!-- Bloque 2: Calibración del pH -->
             <div class="card">
-                <div class="titulo-card">
+                <header class="titulo-card">
                     <h3>Calibracion del pH</h3>
-                </div>
+                </header>
 
                 <div class="cuerpo-card">
                     <!-- 1. Registro Histórico de Mantenimiento -->
                     <div class="registro-mantenimiento">
                         <p class="texto-registro">
-                            Última calibración realizada: <strong id="ultima-calibracion">Hace 12 días</strong>
+                            Última calibración realizada: <strong id="ultima-calibracion" aria-live="polite">Hace 12 días</strong>
                         </p>
                         <p class="texto-guia">Se recomienda recalibrar cada 30 días.</p>
                     </div>
@@ -184,7 +216,7 @@
                             <fieldset class="subseccion-tecnica">
                                 <legend class="subtitulo-tecnico subtitulo-con-ayuda">
                                     <span>Subsección A: Hardware y Conexión Física al ESP32-S3</span>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -208,7 +240,7 @@
                                                 </li>
                                             </ul>
                                         </div>
-                                    </span>
+                                    </div>
                                 </legend>
 
                                 <div class="grid-tecnico-hardware">
@@ -276,7 +308,7 @@
                                     <div class="grupo-campo">
                                         <div class="etiqueta-con-ayuda">
                                             <label for="tec-timeout" class="etiqueta-campo">Timeout de Respuesta (ms)</label>
-                                            <span class="ayuda-contextual">
+                                            <div class="ayuda-contextual">
                                                 <button
                                                     type="button"
                                                     class="btn-ayuda-campo"
@@ -289,7 +321,7 @@
                                                 <div id="ayuda-timeout" class="popover-ayuda" role="region" hidden>
                                                     <p class="texto-guia">El sensor tarda hasta 1000 ms en responder.</p>
                                                 </div>
-                                            </span>
+                                            </div>
                                         </div>
                                         <input type="number" id="tec-timeout" name="timeoutMs" class="campo-control" min="1000" max="10000" step="50" value="1200" required />
                                     </div>
@@ -314,7 +346,7 @@
                                     <div class="grupo-campo">
                                         <div class="etiqueta-con-ayuda">
                                             <label for="tec-div-ph" class="etiqueta-campo">Factor Divisor pH</label>
-                                            <span class="ayuda-contextual">
+                                            <div class="ayuda-contextual">
                                                 <button
                                                     type="button"
                                                     class="btn-ayuda-campo"
@@ -327,7 +359,7 @@
                                                 <div id="ayuda-divisor-ph" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                                     <p class="texto-guia">Mantiene resolución de 0.01 pH.</p>
                                                 </div>
-                                            </span>
+                                            </div>
                                         </div>
                                         <input type="number" id="tec-div-ph" name="divisorPh" class="campo-control" min="1" step="1" value="100" required />
                                     </div>
@@ -347,14 +379,14 @@
                             <p id="error-tecnico-ph" class="mensaje-error-form" role="alert" hidden></p>
 
                             <!-- Acción de Restauración y Guardado -->
-                            <div class="acciones-card acciones-tecnicas">
+                            <footer class="acciones-card acciones-tecnicas">
                                 <button type="button" id="btn-restaurar-fabrica" class="btn-modal btn-modal-cancelar">
                                     Restaurar valores de fábrica
                                 </button>
                                 <button type="submit" id="btn-guardar-tecnico" class="btn-modal btn-modal-activar">
                                     Guardar Configuración Técnica
                                 </button>
-                            </div>
+                            </footer>
 
                         </form>
                     </div>
@@ -362,18 +394,18 @@
             </div>
 
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Modal de confirmación operativa (SEN0708) -->
     <div id="modal-confirmacion-ph" class="modal-ph-overlay" hidden>
-        <div class="modal-ph-caja" role="dialog" aria-modal="true" aria-labelledby="modal-ph-titulo" aria-describedby="modal-ph-mensaje">
+        <div class="modal-ph-caja" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="modal-ph-titulo" aria-describedby="modal-ph-mensaje">
             <h4 id="modal-ph-titulo" class="modal-ph-titulo"></h4>
             <p id="modal-ph-mensaje" class="modal-ph-mensaje"></p>
-            <div class="modal-ph-acciones">
+            <footer class="modal-ph-acciones">
                 <button type="button" id="btn-modal-cancelar" class="btn-modal btn-modal-cancelar">Cancelar</button>
                 <button type="button" id="btn-modal-aceptar" class="btn-modal btn-modal-pausar">Aceptar</button>
-            </div>
+            </footer>
         </div>
     </div>
 

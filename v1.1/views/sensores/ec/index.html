@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración EC / TDS</title>
+    <title>AXIÓN - IOT | Sensor de Conductividad Eléctrica (EC / TDS)</title>
+    <meta name="description" content="Configuración de umbrales, compensación térmica, calibración estándar y parámetros ADC del sensor de conductividad eléctrica EC/TDS en AXIÓN - IOT.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://axion-iot.local/views/sensores/ec/index.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Sensor de Conductividad Eléctrica (EC / TDS)">
+    <meta property="og:description" content="Configura umbrales de EC/TDS, calibración y parámetros ADC para ESP32-S3 en AXIÓN - IOT.">
+    <meta property="og:url" content="https://axion-iot.local/views/sensores/ec/index.html">
+    <meta property="og:image" content="../../../assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Sensor de Conductividad Eléctrica (EC / TDS)">
+    <meta name="twitter:description" content="Configuración y calibración del sensor de conductividad eléctrica EC/TDS en AXIÓN - IOT.">
+    <meta name="twitter:image" content="../../../assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Configuración técnica y calibración del sensor de conductividad eléctrica (EC/TDS) en AXIÓN - IOT."
+        }
+    </script>
+
     <link rel="stylesheet" href="../../../css/style.css">
     <link rel="stylesheet" href="../../../css/header.css">
     <link rel="stylesheet" href="../../../css/sidebar.css">
     <link rel="stylesheet" href="../../../css/ec.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -17,17 +48,18 @@
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
 
-        <div id="contenedor-base">
+        <main id="contenedor-base">
+            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;">Configuración del Sensor de Conductividad Eléctrica (EC / TDS) — AXIÓN - IOT</h1>
             <div class="ordenar-div">
 
                 <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Cultivo -->
                 <div class="card">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Alertas y Control del Cultivo</h3>
-                        <button type="button" id="btn-estado-ec" class="txt-descr activo" aria-pressed="true">
+                        <button type="button" id="btn-estado-ec" class="txt-descr activo" aria-pressed="true" aria-live="polite">
                             <span id="estado-ec">Activo</span>
                         </button>
-                    </div>
+                    </header>
 
                     <form id="form-control-ec" class="cuerpo-card" novalidate>
                         <!-- 2. Frecuencia de Lectura -->
@@ -125,25 +157,25 @@
                         <p id="error-control-ec" class="mensaje-error-form" role="alert" hidden></p>
 
                         <!-- 5. Pie de tarjeta -->
-                        <div class="acciones-card">
+                        <footer class="acciones-card">
                             <button type="submit" id="btn-guardar-control-ec" class="btn-modal btn-modal-activar">
                                 Guardar Configuración
                             </button>
-                        </div>
+                        </footer>
                     </form>
                 </div>
 
                 <!-- BLOQUE 2 (Tarjeta Superior Derecha): Calibración de Conductividad (EC / TDS) -->
                 <div class="card">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Calibración de Conductividad (EC / TDS)</h3>
-                    </div>
+                    </header>
 
                     <div class="cuerpo-card">
                         <!-- 1. Encabezado y Registro -->
                         <div class="registro-mantenimiento">
                             <p class="texto-registro">
-                                Última calibración realizada: <strong id="ultima-calibracion-ec">Hace 18 días</strong>
+                                Última calibración realizada: <strong id="ultima-calibracion-ec" aria-live="polite">Hace 18 días</strong>
                             </p>
                             <p class="texto-guia">Se recomienda recalibrar cada 30 días.</p>
                         </div>
@@ -249,7 +281,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-ec-kvalue" class="etiqueta-campo">Factor de Conversión (K_value)</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -262,7 +294,7 @@
                                                     <div id="ayuda-ec-kvalue" class="popover-ayuda" role="region" hidden>
                                                         <p class="texto-guia">Para convertir mS/cm a ppm (TDS = EC × 1000 × K_value).</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-ec-kvalue" name="kValue" class="campo-control" min="0.1" max="1.0" step="0.01" value="0.50" required />
                                         </div>
@@ -270,7 +302,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-ec-alpha" class="etiqueta-campo">Coeficiente Térmico (α)</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -283,7 +315,7 @@
                                                     <div id="ayuda-ec-alpha" class="popover-ayuda" role="region" hidden>
                                                         <p class="texto-guia">Representa 2% (0.02) de ajuste por cada °C respecto a 25 °C.</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-ec-alpha" name="coeficienteTermico" class="campo-control" min="0.001" max="0.1" step="0.001" value="0.02" required />
                                         </div>
@@ -291,7 +323,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-ec-ventana" class="etiqueta-campo">Ventana de Muestreo (N lecturas)</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -304,7 +336,7 @@
                                                     <div id="ayuda-ec-ventana" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                                         <p class="texto-guia">Cantidad de muestras que promedia el filtro para estabilizar la señal analógica.</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-ec-ventana" name="ventanaMuestreo" class="campo-control" min="1" max="200" step="1" value="30" required />
                                         </div>
@@ -314,14 +346,14 @@
                                 <p id="error-tecnico-ec" class="mensaje-error-form" role="alert" hidden></p>
 
                                 <!-- 3. Pie del acordeón técnico -->
-                                <div class="acciones-card acciones-tecnicas">
+                                <footer class="acciones-card acciones-tecnicas">
                                     <button type="button" id="btn-restaurar-fabrica-ec" class="btn-modal btn-modal-cancelar">
                                         Restaurar valores de fábrica
                                     </button>
                                     <button type="submit" id="btn-guardar-tecnico-ec" class="btn-modal btn-modal-activar">
                                         Guardar Configuración Técnica
                                     </button>
-                                </div>
+                                </footer>
 
                             </form>
                         </div>
@@ -329,12 +361,12 @@
                 </div>
 
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Modal de confirmación operativa (EC / TDS V1.0) -->
     <div id="modal-confirmacion-ec" class="modal-ec-overlay" hidden>
-        <div class="modal-ec-caja" role="dialog" aria-modal="true" aria-labelledby="modal-ec-titulo" aria-describedby="modal-ec-mensaje">
+        <div class="modal-ec-caja" role="dialog" aria-modal="true" aria-labelledby="modal-ec-titulo" aria-describedby="modal-ec-mensaje" aria-live="polite">
             <h4 id="modal-ec-titulo" class="modal-ec-titulo"></h4>
             <p id="modal-ec-mensaje" class="modal-ec-mensaje"></p>
             <div class="modal-ec-acciones">

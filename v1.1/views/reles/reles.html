@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Equipos y Relés - AXIÓN IOT</title>
+    <title>AXIÓN - IOT | Control de Equipos y Relés</title>
+    <meta name="description" content="Control manual, modo automático y configuración técnica de pines GPIO para el módulo de 6 relés conectado al ESP32-S3 en AXIÓN - IOT.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://axion-iot.local/views/reles/reles.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Control de Equipos y Relés">
+    <meta property="og:description" content="Administra electrobombas, iluminación y canales auxiliares de tu cultivo hidropónico desde el módulo de 6 relés.">
+    <meta property="og:url" content="https://axion-iot.local/views/reles/reles.html">
+    <meta property="og:image" content="../../assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Control de Equipos y Relés">
+    <meta name="twitter:description" content="Administra electrobombas, reflector y canales de reserva del módulo de relés ESP32-S3.">
+    <meta name="twitter:image" content="../../assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Módulo de control de equipos y relés del sistema hidropónico AXIÓN - IOT."
+        }
+    </script>
+
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/header.css">
     <link rel="stylesheet" href="../../css/sidebar.css">
     <link rel="stylesheet" href="../../css/reles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -17,12 +48,13 @@
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
 
-        <div id="contenedor-base">
+        <main id="contenedor-base">
+            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;">Control de Equipos y Módulo de Relés — AXIÓN - IOT</h1>
             <div class="reles-columna-unica">
 
                 <!-- BLOQUE 1 (Superior): Control Manual y Modo de Operación -->
                 <section class="card card-reles" aria-label="Control manual y modo de operación">
-                    <div class="titulo-card encabezado-reles">
+                    <header class="titulo-card encabezado-reles">
                         <h3>Control Manual y Modo de Operación</h3>
                         <div class="control-modo-global">
                             <label for="modo-operacion-reles" class="etiqueta-campo">Modo:</label>
@@ -31,15 +63,15 @@
                                 <option value="automatico">Modo Automático (Temporizador)</option>
                             </select>
                         </div>
-                    </div>
+                    </header>
 
                     <div class="cuerpo-card">
-                        <p id="aviso-modo-automatico" class="aviso-modo-auto" hidden>
+                        <p id="aviso-modo-automatico" class="aviso-modo-auto" role="status" aria-live="polite" hidden>
                             Modo Automático (Temporizador) activo: el control manual de los relés está bloqueado temporalmente para evitar conflictos con la programación del ESP32-S3.
                         </p>
 
                         <!-- Cuadrícula de 6 tarjetas individuales (Relé 1 al Relé 6) -->
-                        <div class="grid-reles-canales" id="grid-reles-canales"></div>
+                        <div class="grid-reles-canales" id="grid-reles-canales" aria-live="polite"></div>
                     </div>
                 </section>
 
@@ -106,14 +138,14 @@
 
                                 <p id="error-tecnico-reles" class="mensaje-error-form" role="alert" hidden></p>
 
-                                <div class="acciones-card acciones-tecnicas">
+                                <footer class="acciones-card acciones-tecnicas">
                                     <button type="button" id="btn-restaurar-fabrica-reles" class="btn-modal btn-modal-cancelar">
                                         Restaurar valores de fábrica
                                     </button>
                                     <button type="submit" id="btn-guardar-tecnico-reles" class="btn-modal btn-modal-activar">
                                         Guardar Configuración Técnica
                                     </button>
-                                </div>
+                                </footer>
 
                             </form>
                         </div>
@@ -121,12 +153,12 @@
                 </section>
 
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Modal de confirmación operativa -->
     <div id="modal-confirmacion-reles" class="modal-reles-overlay" hidden>
-        <div class="modal-reles-caja" role="dialog" aria-modal="true" aria-labelledby="modal-reles-titulo" aria-describedby="modal-reles-mensaje">
+        <div class="modal-reles-caja" role="dialog" aria-modal="true" aria-labelledby="modal-reles-titulo" aria-describedby="modal-reles-mensaje" aria-live="polite">
             <h4 id="modal-reles-titulo" class="modal-reles-titulo"></h4>
             <p id="modal-reles-mensaje" class="modal-reles-mensaje"></p>
             <div class="modal-reles-acciones">

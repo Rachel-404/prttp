@@ -1,12 +1,12 @@
 <div class="grid-respaldos">
     <!-- Tarjeta Izquierda: Envío Automático al Correo del Administrador -->
     <article class="card">
-        <div class="titulo-card">
+        <header class="titulo-card">
             <h3>Envío Automático al Correo del Administrador</h3>
-            <button type="button" id="btn-estado-backup-correo" class="txt-descr activo" aria-pressed="true">
+            <button type="button" id="btn-estado-backup-correo" class="txt-descr activo" aria-pressed="true" aria-live="polite">
                 <span id="txt-estado-backup-correo">Activo</span>
             </button>
-        </div>
+        </header>
 
         <form id="form-backup-correo" class="cuerpo-card" novalidate>
             <div class="grupo-campo">
@@ -41,7 +41,7 @@
 
             <p id="error-backup-correo" class="mensaje-error-form" role="alert" hidden></p>
 
-            <div class="acciones-card acciones-dobles">
+            <footer class="acciones-card acciones-dobles">
                 <button type="button" id="btn-enviar-copia-ahora" class="btn-modal btn-modal-cancelar btn-con-icono">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -52,18 +52,18 @@
                 <button type="submit" id="btn-guardar-programacion-correo" class="btn-modal btn-modal-activar">
                     Guardar Programación
                 </button>
-            </div>
+            </footer>
         </form>
     </article>
 
     <!-- Tarjeta Derecha: Sincronización con Google Drive Institucional -->
     <article class="card">
-        <div class="titulo-card">
+        <header class="titulo-card">
             <h3>Sincronización con Google Drive Institucional</h3>
-            <button type="button" id="btn-estado-backup-drive" class="txt-descr activo" aria-pressed="true">
+            <button type="button" id="btn-estado-backup-drive" class="txt-descr activo" aria-pressed="true" aria-live="polite">
                 <span id="txt-estado-backup-drive">Conectado</span>
             </button>
-        </div>
+        </header>
 
         <form id="form-backup-drive" class="cuerpo-card" novalidate>
             <div class="grupo-campo">
@@ -100,12 +100,12 @@
 
             <div class="caja-estado-respaldo">
                 <span class="etiqueta-campo">Estado de Sincronización</span>
-                <p id="texto-ultimo-respaldo-drive" class="texto-registro">Último respaldo exitoso: Hoy a las 00:00 hrs</p>
+                <p id="texto-ultimo-respaldo-drive" class="texto-registro" aria-live="polite">Último respaldo exitoso: Hoy a las 00:00 hrs</p>
             </div>
 
             <p id="error-backup-drive" class="mensaje-error-form" role="alert" hidden></p>
 
-            <div class="acciones-card acciones-dobles">
+            <footer class="acciones-card acciones-dobles">
                 <button type="button" id="btn-respaldar-drive-ahora" class="btn-modal btn-modal-cancelar btn-con-icono">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <polyline points="23 4 23 10 17 10"></polyline>
@@ -116,7 +116,7 @@
                 <button type="submit" id="btn-guardar-config-drive" class="btn-modal btn-modal-activar">
                     Guardar Configuración
                 </button>
-            </div>
+            </footer>
         </form>
     </article>
 </div>

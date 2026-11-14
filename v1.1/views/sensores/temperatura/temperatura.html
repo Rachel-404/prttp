@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración Temperatura del Agua</title>
+    <title>AXIÓN - IOT | Sensor de Temperatura del Agua (PT100)</title>
+    <meta name="description" content="Configuración de alertas térmicas, compensación de lectura hacia EC y pH, ajuste de desviación y parámetros PT100 3 hilos en AXIÓN - IOT.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensor temperatura, PT100, RTD, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://axion-iot.local/views/sensores/temperatura/temperatura.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Sensor de Temperatura del Agua (PT100)">
+    <meta property="og:description" content="Configura umbrales térmicos de la solución nutritiva, ajuste de calibración y parámetros PT100 en AXIÓN - IOT.">
+    <meta property="og:url" content="https://axion-iot.local/views/sensores/temperatura/temperatura.html">
+    <meta property="og:image" content="../../../assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Sensor de Temperatura del Agua (PT100)">
+    <meta name="twitter:description" content="Configuración y calibración del sensor de temperatura del agua PT100 en AXIÓN - IOT.">
+    <meta name="twitter:image" content="../../../assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Configuración operativa, ajuste de desviación y parámetros RTD PT100 del sensor de temperatura del agua en AXIÓN - IOT."
+        }
+    </script>
+
     <link rel="stylesheet" href="../../../css/style.css">
     <link rel="stylesheet" href="../../../css/header.css">
     <link rel="stylesheet" href="../../../css/sidebar.css">
     <link rel="stylesheet" href="../../../css/temperatura.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -17,17 +48,18 @@
         <header id="contenedor-navbar"></header>
         <aside id="contenedor-sidebar"></aside>
 
-        <div id="contenedor-base">
+        <main id="contenedor-base">
+            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;">Configuración del Sensor de Temperatura del Agua (PT100) — AXIÓN - IOT</h1>
             <div class="ordenar-div">
 
                 <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Cultivo -->
                 <div class="card">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Alertas y Control del Cultivo</h3>
-                        <button type="button" id="btn-estado-temp" class="txt-descr activo" aria-pressed="true">
+                        <button type="button" id="btn-estado-temp" class="txt-descr activo" aria-pressed="true" aria-live="polite">
                             <span id="estado-temp">Activo</span>
                         </button>
-                    </div>
+                    </header>
 
                     <form id="form-control-temp" class="cuerpo-card" novalidate>
                         <!-- 2. Frecuencia de Lectura -->
@@ -47,7 +79,7 @@
                             <div class="grupo-campo">
                                 <div class="etiqueta-con-ayuda">
                                     <label for="temp-minimo-agua" class="etiqueta-campo">Temp. Mínima Agua (°C)</label>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -60,7 +92,7 @@
                                         <div id="ayuda-temp-min" class="popover-ayuda" role="region" hidden>
                                             <p class="texto-guia">Evita estrés por frío en las raíces (rango físico PT100: 0 a 400 °C).</p>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -78,7 +110,7 @@
                             <div class="grupo-campo">
                                 <div class="etiqueta-con-ayuda">
                                     <label for="temp-maximo-agua" class="etiqueta-campo">Temp. Máxima Agua (°C)</label>
-                                    <span class="ayuda-contextual">
+                                    <div class="ayuda-contextual">
                                         <button
                                             type="button"
                                             class="btn-ayuda-campo"
@@ -91,7 +123,7 @@
                                         <div id="ayuda-temp-max" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                             <p class="texto-guia">Previene pudrición de raíz y falta de oxígeno disuelto.</p>
                                         </div>
-                                    </span>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -111,7 +143,7 @@
                         <div class="fila-switch">
                             <div class="etiqueta-con-ayuda">
                                 <label for="btn-compensar-otros" class="etiqueta-campo">Compensar temperatura a otros sensores (EC y pH)</label>
-                                <span class="ayuda-contextual">
+                                <div class="ayuda-contextual">
                                     <button
                                         type="button"
                                         class="btn-ayuda-campo"
@@ -124,9 +156,9 @@
                                     <div id="ayuda-temp-sync" class="popover-ayuda" role="region" hidden>
                                         <p class="texto-guia">Provee la temperatura real del agua en tiempo real para corregir las lecturas de conductividad (TDS V1.0) y pH.</p>
                                     </div>
-                                </span>
+                                </div>
                             </div>
-                            <button type="button" id="btn-compensar-otros" class="txt-descr activo" aria-pressed="true">
+                            <button type="button" id="btn-compensar-otros" class="txt-descr activo" aria-pressed="true" aria-live="polite">
                                 <span id="texto-compensar-otros">Activada</span>
                             </button>
                         </div>
@@ -134,25 +166,25 @@
                         <p id="error-control-temp" class="mensaje-error-form" role="alert" hidden></p>
 
                         <!-- 5. Pie de tarjeta -->
-                        <div class="acciones-card">
+                        <footer class="acciones-card">
                             <button type="submit" id="btn-guardar-control-temp" class="btn-modal btn-modal-activar">
                                 Guardar Configuración
                             </button>
-                        </div>
+                        </footer>
                     </form>
                 </div>
 
                 <!-- BLOQUE 2 (Tarjeta Superior Derecha): Calibración de Temperatura -->
                 <div class="card">
-                    <div class="titulo-card">
+                    <header class="titulo-card">
                         <h3>Calibración de Temperatura</h3>
-                    </div>
+                    </header>
 
                     <div class="cuerpo-card">
                         <!-- 1. Encabezado y Registro -->
                         <div class="registro-mantenimiento">
                             <p class="texto-registro">
-                                Última calibración realizada: <strong id="ultima-calibracion-temp">Hace 15 días</strong>
+                                Última calibración realizada: <strong id="ultima-calibracion-temp" aria-live="polite">Hace 15 días</strong>
                             </p>
                             <p class="texto-guia">Se recomienda verificar cada 60 días.</p>
                         </div>
@@ -267,7 +299,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-temp-r0" class="etiqueta-campo">Resistencia Base a 0°C R0 (Ω)</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -280,7 +312,7 @@
                                                     <div id="ayuda-temp-r0" class="popover-ayuda" role="region" hidden>
                                                         <p class="texto-guia">Estándar PT100 (100.0 Ω a 0 °C).</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-temp-r0" name="r0Ohmios" class="campo-control" min="50" max="1000" step="0.1" value="100.0" required />
                                         </div>
@@ -288,7 +320,7 @@
                                         <div class="grupo-campo">
                                             <div class="etiqueta-con-ayuda">
                                                 <label for="tec-temp-alpha" class="etiqueta-campo">Coeficiente Térmico α</label>
-                                                <span class="ayuda-contextual">
+                                                <div class="ayuda-contextual">
                                                     <button
                                                         type="button"
                                                         class="btn-ayuda-campo"
@@ -301,7 +333,7 @@
                                                     <div id="ayuda-temp-alpha" class="popover-ayuda popover-ayuda-izq" role="region" hidden>
                                                         <p class="texto-guia">Norma IEC 60751 para sondas RTD de platino (0.00385).</p>
                                                     </div>
-                                                </span>
+                                                </div>
                                             </div>
                                             <input type="number" id="tec-temp-alpha" name="coeficienteAlpha" class="campo-control" min="0.001" max="0.01" step="0.00001" value="0.00385" required />
                                         </div>
@@ -319,14 +351,14 @@
                                 <p id="error-tecnico-temp" class="mensaje-error-form" role="alert" hidden></p>
 
                                 <!-- 3. Pie del acordeón técnico -->
-                                <div class="acciones-card acciones-tecnicas">
+                                <footer class="acciones-card acciones-tecnicas">
                                     <button type="button" id="btn-restaurar-fabrica-temp" class="btn-modal btn-modal-cancelar">
                                         Restaurar valores de fábrica
                                     </button>
                                     <button type="submit" id="btn-guardar-tecnico-temp" class="btn-modal btn-modal-activar">
                                         Guardar Configuración Técnica
                                     </button>
-                                </div>
+                                </footer>
 
                             </form>
                         </div>
@@ -334,18 +366,18 @@
                 </div>
 
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Modal de confirmación operativa (PT100 3 Hilos) -->
     <div id="modal-confirmacion-temp" class="modal-temp-overlay" hidden>
-        <div class="modal-temp-caja" role="dialog" aria-modal="true" aria-labelledby="modal-temp-titulo" aria-describedby="modal-temp-mensaje">
+        <div class="modal-temp-caja" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="modal-temp-titulo" aria-describedby="modal-temp-mensaje">
             <h4 id="modal-temp-titulo" class="modal-temp-titulo"></h4>
             <p id="modal-temp-mensaje" class="modal-temp-mensaje"></p>
-            <div class="modal-temp-acciones">
+            <footer class="modal-temp-acciones">
                 <button type="button" id="btn-modal-cancelar-temp" class="btn-modal btn-modal-cancelar">Cancelar</button>
                 <button type="button" id="btn-modal-aceptar-temp" class="btn-modal btn-modal-pausar">Aceptar</button>
-            </div>
+            </footer>
         </div>
     </div>
 

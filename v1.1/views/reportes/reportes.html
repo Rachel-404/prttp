@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes y Respaldos - AXIÓN IOT</title>
+    <title>AXIÓN - IOT | Reportes y Respaldos</title>
+    <meta name="description" content="Consulta de historial de sensores, exportación en CSV/XLSX/PDF y respaldos automáticos por correo y Google Drive en AXIÓN - IOT.">
+    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://axion-iot.local/views/reportes/reportes.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AXIÓN - IOT">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:title" content="AXIÓN - IOT | Reportes y Respaldos">
+    <meta property="og:description" content="Analiza el historial de variables hidropónicas, exporta reportes y programa copias de seguridad automáticas.">
+    <meta property="og:url" content="https://axion-iot.local/views/reportes/reportes.html">
+    <meta property="og:image" content="../../assets/img/og-axion-preview.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AXIÓN - IOT | Reportes y Respaldos">
+    <meta name="twitter:description" content="Consulta histórica, exportación y respaldos automáticos del sistema hidropónico AXIÓN - IOT.">
+    <meta name="twitter:image" content="../../assets/img/og-axion-preview.png">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "AXIÓN - IOT",
+            "applicationCategory": "AgriculturalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "es",
+            "description": "Módulo de reportes históricos y respaldos automáticos del sistema hidropónico AXIÓN - IOT."
+        }
+    </script>
+
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/header.css">
     <link rel="stylesheet" href="../../css/sidebar.css">
     <link rel="stylesheet" href="../../css/reportes.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
@@ -22,7 +53,7 @@
                 <!-- Barra superior de pestañas estilo navegador -->
                 <header class="encabezado-reportes">
                     <div class="titulo-modulo-reportes">
-                        <h2>Reportes y Respaldos</h2>
+                        <h1>Reportes y Respaldos</h1>
                     </div>
                     <nav class="barra-pestanas" role="tablist" aria-label="Secciones de Reportes y Respaldos">
                         <button
@@ -67,6 +98,7 @@
                     class="contenido-pestana"
                     role="tabpanel"
                     aria-labelledby="tab-historial"
+                    aria-live="polite"
                 ></section>
             </div>
         </main>
@@ -74,7 +106,7 @@
 
     <!-- Modal compartido de confirmación / aviso de exportación -->
     <div id="modal-reportes-overlay" class="modal-reportes-overlay" hidden>
-        <div class="modal-reportes-caja" role="dialog" aria-modal="true" aria-labelledby="modal-reportes-titulo" aria-describedby="modal-reportes-mensaje">
+        <div class="modal-reportes-caja" role="dialog" aria-modal="true" aria-labelledby="modal-reportes-titulo" aria-describedby="modal-reportes-mensaje" aria-live="polite">
             <h4 id="modal-reportes-titulo" class="modal-reportes-titulo"></h4>
             <p id="modal-reportes-mensaje" class="modal-reportes-mensaje"></p>
             <div class="modal-reportes-acciones">
