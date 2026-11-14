@@ -5,6 +5,74 @@ const BASE_URL = document.currentScript
 
 const CLAVE_TEMA = "axion_tema";
 const CLAVE_TIPOGRAFIA = "axion_tipografia";
+const CLAVE_SESION_ADMIN = "axion_sesion_activa";
+
+function obtenerSesionActiva() {
+    try {
+        const raw =
+            localStorage.getItem(CLAVE_SESION_ADMIN) ||
+            sessionStorage.getItem(CLAVE_SESION_ADMIN);
+        if (!raw) return null;
+        const datos = JSON.parse(raw);
+        return datos && datos.autenticado === true ? datos : null;
+    } catch (e) {
+        console.warn("No se pudo leer el estado de sesión:", e);
+        return null;
+    }
+}
+
+function inicializarSesionHeader(headerContainer) {
+    if (!headerContainer) return;
+
+    const btnLogin = headerContainer.querySelector("#btn-header-login");
+    const contenedorActivo = headerContainer.querySelector("#contenedor-sesion-activa");
+    const btnDropdown = headerContainer.querySelector("#btn-perfil-dropdown");
+    const menuDropdown = headerContainer.querySelector("#menu-perfil-header");
+    const btnCerrarSesion = headerContainer.querySelector("#btn-cerrar-sesion");
+
+    if (!btnLogin || !contenedorActivo || !btnDropdown || !menuDropdown) return;
+
+    const sesion = obtenerSesionActiva();
+    const autenticado = Boolean(sesion);
+
+    btnLogin.hidden = autenticado;
+    contenedorActivo.hidden = !autenticado;
+
+    const cerrarMenu = (devolverFoco = false) => {
+        menuDropdown.hidden = true;
+        btnDropdown.setAttribute("aria-expanded", "false");
+        if (devolverFoco) btnDropdown.focus();
+    };
+
+    if (autenticado) {
+        btnDropdown.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const abierto = !menuDropdown.hidden;
+            menuDropdown.hidden = abierto;
+            btnDropdown.setAttribute("aria-expanded", abierto ? "false" : "true");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!contenedorActivo.contains(e.target) && !menuDropdown.hidden) {
+                cerrarMenu(false);
+            }
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && !menuDropdown.hidden) {
+                cerrarMenu(true);
+            }
+        });
+    }
+
+    if (btnCerrarSesion) {
+        btnCerrarSesion.addEventListener("click", () => {
+            localStorage.removeItem(CLAVE_SESION_ADMIN);
+            sessionStorage.removeItem(CLAVE_SESION_ADMIN);
+            window.location.href = new URL("login.html", BASE_URL).href;
+        });
+    }
+}
 
 function resolverTemaClaro(modo) {
     if (modo === "sistema") {
@@ -106,6 +174,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     localStorage.setItem(CLAVE_TEMA, esClaro ? "claro" : "oscuro");
                 });
             }
+
+            inicializarSesionHeader(headerContainer);
         }
     });
 
