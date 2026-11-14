@@ -49,7 +49,10 @@
         <aside id="contenedor-sidebar"></aside>
 
         <main id="contenedor-base">
-            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;">Configuración del Sensor de Temperatura y Humedad Ambiental (DHT22) — AXIÓN - IOT</h1>
+            <header class="encabezado-modulo">
+                <h1>Configuración del Sensor de Temperatura y Humedad Ambiental (DHT22)</h1>
+                <p class="subtitulo-modulo">Control del microclima en invernadero, verificación con termohigrómetro y puerto digital.</p>
+            </header>
             <div class="ordenar-div">
 
                 <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Microclima -->
@@ -298,24 +301,13 @@
                     </div>
                 </div>
 
-                <!-- BLOQUE 3 (Acordeón Inferior Colapsado): Configuración Técnica y Conexión (Solo Técnicos) -->
-                <div class="card card-acordeon" id="bloque-tecnico-dht22">
-                    <button
-                        type="button"
-                        id="btn-acordeon-tecnico-dht22"
-                        class="titulo-card acordeon-tecnico-toggle"
-                        aria-expanded="false"
-                        aria-controls="panel-tecnico-dht22"
-                    >
+                <!-- BLOQUE 3 (Tarjeta Inferior Abierta): Configuración Técnica y Conexión (Solo Técnicos) -->
+                <div class="card card-tecnica-abierta" id="bloque-tecnico-dht22">
+                    <header class="titulo-card">
                         <h3>Configuración Técnica y Conexión (Solo Técnicos)</h3>
-                        <svg class="flecha-desplegable-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </button>
+                    </header>
 
-                    <div id="panel-tecnico-dht22" class="acordeon-tecnico-panel">
-                        <div class="acordeon-tecnico-inner">
-                            <form id="form-tecnico-dht22" class="cuerpo-card" novalidate>
+                    <form id="form-tecnico-dht22" class="cuerpo-card" novalidate>
 
                                 <!-- Subsección A: Cableado y Protocolo Digital (ESP32-S3) -->
                                 <fieldset class="subseccion-tecnica">
@@ -392,7 +384,7 @@
                                                 id="tec-dht22-rango-hum"
                                                 name="rangoOperativoHum"
                                                 class="campo-control campo-solo-lectura"
-                                                value="0 a 100 % HR"
+                                                value="0 a 100% HR"
                                                 readonly
                                             />
                                         </div>
@@ -427,8 +419,6 @@
                                 </footer>
 
                             </form>
-                        </div>
-                    </div>
                 </div>
 
             </div>

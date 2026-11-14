@@ -158,3 +158,23 @@ body.tema-claro .opcionII:hover {
     width: 100%;
     border-radius: 10px;
 }
+
+/* ENCABEZADO COMÚN DE MÓDULO (H1 VISIBLE) */
+.encabezado-modulo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.encabezado-modulo h1 {
+    font-size: var(--font-size-title);
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.25;
+}
+
+.subtitulo-modulo {
+    font-size: var(--font-size-base);
+    color: var(--text-muted);
+}

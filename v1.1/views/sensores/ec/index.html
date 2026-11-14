@@ -49,7 +49,10 @@
         <aside id="contenedor-sidebar"></aside>
 
         <main id="contenedor-base">
-            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;">Configuración del Sensor de Conductividad Eléctrica (EC / TDS) — AXIÓN - IOT</h1>
+            <header class="encabezado-modulo">
+                <h1>Configuración del Sensor de Conductividad Eléctrica (EC)</h1>
+                <p class="subtitulo-modulo">Umbrales de nutrientes, calibración estándar y parámetros ADC del ESP32-S3.</p>
+            </header>
             <div class="ordenar-div">
 
                 <!-- BLOQUE 1 (Tarjeta Superior Izquierda): Alertas y Control del Cultivo -->
@@ -216,22 +219,13 @@
                     </div>
                 </div>
 
-                <!-- BLOQUE 3 (Acordeón Inferior Colapsado): Configuración Técnica y Conexión -->
-                <div class="card card-acordeon" id="bloque-tecnico-ec">
-                    <button
-                        type="button"
-                        id="btn-acordeon-tecnico-ec"
-                        class="titulo-card acordeon-tecnico-toggle"
-                        aria-expanded="false"
-                        aria-controls="panel-tecnico-ec"
-                    >
+                <!-- BLOQUE 3 (Tarjeta Inferior Abierta): Configuración Técnica y Conexión -->
+                <div class="card card-tecnica-abierta" id="bloque-tecnico-ec">
+                    <header class="titulo-card">
                         <h3>Configuración Técnica y Conexión (Solo Técnicos)</h3>
-                        <span class="material-symbols-outlined flecha-desplegable" aria-hidden="true">expand_more</span>
-                    </button>
+                    </header>
 
-                    <div id="panel-tecnico-ec" class="acordeon-tecnico-panel">
-                        <div class="acordeon-tecnico-inner">
-                            <form id="form-tecnico-ec" class="cuerpo-card" novalidate>
+                    <form id="form-tecnico-ec" class="cuerpo-card" novalidate>
 
                                 <!-- 1. Subsección Hardware y ADC (ESP32-S3) -->
                                 <fieldset class="subseccion-tecnica">
@@ -356,8 +350,6 @@
                                 </footer>
 
                             </form>
-                        </div>
-                    </div>
                 </div>
 
             </div>

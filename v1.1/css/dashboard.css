@@ -267,11 +267,79 @@ body.tema-claro .pie-sensor {
 }
 
 .cuerpo-tendencias {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
     padding: 18px 20px 20px 20px;
     width: 100%;
+}
+
+.tendencias-layout {
+    display: flex;
+    align-items: stretch;
+    gap: 24px;
+    width: 100%;
+}
+
+.tendencias-grafica-col {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.tendencias-filtros-panel {
+    flex: 0 0 23%;
+    min-width: 210px;
+    max-width: 270px;
+    padding: 4px 0 4px 20px;
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+}
+
+.titulo-filtros-tendencia {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.campo-filtro-minimal {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.etiqueta-filtro-minimal {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.input-filtro-minimal {
+    width: 100%;
+    padding: 6px 2px;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    color-scheme: dark;
+    transition: border-color 0.2s ease;
+}
+
+body.tema-claro .input-filtro-minimal {
+    color-scheme: light;
+}
+
+.input-filtro-minimal:focus {
+    border-bottom-color: #16a34a;
 }
 
 .contenedor-canvas-tendencias {
@@ -306,6 +374,29 @@ body.tema-claro .pie-sensor {
     flex-shrink: 0;
 }
 
+@media (max-width: 960px) {
+    .tendencias-layout {
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .tendencias-filtros-panel {
+        flex: none;
+        width: 100%;
+        max-width: 100%;
+        padding: 14px 0 0 0;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px 18px;
+    }
+
+    .titulo-filtros-tendencia {
+        grid-column: 1 / -1;
+    }
+}
+
 @media (max-width: 720px) {
     .contenedor-canvas-tendencias {
         height: 250px;
@@ -313,6 +404,10 @@ body.tema-claro .pie-sensor {
 
     .leyenda-tendencias {
         justify-content: flex-start;
+    }
+
+    .tendencias-filtros-panel {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -351,8 +446,8 @@ body.tema-claro .enlace-gestionar-equipos {
 .grid-equipos-dashboard {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    padding: 18px 20px 20px 20px;
+    gap: 10px;
+    padding: 14px 18px 18px 18px;
     width: 100%;
 }
 
@@ -360,18 +455,18 @@ body.tema-claro .enlace-gestionar-equipos {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 12px 14px;
+    gap: 8px;
+    padding: 10px 12px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background-color: var(--bg-main);
 }
 
 .nombre-equipo {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-main);
-    line-height: 1.35;
+    line-height: 1.3;
 }
 
 .estado-equipo {
@@ -428,5 +523,3 @@ body.tema-claro .estado-equipo.apagado {
         grid-template-columns: 1fr;
     }
 }
-
-

@@ -49,7 +49,10 @@
         <aside id="contenedor-sidebar"></aside>
 
         <main id="contenedor-base">
-            <h1 class="sr-only">AXIÓN - IOT — Dashboard de Monitoreo Hidropónico en Tiempo Real</h1>
+            <header class="encabezado-modulo">
+                <h1>Dashboard de Monitoreo en Tiempo Real</h1>
+                <p class="subtitulo-modulo">Supervisión continua de variables fisicoquímicas, actuadores y tendencias del cultivo.</p>
+            </header>
 
             <section class="dashboard-grid" aria-label="Monitoreo del cultivo en tiempo real">
 
@@ -104,7 +107,7 @@
                     </header>
 
                     <div class="cuerpo-sensor" aria-live="polite">
-                        <p id="valor-nivel" class="valor-principal valor-normal">85 %</p>
+                        <p id="valor-nivel" class="valor-principal valor-normal">85%</p>
                         <p id="ref-nivel" class="rango-referencia">Nivel normal: 20% - 90%</p>
                     </div>
 
@@ -231,11 +234,39 @@
                 </header>
 
                 <div class="cuerpo-tendencias">
-                    <div class="contenedor-canvas-tendencias">
-                        <canvas id="grafica-tendencias" role="img" aria-label="Gráfica de tendencia de las últimas 24 horas"></canvas>
-                    </div>
+                    <div class="tendencias-layout">
+                        <div class="tendencias-grafica-col">
+                            <div class="contenedor-canvas-tendencias">
+                                <canvas id="grafica-tendencias" role="img" aria-label="Gráfica de tendencia de las últimas 24 horas"></canvas>
+                            </div>
 
-                    <div id="leyenda-tendencias" class="leyenda-tendencias" aria-label="Leyenda de la gráfica"></div>
+                            <div id="leyenda-tendencias" class="leyenda-tendencias" aria-label="Leyenda de la gráfica"></div>
+                        </div>
+
+                        <aside class="tendencias-filtros-panel" aria-label="Filtros de fecha y hora para tendencias">
+                            <h4 class="titulo-filtros-tendencia">Intervalo de Consulta</h4>
+
+                            <div class="campo-filtro-minimal">
+                                <label for="tendencia-fecha-inicio" class="etiqueta-filtro-minimal">Fecha inicial</label>
+                                <input type="date" id="tendencia-fecha-inicio" name="fechaInicioTendencia" class="input-filtro-minimal">
+                            </div>
+
+                            <div class="campo-filtro-minimal">
+                                <label for="tendencia-hora-inicio" class="etiqueta-filtro-minimal">Hora inicial</label>
+                                <input type="time" id="tendencia-hora-inicio" name="horaInicioTendencia" class="input-filtro-minimal" value="00:00">
+                            </div>
+
+                            <div class="campo-filtro-minimal">
+                                <label for="tendencia-fecha-fin" class="etiqueta-filtro-minimal">Fecha final</label>
+                                <input type="date" id="tendencia-fecha-fin" name="fechaFinTendencia" class="input-filtro-minimal">
+                            </div>
+
+                            <div class="campo-filtro-minimal">
+                                <label for="tendencia-hora-fin" class="etiqueta-filtro-minimal">Hora final</label>
+                                <input type="time" id="tendencia-hora-fin" name="horaFinTendencia" class="input-filtro-minimal" value="23:59">
+                            </div>
+                        </aside>
+                    </div>
                 </div>
             </section>
         </main>

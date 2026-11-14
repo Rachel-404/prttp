@@ -17,13 +17,15 @@
 }
 
 /* ==========================================================================
-   LAYOUT VERTICAL DE UNA SOLA COLUMNA (TARJETAS APILADAS ANCHO COMPLETO)
+   LAYOUT DE DOS COLUMNAS (CUENTA A LA IZQUIERDA, APARIENCIA A LA DERECHA)
    ========================================================================== */
+.config-dos-columnas,
 .config-columna-unica {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     gap: 24px;
     width: 100%;
+    align-items: start;
 }
 
 .card-config-ancha {
@@ -87,9 +89,19 @@
 
 .grid-tipografia-tres {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, max-content));
+    gap: 16px 22px;
     align-items: end;
+}
+
+.grid-tipografia-tres .campo-con-unidad {
+    width: 112px;
+    max-width: 100%;
+}
+
+.grid-tipografia-tres .campo-sin-borde-unidad {
+    text-align: center;
+    padding: 8px 4px 8px 10px;
 }
 
 .grupo-campo {
@@ -345,9 +357,14 @@
     z-index: 2100;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1050px) {
+    .config-dos-columnas,
+    .config-columna-unica {
+        grid-template-columns: 1fr;
+    }
+
     .grid-tipografia-tres {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, max-content));
     }
 }
 
