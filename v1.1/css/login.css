@@ -56,6 +56,12 @@ body.tema-claro .login-card {
     justify-content: center;
 }
 
+.login-logo-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
 .login-titulo {
     font-size: var(--font-size-title);
     font-weight: 700;

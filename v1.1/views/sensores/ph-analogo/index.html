@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXIÓN - IOT | Sensor de pH Analógico 24/7 (SEN0169-V2)</title>
+    <meta name="description" content="Configuración de umbrales, compensación térmica, calibración en milivoltios y mantenimiento preventivo del sensor de pH analógico 24/7 DFRobot SEN0169-V2 en AXIÓN - IOT.">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/header.css">
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/ph.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <main id="contenedor-base">
+            <header class="encabezado-modulo">
+                <h1>Sensor de pH Analógico 24/7 (SEN0169-V2)</h1>
+                <p class="subtitulo-modulo">Monitoreo continuo 24/7 por electrodo analógico BNC, calibración en milivoltios y mantenimiento preventivo.</p>
+            </header>
+
+            <div class="ordenar-div">
+
+                <!-- Tarjeta 1: Control Operativo, Umbrales y Compensación Térmica -->
+                <div class="card">
+                    <header class="titulo-card">
+                        <h3>Umbrales y Compensación Térmica</h3>
+                        <button type="button" id="btn-estado-ph-analogo" class="txt-descr activo" aria-pressed="true" aria-live="polite">
+                            <span id="estado-ph-analogo">Activo</span>
+                        </button>
+                    </header>
+
+                    <form id="form-control-ph-analogo" class="cuerpo-card" novalidate>
+                        <div class="grupo-campo">
+                            <label for="frecuencia-lectura-ph-analogo" class="etiqueta-campo">Frecuencia de lectura</label>
+                            <select id="frecuencia-lectura-ph-analogo" name="frecuenciaLectura" class="campo-control">
+                                <option value="5">Cada 5 segundos</option>
+                                <option value="10" selected>Cada 10 segundos</option>
+                                <option value="30">Cada 30 segundos</option>
+                                <option value="60">Cada 1 minuto</option>
+                                <option value="300">Cada 5 minutos</option>
+                            </select>
+                        </div>
+
+                        <div class="fila-dos-cols">
+                            <div class="grupo-campo">
+                                <label for="ph-analogo-min" class="etiqueta-campo">Umbral Mínimo de pH</label>
+                                <input type="number" id="ph-analogo-min" name="phMinimo" class="campo-control" min="0.00" max="14.00" step="0.01" value="5.50" required />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="ph-analogo-max" class="etiqueta-campo">Umbral Máximo de pH</label>
+                                <input type="number" id="ph-analogo-max" name="phMaximo" class="campo-control" min="0.00" max="14.00" step="0.01" value="6.50" required />
+                            </div>
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label for="fuente-temp-ph-analogo" class="etiqueta-campo">Fuente de Temperatura Externa</label>
+                            <select id="fuente-temp-ph-analogo" name="fuenteTemperatura" class="campo-control">
+                                <option value="pt100" selected>RTD PT100 (Tiempo real)</option>
+                                <option value="sen0708">pH RS485 SEN0708</option>
+                                <option value="fija25">Temperatura Fija 25 °C</option>
+                            </select>
+                        </div>
+
+                        <div class="paso-calibracion" role="note" aria-label="Protección térmica crítica">
+                            <p class="texto-registro"><strong>Protección térmica crítica:</strong> Si el líquido supera los 60 °C se activa una alerta crítica automática para proteger la membrana de vidrio del electrodo.</p>
+                        </div>
+
+                        <footer class="acciones-card">
+                            <button type="submit" class="btn-modal btn-modal-activar">
+                                Guardar Configuración
+                            </button>
+                        </footer>
+                    </form>
+                </div>
+
+                <!-- Tarjeta 2: Asistente de Calibración en 2 Puntos (Milivoltios) -->
+                <div class="card">
+                    <header class="titulo-card">
+                        <h3>Asistente de Calibración en 2 Puntos (Milivoltios)</h3>
+                    </header>
+
+                    <div class="cuerpo-card">
+                        <!-- Paso 1: Buffer Neutro pH 7.0 -->
+                        <div class="paso-calibracion">
+                            <div class="paso-info">
+                                <p class="etiqueta-campo">Paso 1: Buffer Neutro pH 7.0 (Ventana válida: 1322–1678 mV)</p>
+                                <div class="fila-dos-cols">
+                                    <div class="grupo-campo">
+                                        <label for="voltaje-neutro-mv" class="etiqueta-campo">Voltaje Neutro (mV)</label>
+                                        <input type="number" id="voltaje-neutro-mv" name="voltajeNeutro" class="campo-control" step="0.1" value="1500.0" required />
+                                    </div>
+                                    <div class="grupo-campo">
+                                        <span class="etiqueta-campo">Estabilización en curso</span>
+                                        <p class="texto-registro">Tiempo restante: <strong id="contador-estabilizacion" aria-live="polite">60 s</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="paso-accion">
+                                <button type="button" id="btn-estabilizar-neutro" class="btn-modal btn-modal-activar">
+                                    Iniciar Estabilización (60 s)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Paso 2: Buffer Ácido pH 4.0 -->
+                        <div class="paso-calibracion">
+                            <div class="paso-info">
+                                <p class="etiqueta-campo">Paso 2: Buffer Ácido pH 4.0 (Ventana válida: 1854–2210 mV)</p>
+                                <div class="grupo-campo">
+                                    <label for="voltaje-acido-mv" class="etiqueta-campo">Voltaje Ácido (mV)</label>
+                                    <input type="number" id="voltaje-acido-mv" name="voltajeAcido" class="campo-control" step="0.1" value="2032.4" required />
+                                </div>
+                            </div>
+                            <div class="paso-accion">
+                                <button type="button" id="btn-capturar-acido" class="btn-modal btn-modal-activar">
+                                    Capturar Punto Ácido
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Panel de Diagnóstico de Calibración (Solo lectura) -->
+                        <div class="registro-mantenimiento" aria-label="Diagnóstico de calibración">
+                            <p class="etiqueta-campo">Diagnóstico de Calibración (Solo lectura)</p>
+                            <p class="texto-registro">Pendiente de Calibración: <strong>59.16 mV/pH</strong> | Intercepto (Offset): <strong>0.0 mV</strong></p>
+                            <div class="fila-switch">
+                                <span class="texto-registro">Eficiencia / Salud del Electrodo: <strong>98.5 %</strong></span>
+                                <span class="txt-descr activo">Óptimo (85–105 %)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3: Vida Útil y Mantenimiento Preventivo 24/7 -->
+                <div class="card">
+                    <header class="titulo-card">
+                        <h3>Vida Útil y Mantenimiento Preventivo 24/7</h3>
+                    </header>
+
+                    <div class="cuerpo-card">
+                        <div class="grupo-campo">
+                            <label for="fecha-instalacion-electrodo" class="etiqueta-campo">Fecha de Instalación del Electrodo</label>
+                            <input type="date" id="fecha-instalacion-electrodo" name="fechaInstalacion" class="campo-control" value="2026-10-05" />
+                        </div>
+
+                        <div class="registro-mantenimiento">
+                            <p class="texto-registro">
+                                Tiempo acumulado de inmersión: <strong>42.5 días (1,020 horas)</strong>
+                            </p>
+                            <progress value="42.5" max="182.5" aria-label="Progreso de vida útil del electrodo" style="width: 100%; height: 14px; accent-color: #16a34a;"></progress>
+                            <p class="texto-guia">
+                                La vida útil recomendada en inmersión continua 24/7 es de <strong>182.5 días (6 meses / 4,380 horas)</strong>. Se emitirá una advertencia preventiva al aproximarse al límite.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 4: Configuración Técnica y Hardware (BNC / ADC1) -->
+                <div class="card card-tecnica-abierta" id="bloque-tecnico-ph-analogo">
+                    <header class="titulo-card">
+                        <h3>Configuración Técnica y Hardware (BNC / ADC1)</h3>
+                    </header>
+
+                    <form id="form-tecnico-ph-analogo" class="cuerpo-card" novalidate>
+                        <fieldset class="subseccion-tecnica">
+                            <legend class="subtitulo-tecnico">Interfaz Analógica ESP32-S3 y Diagnóstico Eléctrico</legend>
+
+                            <div class="grupo-campo">
+                                <label for="tec-ph-analogo-adc" class="etiqueta-campo">Canal ADC1 (Conector Gravity PH2.0-3P)</label>
+                                <select id="tec-ph-analogo-adc" name="canalAdc1" class="campo-control">
+                                    <option value="GPIO1_ADC1">GPIO1_ADC1</option>
+                                    <option value="GPIO2_ADC1">GPIO2_ADC1</option>
+                                    <option value="GPIO3_ADC1">GPIO3_ADC1</option>
+                                    <option value="GPIO4_ADC1" selected>GPIO4_ADC1</option>
+                                    <option value="GPIO5_ADC1">GPIO5_ADC1</option>
+                                    <option value="GPIO6_ADC1">GPIO6_ADC1</option>
+                                    <option value="GPIO7_ADC1">GPIO7_ADC1</option>
+                                    <option value="GPIO8_ADC1">GPIO8_ADC1</option>
+                                    <option value="GPIO9_ADC1">GPIO9_ADC1</option>
+                                    <option value="GPIO10_ADC1">GPIO10_ADC1</option>
+                                </select>
+                            </div>
+
+                            <div class="registro-mantenimiento" aria-label="Indicadores eléctricos fijos">
+                                <p class="texto-registro">Rango de salida analógica: <strong>0.0 – 3.0 V</strong></p>
+                                <p class="texto-registro">Diagnóstico de cable: <strong>Señal válida (Alerta automática en 0.0 V o 3.0 V)</strong></p>
+                            </div>
+                        </fieldset>
+
+                        <footer class="acciones-card acciones-tecnicas">
+                            <button type="button" id="btn-restaurar-fabrica-ph-analogo" class="btn-modal btn-modal-cancelar">
+                                Restaurar Valores de Fábrica
+                            </button>
+                            <button type="submit" class="btn-modal btn-modal-activar">
+                                Guardar Configuración
+                            </button>
+                        </footer>
+                    </form>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-ph-analogo" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../../js/main.js"></script>
+    <script src="../../../js/ph_analogo.js"></script>
+</body>
+
+</html>
+
