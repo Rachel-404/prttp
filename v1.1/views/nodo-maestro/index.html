@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXIÓN - IOT | Controlador Maestro ESP32-S3 (N16R8)</title>
+    <meta name="description" content="Configuración de red Wi-Fi, BLE, transporte MQTT/HTTP/WebSocket, cola circular LittleFS y Pinout Manager del Controlador Maestro ESP32-S3 en AXIÓN - IOT.">
+    <meta name="author" content="AXIÓN - IOT">
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/header.css">
+    <link rel="stylesheet" href="../../css/sidebar.css">
+    <link rel="stylesheet" href="../../css/reportes.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+
+<body>
+    <div class="layout-container">
+        <header id="contenedor-navbar"></header>
+        <aside id="contenedor-sidebar"></aside>
+
+        <main id="contenedor-base">
+            <header class="encabezado-modulo">
+                <h1>Controlador Maestro ESP32-S3 (N16R8)</h1>
+                <p class="subtitulo-modulo">Gestión de conectividad inalámbrica, transporte de telemetría, buffer offline LittleFS y matriz de pines GPIO.</p>
+            </header>
+
+            <!-- Telemetría de Salud del Hardware -->
+            <section class="grid-tecnico-cuatro" aria-label="Telemetría de salud del controlador" style="margin-bottom: 24px;">
+                <div class="tarjeta-metrica-contraste">
+                    <span class="etiqueta-metrica-contraste">Estado de Red</span>
+                    <strong class="valor-metrica-contraste valor-metrica-normal">Conectado (Wi-Fi -58 dBm)</strong>
+                </div>
+
+                <div class="tarjeta-metrica-contraste">
+                    <span class="etiqueta-metrica-contraste">Alimentación y Consumo</span>
+                    <strong class="valor-metrica-contraste">5V USB-C (~160 mA en TX)</strong>
+                </div>
+
+                <div class="tarjeta-metrica-contraste">
+                    <span class="etiqueta-metrica-contraste">Memoria Flash (LittleFS 16 MB)</span>
+                    <strong class="valor-metrica-contraste">24% Ocupado (10 MB asignados a Buffer)</strong>
+                </div>
+
+                <div class="tarjeta-metrica-contraste">
+                    <span class="etiqueta-metrica-contraste">Memoria PSRAM (8 MB)</span>
+                    <strong class="valor-metrica-contraste">12% Ocupado (Caché FIFO activa)</strong>
+                </div>
+            </section>
+
+            <div class="ordenar-div">
+
+                <!-- Tarjeta 1: Conectividad Wi-Fi, BLE y Transporte de Datos (RF-ESP-01) -->
+                <div class="card">
+                    <header class="titulo-card">
+                        <h3>Conectividad Wi-Fi, BLE y Transporte de Datos</h3>
+                    </header>
+
+                    <form id="form-conectividad-nodo" class="cuerpo-card" novalidate>
+                        <fieldset class="subseccion-tecnica">
+                            <legend class="subtitulo-tecnico">Red Inalámbrica</legend>
+
+                            <div class="fila-dos-cols">
+                                <div class="grupo-campo">
+                                    <label for="nodo-ssid" class="etiqueta-campo">SSID de Red Wi-Fi</label>
+                                    <input type="text" id="nodo-ssid" name="ssid" class="campo-control" value="AXION_LAB_HIDROPONIA" required />
+                                </div>
+
+                                <div class="grupo-campo">
+                                    <label for="nodo-wifi-pass" class="etiqueta-campo">Contraseña Wi-Fi</label>
+                                    <input type="password" id="nodo-wifi-pass" name="wifiPassword" class="campo-control" value="********" required />
+                                </div>
+                            </div>
+
+                            <div class="fila-switch">
+                                <label for="btn-ble-switch" class="etiqueta-campo">Aprovisionamiento Bluetooth 5 LE</label>
+                                <button type="button" id="btn-ble-switch" class="txt-descr activo" aria-pressed="true">
+                                    <span id="texto-ble-switch">Activo</span>
+                                </button>
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="nodo-asignacion-ip" class="etiqueta-campo">Asignación IP</label>
+                                <select id="nodo-asignacion-ip" name="asignacionIp" class="campo-control">
+                                    <option value="dhcp" selected>DHCP Automático</option>
+                                    <option value="estatica">IP Estática</option>
+                                </select>
+                            </div>
+
+                            <div id="grupo-ip-estatica" class="fila-dos-cols" hidden>
+                                <div class="grupo-campo">
+                                    <label for="nodo-ip-local" class="etiqueta-campo">IP Local</label>
+                                    <input type="text" id="nodo-ip-local" name="ipLocal" class="campo-control" value="192.168.1.120" />
+                                </div>
+                                <div class="grupo-campo">
+                                    <label for="nodo-mascara" class="etiqueta-campo">Máscara de Subred</label>
+                                    <input type="text" id="nodo-mascara" name="mascara" class="campo-control" value="255.255.255.0" />
+                                </div>
+                                <div class="grupo-campo">
+                                    <label for="nodo-gateway" class="etiqueta-campo">Gateway</label>
+                                    <input type="text" id="nodo-gateway" name="gateway" class="campo-control" value="192.168.1.1" />
+                                </div>
+                                <div class="grupo-campo">
+                                    <label for="nodo-dns" class="etiqueta-campo">DNS</label>
+                                    <input type="text" id="nodo-dns" name="dns" class="campo-control" value="8.8.8.8" />
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="subseccion-tecnica">
+                            <legend class="subtitulo-tecnico">Protocolo de Transporte</legend>
+
+                            <div class="fila-dos-cols">
+                                <div class="grupo-campo">
+                                    <label for="nodo-protocolo" class="etiqueta-campo">Protocolo</label>
+                                    <select id="nodo-protocolo" name="protocolo" class="campo-control">
+                                        <option value="mqtt" selected>MQTT</option>
+                                        <option value="http">HTTP / REST</option>
+                                        <option value="ws">WebSocket</option>
+                                    </select>
+                                </div>
+
+                                <div class="grupo-campo">
+                                    <label for="nodo-puerto" class="etiqueta-campo">Puerto</label>
+                                    <input type="number" id="nodo-puerto" name="puerto" class="campo-control" min="1" max="65535" value="8883" required />
+                                </div>
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="nodo-broker-url" class="etiqueta-campo">Servidor / Broker URL</label>
+                                <input type="text" id="nodo-broker-url" name="brokerUrl" class="campo-control" value="mqtts://broker.axion-iot.local" required />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="nodo-endpoint" class="etiqueta-campo">Tópico Principal / Endpoint</label>
+                                <input type="text" id="nodo-endpoint" name="endpoint" class="campo-control" value="axion/hidroponia/telemetria" required />
+                            </div>
+
+                            <div class="fila-dos-cols">
+                                <div class="grupo-campo">
+                                    <label for="nodo-usuario" class="etiqueta-campo">Usuario</label>
+                                    <input type="text" id="nodo-usuario" name="usuario" class="campo-control" value="esp32_nodo_01" />
+                                </div>
+
+                                <div class="grupo-campo">
+                                    <label for="nodo-pass-transporte" class="etiqueta-campo">Contraseña</label>
+                                    <input type="password" id="nodo-pass-transporte" name="passTransporte" class="campo-control" value="********" />
+                                </div>
+                            </div>
+
+                            <label class="item-checkbox-variable" for="nodo-tls">
+                                <input type="checkbox" id="nodo-tls" name="habilitarTls" checked />
+                                <span>Habilitar Cifrado TLS / SSL</span>
+                            </label>
+                        </fieldset>
+
+                        <footer class="acciones-card">
+                            <button type="submit" class="btn-modal btn-modal-activar">
+                                Guardar Conectividad
+                            </button>
+                        </footer>
+                    </form>
+                </div>
+
+                <!-- Tarjeta 2: Temporización y Política de Buffer Offline (RF-ESP-02 / CU-19) -->
+                <div class="card">
+                    <header class="titulo-card">
+                        <h3>Temporización y Buffer Offline (LittleFS)</h3>
+                    </header>
+
+                    <form id="form-buffer-nodo" class="cuerpo-card" novalidate>
+                        <div class="fila-dos-cols">
+                            <div class="grupo-campo">
+                                <label for="nodo-muestreo" class="etiqueta-campo">Frecuencia Global de Muestreo (segundos)</label>
+                                <input type="number" id="nodo-muestreo" name="muestreoSeg" class="campo-control" min="1" max="3600" value="2" required />
+                            </div>
+
+                            <div class="grupo-campo">
+                                <label for="nodo-envio" class="etiqueta-campo">Frecuencia de Envío al Servidor (segundos)</label>
+                                <input type="number" id="nodo-envio" name="envioSeg" class="campo-control" min="1" max="3600" value="10" required />
+                            </div>
+                        </div>
+
+                        <fieldset class="subseccion-tecnica">
+                            <legend class="subtitulo-tecnico">Cola Circular Offline (Tolerancia a fallos 72 h)</legend>
+
+                            <div class="fila-dos-cols">
+                                <div class="grupo-campo">
+                                    <label for="nodo-particion" class="etiqueta-campo">Tamaño de Partición LittleFS (MB)</label>
+                                    <input type="number" id="nodo-particion" name="particionMb" class="campo-control" min="1" max="14" value="10" required />
+                                </div>
+
+                                <div class="grupo-campo">
+                                    <label for="nodo-formato-buffer" class="etiqueta-campo">Formato de Registro Compacto</label>
+                                    <select id="nodo-formato-buffer" name="formatoBuffer" class="campo-control">
+                                        <option value="cbor" selected>Binario / CBOR</option>
+                                        <option value="csv">CSV Compacto</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="fila-dos-cols">
+                                <div class="grupo-campo">
+                                    <label for="nodo-lote" class="etiqueta-campo">Tamaño de Lote de Sincronización (tramas)</label>
+                                    <input type="number" id="nodo-lote" name="loteTramas" class="campo-control" min="1" max="500" value="50" required />
+                                </div>
+
+                                <div class="grupo-campo">
+                                    <label for="nodo-desbordamiento" class="etiqueta-campo">Política de Desbordamiento</label>
+                                    <select id="nodo-desbordamiento" name="politicaDesbordamiento" class="campo-control">
+                                        <option value="fifo" selected>Sobrescribir tramas más antiguas (FIFO) y alertar</option>
+                                        <option value="detener">Detener captura al llenar partición</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="paso-calibracion">
+                                <div class="paso-info">
+                                    <span class="etiqueta-campo">Tramas pendientes en buffer</span>
+                                    <p class="texto-registro"><strong>0 tramas (0% de ocupación)</strong></p>
+                                </div>
+                                <div class="paso-accion">
+                                    <button type="button" id="btn-forzar-sync" class="btn-modal btn-modal-cancelar">
+                                        Forzar Sincronización Ahora
+                                    </button>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <footer class="acciones-card">
+                            <button type="submit" class="btn-modal btn-modal-activar">
+                                Guardar Política de Buffer
+                            </button>
+                        </footer>
+                    </form>
+                </div>
+
+                <!-- Tarjeta 3 (Ancho completo): Pinout Manager Interactivo (RF-ESP-03 / CU-15 / RN-06) -->
+                <div class="card">
+                    <header class="titulo-card">
+                        <h3>Pinout Manager Interactivo (ESP32-S3-WROOM-1 N16R8)</h3>
+                        <span class="texto-guia">Matriz de asignación y reserva de pines GPIO</span>
+                    </header>
+
+                    <form id="form-pinout-nodo" class="cuerpo-card" novalidate>
+                        <div class="contenedor-tabla-registros">
+                            <table class="tabla-historial" aria-label="Matriz de asignación de pines GPIO del ESP32-S3">
+                                <thead>
+                                    <tr>
+                                        <th>Pines GPIO</th>
+                                        <th>Periférico / Bus</th>
+                                        <th>Función Asignada</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>GPIO 1</strong></td>
+                                        <td>ADC1</td>
+                                        <td>Sensor EC / TDS</td>
+                                        <td><span class="celda-estado estado-normal"><span class="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 2</strong></td>
+                                        <td>ADC1</td>
+                                        <td>Transmisor de Nivel de Agua</td>
+                                        <td><span class="celda-estado estado-normal"><span class="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 3</strong></td>
+                                        <td>ADC1</td>
+                                        <td>Sensor pH Analógico 24/7</td>
+                                        <td><span class="celda-estado estado-normal"><span class="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 4</strong></td>
+                                        <td>Digital 1-Wire</td>
+                                        <td>Sensor Temperatura y Humedad DHT22</td>
+                                        <td><span class="celda-estado estado-normal"><span class="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 10, 11, 12, 13</strong></td>
+                                        <td>Bus SPI</td>
+                                        <td>Sonda PT100 (Digitalizador MAX31865)</td>
+                                        <td><span class="celda-estado estado-normal"><span class="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 17, 18, 21</strong></td>
+                                        <td>UART1 / RS485</td>
+                                        <td>Sensor pH RS485 (TX, RX, DE/RE)</td>
+                                        <td><span class="celda-estado estado-normal"><span class="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 5, 6, 7, 15, 16, 47</strong></td>
+                                        <td>Salida Digital</td>
+                                        <td>Módulo de 6 Relés (Actuadores)</td>
+                                        <td><span class="celda-estado estado-normal"><span class="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 0, 45, 46</strong></td>
+                                        <td>Sistema</td>
+                                        <td>Pines Strapping de arranque</td>
+                                        <td><span class="celda-estado estado-advertencia"><span class="punto-estado" aria-hidden="true"></span><span>Advertencia</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 19, 20</strong></td>
+                                        <td>USB OTG</td>
+                                        <td>USB Nativo D- / D+</td>
+                                        <td><span class="celda-estado estado-advertencia"><span class="punto-estado" aria-hidden="true"></span><span>Advertencia</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 43, 44</strong></td>
+                                        <td>UART0</td>
+                                        <td>Consola Serial de Depuración</td>
+                                        <td><span class="celda-estado estado-advertencia"><span class="punto-estado" aria-hidden="true"></span><span>Advertencia</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 26 – 32</strong></td>
+                                        <td>Flash SPI</td>
+                                        <td>Reservados Flash SPI Interna</td>
+                                        <td><span class="celda-estado estado-critico"><span class="punto-estado" aria-hidden="true"></span><span>Bloqueado de Fábrica</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 35, 36, 37</strong></td>
+                                        <td>PSRAM Octal</td>
+                                        <td>Ocupados por PSRAM Octal (8 MB)</td>
+                                        <td><span class="celda-estado estado-critico"><span class="punto-estado" aria-hidden="true"></span><span>Bloqueado de Fábrica</span></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <footer class="acciones-card acciones-tecnicas">
+                            <button type="button" id="btn-validar-pinout" class="btn-modal btn-modal-cancelar">
+                                Validar Mapa de Pines
+                            </button>
+                            <button type="submit" class="btn-modal btn-modal-activar">
+                                Guardar y Sincronizar Nodo
+                            </button>
+                        </footer>
+                    </form>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-nodo-maestro" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/nodo_maestro.js"></script>
+</body>
+
+</html>
+
