@@ -9,14 +9,9 @@
 }
 
 @media (max-width: 768px) {
+
     .navbar-titulo {
         display: none;
-    }
-
-    .imagen-movil {
-        display: block;
-        width: 100%;
-        height: auto;
     }
 }
 
@@ -272,6 +267,7 @@ body.tema-claro .item-cerrar-sesion:focus-visible {
 }
 
 @media (max-width: 560px) {
+
     .navbar-acciones {
         gap: 8px;
     }

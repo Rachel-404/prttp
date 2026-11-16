@@ -76,12 +76,6 @@ body.tema-claro .login-card {
     gap: 16px;
 }
 
-.grupo-campo {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
 .etiqueta-campo {
     font-size: var(--font-size-base);
     font-weight: 600;
@@ -312,54 +306,6 @@ body.tema-claro .login-feedback.es-exito {
     border-radius: 4px;
 }
 
-/* MODAL DE RECUPERACIÓN DE ACCESO */
-.modal-login-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 2000;
-}
-
-.modal-login-caja {
-    width: 100%;
-    max-width: 440px;
-    background-color: var(--bg-card);
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.modal-login-titulo {
-    margin: 0;
-    font-size: var(--font-size-subtitle);
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.modal-login-mensaje {
-    margin: 0;
-    font-size: var(--font-size-base);
-    line-height: 1.5;
-    color: var(--text-muted);
-}
-
-.modal-login-acciones {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 4px;
-}
-
 .modal-login-form {
     display: flex;
     flex-direction: column;
@@ -376,25 +322,9 @@ body.tema-claro .login-feedback.es-exito {
     background-color: var(--hover-bg);
 }
 
-.toast-login {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    max-width: 420px;
-    background: var(--bg-navbar);
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    z-index: 2100;
-}
-
 @media (max-width: 480px) {
+
     .login-card {
         padding: 22px 18px 18px 18px;
     }
 }
-

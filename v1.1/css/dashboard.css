@@ -235,12 +235,14 @@ body.tema-claro .pie-sensor {
    DISEÑO ADAPTATIVO (RESPONSIVE)
    ========================================================================== */
 @media (max-width: 1150px) {
+
     .dashboard-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 720px) {
+
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
@@ -419,6 +421,7 @@ body.tema-claro .input-filtro-minimal {
 }
 
 @media (max-width: 960px) {
+
     .tendencias-layout {
         flex-direction: column;
         gap: 18px;
@@ -442,6 +445,7 @@ body.tema-claro .input-filtro-minimal {
 }
 
 @media (max-width: 720px) {
+
     .contenedor-canvas-tendencias {
         height: 250px;
     }
@@ -557,12 +561,14 @@ body.tema-claro .estado-equipo.apagado {
 }
 
 @media (max-width: 1150px) {
+
     .grid-equipos-dashboard {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 720px) {
+
     .grid-equipos-dashboard {
         grid-template-columns: 1fr;
     }

@@ -16,18 +16,6 @@
     color: var(--text-muted);
 }
 
-/* ==========================================================================
-   LAYOUT DE DOS COLUMNAS (CUENTA A LA IZQUIERDA, APARIENCIA A LA DERECHA)
-   ========================================================================== */
-.config-dos-columnas,
-.config-columna-unica {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    gap: 24px;
-    width: 100%;
-    align-items: start;
-}
-
 .card-config-ancha {
     width: 100%;
     min-height: unset;
@@ -48,14 +36,6 @@
     font-size: var(--font-size-subtitle);
     font-weight: 700;
     color: var(--text-main);
-}
-
-.cuerpo-card {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    padding: 18px 20px 20px 20px;
-    width: 100%;
 }
 
 /* Grilla interna equilibrada para evitar inputs estirados en tarjetas anchas */
@@ -102,12 +82,6 @@
 .grid-tipografia-tres .campo-sin-borde-unidad {
     text-align: center;
     padding: 8px 4px 8px 10px;
-}
-
-.grupo-campo {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
 }
 
 .etiqueta-campo {
@@ -213,30 +187,6 @@
     word-break: break-word;
 }
 
-/* ==========================================================================
-   ACCIONES, ENLACES Y BOTONES
-   ========================================================================== */
-[hidden] {
-    display: none !important;
-}
-
-.mensaje-error-form {
-    margin: 0;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #991b1b;
-    background-color: #7f1d1d;
-    color: #fee2e2;
-    font-size: var(--font-size-base);
-}
-
-.acciones-card {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding-top: 4px;
-}
-
 .acciones-cuenta {
     justify-content: space-between;
     flex-wrap: wrap;
@@ -292,76 +242,7 @@
     background: #b45309;
 }
 
-/* ==========================================================================
-   MODAL Y TOAST
-   ========================================================================== */
-.modal-config-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 2000;
-}
-
-.modal-config-caja {
-    width: 100%;
-    max-width: 440px;
-    background: var(--bg-navbar);
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.modal-config-titulo {
-    margin: 0;
-    font-size: var(--font-size-subtitle);
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.modal-config-mensaje {
-    margin: 0;
-    font-size: var(--font-size-base);
-    line-height: 1.5;
-    color: var(--text-muted);
-}
-
-.modal-config-acciones {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 4px;
-}
-
-.toast-config {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--bg-navbar);
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    z-index: 2100;
-}
-
 @media (max-width: 1050px) {
-    .config-dos-columnas,
-    .config-columna-unica {
-        grid-template-columns: 1fr;
-    }
 
     .grid-tipografia-tres {
         grid-template-columns: repeat(2, minmax(0, max-content));
@@ -369,6 +250,7 @@
 }
 
 @media (max-width: 768px) {
+
     .grid-cuenta-campos,
     .grid-tipografia-tres {
         grid-template-columns: 1fr;

@@ -426,11 +426,11 @@
     </div>
 
     <!-- Modal de confirmación operativa (DHT22) -->
-    <div id="modal-confirmacion-dht22" class="modal-dht22-overlay" hidden>
-        <div class="modal-dht22-caja" role="dialog" aria-modal="true" aria-labelledby="modal-dht22-titulo" aria-describedby="modal-dht22-mensaje" aria-live="polite">
-            <h4 id="modal-dht22-titulo" class="modal-dht22-titulo"></h4>
-            <p id="modal-dht22-mensaje" class="modal-dht22-mensaje"></p>
-            <div class="modal-dht22-acciones">
+    <div id="modal-confirmacion-dht22" class="modal-overlay" hidden>
+        <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-mensaje" aria-live="polite">
+            <h4 id="modal-titulo" class="modal-titulo"></h4>
+            <p id="modal-mensaje" class="modal-mensaje"></p>
+            <div class="modal-acciones">
                 <button type="button" id="btn-modal-cancelar-dht22" class="btn-modal btn-modal-cancelar">Cancelar</button>
                 <button type="button" id="btn-modal-aceptar-dht22" class="btn-modal btn-modal-pausar">Aceptar</button>
             </div>
@@ -438,7 +438,7 @@
     </div>
 
     <!-- Notificación breve de orden enviada -->
-    <div id="toast-dht22" class="toast-dht22" role="status" aria-live="polite" hidden></div>
+    <div id="toast-notificacion" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
 
     <script src="../../../js/main.js"></script>
     <script src="../../../js/temperatura_humedad.js"></script>
