@@ -402,6 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const btnAnt = document.getElementById("btn-pagina-anterior");
         const btnSig = document.getElementById("btn-pagina-siguiente");
         const btnsExportar = Array.from(document.querySelectorAll(".btn-exportar-formato"));
+        const btnSuperponer = document.getElementById("btn-superponer-lecturas");
 
         if (!formFiltros || !inputInicio || !inputFin || !selectIntervalo) return;
 
@@ -497,6 +498,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
         });
+
+        if (btnSuperponer) {
+            btnSuperponer.addEventListener("click", () => {
+                mostrarToast("Lecturas de bitácora manual superpuestas para contraste estadístico.");
+            });
+        }
     }
 
     function actualizarBadgeCorreo(btn, txt, activo) {

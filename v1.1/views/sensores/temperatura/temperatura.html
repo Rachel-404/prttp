@@ -244,8 +244,7 @@
                                         <div class="grupo-campo">
                                             <label for="tec-temp-conexion" class="etiqueta-campo">Tipo de Conexión</label>
                                             <select id="tec-temp-conexion" name="tipoConexion" class="campo-control">
-                                                <option value="3_hilos" selected>3 Hilos (Compensación de cable activa)</option>
-                                                <option value="2_hilos">2 Hilos</option>
+                                                <option value="3_hilos" selected>3 hilos (Compensación de cable)</option>
                                             </select>
                                         </div>
 
@@ -262,21 +261,76 @@
                                             <label for="tec-temp-interfaz" class="etiqueta-campo">Interfaz / Módulo Lector</label>
                                             <select id="tec-temp-interfaz" name="interfazLector" class="campo-control">
                                                 <option value="SPI_MAX31865" selected>SPI - Digitalizador MAX31865</option>
-                                                <option value="ANALOG_ADC">Analógico (Transmisor ADC)</option>
+                                                <option value="ANALOG_ADC">Transmisor Analógico (ADC)</option>
                                             </select>
                                         </div>
                                     </div>
 
-                                    <div class="grupo-campo">
-                                        <label for="tec-temp-pines" class="etiqueta-campo">Pines ESP32-S3</label>
-                                        <input
-                                            type="text"
-                                            id="tec-temp-pines"
-                                            name="pinesEsp32"
-                                            class="campo-control"
-                                            value="CS: GPIO 5, SCK: GPIO 18, MISO: GPIO 19, MOSI: GPIO 23"
-                                            required
-                                        />
+                                    <div id="grupo-temp-spi" class="grid-tecnico-cuatro">
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-pin-cs" class="etiqueta-campo">Pin CS</label>
+                                            <select id="tec-temp-pin-cs" name="pinCs" class="campo-control">
+                                                <option value="GPIO5" selected>GPIO 5</option>
+                                                <option value="GPIO10">GPIO 10</option>
+                                                <option value="GPIO15">GPIO 15</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-pin-mosi" class="etiqueta-campo">Pin MOSI</label>
+                                            <select id="tec-temp-pin-mosi" name="pinMosi" class="campo-control">
+                                                <option value="GPIO11">GPIO 11</option>
+                                                <option value="GPIO23" selected>GPIO 23</option>
+                                                <option value="GPIO35">GPIO 35</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-pin-miso" class="etiqueta-campo">Pin MISO</label>
+                                            <select id="tec-temp-pin-miso" name="pinMiso" class="campo-control">
+                                                <option value="GPIO13">GPIO 13</option>
+                                                <option value="GPIO19" selected>GPIO 19</option>
+                                                <option value="GPIO37">GPIO 37</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-pin-sck" class="etiqueta-campo">Pin SCK</label>
+                                            <select id="tec-temp-pin-sck" name="pinSck" class="campo-control">
+                                                <option value="GPIO12">GPIO 12</option>
+                                                <option value="GPIO18" selected>GPIO 18</option>
+                                                <option value="GPIO36">GPIO 36</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div id="grupo-temp-adc" class="fila-dos-cols" hidden>
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-canal-adc" class="etiqueta-campo">Canal ADC1</label>
+                                            <select id="tec-temp-canal-adc" name="canalAdc1" class="campo-control">
+                                                <option value="GPIO1" selected>GPIO 1 (ADC1)</option>
+                                                <option value="GPIO2">GPIO 2 (ADC1)</option>
+                                                <option value="GPIO3">GPIO 3 (ADC1)</option>
+                                                <option value="GPIO4">GPIO 4 (ADC1)</option>
+                                                <option value="GPIO5">GPIO 5 (ADC1)</option>
+                                                <option value="GPIO6">GPIO 6 (ADC1)</option>
+                                                <option value="GPIO7">GPIO 7 (ADC1)</option>
+                                                <option value="GPIO8">GPIO 8 (ADC1)</option>
+                                                <option value="GPIO9">GPIO 9 (ADC1)</option>
+                                                <option value="GPIO10">GPIO 10 (ADC1)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-rango-adc" class="etiqueta-campo">Rango de escalamiento (°C)</label>
+                                            <input type="text" id="tec-temp-rango-adc" name="rangoEscalamiento" class="campo-control" value="0 a 100 °C" />
+                                        </div>
+                                    </div>
+
+                                    <div class="registro-mantenimiento" aria-label="Diagnóstico de sonda PT100">
+                                        <p class="texto-registro">
+                                            Estado del cable: <strong>Normal (3 hilos)</strong> | Resistencia medida: <strong>109.13 Ω</strong>
+                                        </p>
                                     </div>
                                 </fieldset>
 
@@ -338,6 +392,16 @@
                                                 <option value="60Hz" selected>60 Hz (Perú / América)</option>
                                                 <option value="50Hz">50 Hz (Europa)</option>
                                             </select>
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-coef-a" class="etiqueta-campo">Coeficiente A (Callendar-Van Dusen)</label>
+                                            <input type="number" id="tec-temp-coef-a" name="coeficienteA" class="campo-control" step="0.0000001" value="0.0039083" readonly />
+                                        </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-temp-coef-b" class="etiqueta-campo">Coeficiente B (Callendar-Van Dusen)</label>
+                                            <input type="number" id="tec-temp-coef-b" name="coeficienteB" class="campo-control" step="0.0000000001" value="-0.0000005775" readonly />
                                         </div>
                                     </div>
                                 </fieldset>

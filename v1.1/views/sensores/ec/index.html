@@ -242,6 +242,9 @@
                                                 <option value="GPIO5_ADC1">GPIO 5 (ADC1)</option>
                                                 <option value="GPIO6_ADC1">GPIO 6 (ADC1)</option>
                                                 <option value="GPIO7_ADC1">GPIO 7 (ADC1)</option>
+                                                <option value="GPIO8_ADC1">GPIO 8 (ADC1)</option>
+                                                <option value="GPIO9_ADC1">GPIO 9 (ADC1)</option>
+                                                <option value="GPIO10_ADC1">GPIO 10 (ADC1)</option>
                                             </select>
                                         </div>
 
@@ -264,6 +267,22 @@
                                                 <option value="12" selected>12 bits (4095 niveles)</option>
                                             </select>
                                         </div>
+
+                                        <div class="grupo-campo">
+                                            <label for="tec-ec-atenuacion" class="etiqueta-campo">Atenuación del ADC interno</label>
+                                            <select id="tec-ec-atenuacion" name="atenuacionAdc" class="campo-control">
+                                                <option value="0db">0 dB (hasta ~1.1 V)</option>
+                                                <option value="2.5db">2.5 dB (hasta ~1.5 V)</option>
+                                                <option value="6db">6 dB (hasta ~2.2 V)</option>
+                                                <option value="11db" selected>11 dB (hasta ~3.3 V)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="registro-mantenimiento" aria-label="Parámetros eléctricos nominales">
+                                        <p class="texto-registro">
+                                            Parámetros eléctricos nominales: <strong>Alimentación: 3.3–5.5 V</strong> | <strong>Consumo: 3–6 mA</strong> | <strong>Excitación: Onda AC 1 kHz</strong>
+                                        </p>
                                     </div>
                                 </fieldset>
 

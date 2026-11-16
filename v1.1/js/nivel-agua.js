@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const FRECUENCIAS_VALIDAS = [5, 10, 30, 60, 300];
     const UNIDADES_VALIDAS = ["cm", "pct", "L"];
     const FORMAS_VALIDAS = ["rectangular", "cilindrico"];
-    const SALIDAS_VALIDAS = ["4-20mA", "0.5-4.5V", "modbus"];
+    const SALIDAS_VALIDAS = ["4-20mA", "0.5-4.5V", "0.5-4.5V-std", "0.5-4.5V-rad", "modbus"];
     const PINES_ADC_VALIDOS = ["GPIO1", "GPIO2", "GPIO3", "GPIO4", "GPIO5", "GPIO6", "GPIO7"];
     const BAUDS_VALIDOS = [4800, 9600, 19200, 38400];
     const RANGOS_URL_MAX_KPA = {
@@ -239,8 +239,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function actualizarVisibilidadSalidaElectrica() {
         const salida = selectSalida ? selectSalida.value : "4-20mA";
+        const grupoVsup = document.getElementById("grupo-vsup-radiometrica");
         if (grupo420) grupo420.hidden = salida !== "4-20mA";
-        if (grupoVdc) grupoVdc.hidden = salida !== "0.5-4.5V";
+        if (grupoVdc) grupoVdc.hidden = salida !== "0.5-4.5V" && salida !== "0.5-4.5V-std" && salida !== "0.5-4.5V-rad";
+        if (grupoVsup) grupoVsup.hidden = salida !== "0.5-4.5V-rad";
         if (grupoModbus) grupoModbus.hidden = salida !== "modbus";
     }
 
@@ -487,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!PINES_ADC_VALIDOS.includes(pinAdc420)) {
                 return { valido: false, error: "Selecciona un pin ADC1 válido del ESP32-S3." };
             }
-        } else if (tipoSalida === "0.5-4.5V") {
+        } else if (tipoSalida === "0.5-4.5V" || tipoSalida === "0.5-4.5V-std" || tipoSalida === "0.5-4.5V-rad") {
             pinAdcVdc = selectAdcVdc.value;
             factorDivisorTension = Number.parseFloat(inputDivisorVdc.value);
             if (!PINES_ADC_VALIDOS.includes(pinAdcVdc)) {

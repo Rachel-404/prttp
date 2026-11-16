@@ -138,15 +138,34 @@
         <div class="modal-login-caja" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="modal-recuperar-titulo" aria-describedby="modal-recuperar-mensaje">
             <h2 id="modal-recuperar-titulo" class="modal-login-titulo">Recuperación de Acceso</h2>
             <p id="modal-recuperar-mensaje" class="modal-login-mensaje">
-                Para restablecer la contraseña del Administrador Único, comunícate con el soporte técnico institucional o utiliza el token de recuperación física en el controlador ESP32-S3 desde el módulo de configuración.
+                Ingresa el token de recuperación física del controlador ESP32-S3 y define una nueva contraseña para el Administrador Único.
             </p>
-            <footer class="modal-login-acciones">
-                <button type="button" id="btn-cerrar-recuperar" class="btn-modal btn-modal-activar">
-                    Entendido
-                </button>
-            </footer>
+            <form id="form-recuperar-acceso" class="modal-login-form" novalidate>
+                <div class="grupo-campo">
+                    <label for="rec-token" class="etiqueta-campo">Token de Recuperación de Emergencia</label>
+                    <input type="text" id="rec-token" name="tokenRecuperacion" class="campo-control" placeholder="AXN-REC-XXXX-XXXX" required>
+                </div>
+                <div class="grupo-campo">
+                    <label for="rec-password-nueva" class="etiqueta-campo">Nueva Contraseña</label>
+                    <input type="password" id="rec-password-nueva" name="passwordNueva" class="campo-control" placeholder="Mínimo 8 caracteres" required>
+                </div>
+                <div class="grupo-campo">
+                    <label for="rec-password-confirmar" class="etiqueta-campo">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="rec-password-confirmar" name="passwordConfirmar" class="campo-control" placeholder="Repite la nueva contraseña" required>
+                </div>
+                <footer class="modal-login-acciones">
+                    <button type="button" id="btn-cerrar-recuperar" class="btn-modal btn-modal-cancelar">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-modal btn-modal-activar">
+                        Restablecer Contraseña
+                    </button>
+                </footer>
+            </form>
         </div>
     </div>
+
+    <div id="toast-login" class="toast-login" role="status" aria-live="polite" hidden></div>
 
     <script src="js/login.js"></script>
 </body>

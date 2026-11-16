@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AXIÓN - IOT | Dashboard de Monitoreo Hidropónico</title>
-    <meta name="description" content="Panel principal de monitoreo en tiempo real para cultivos hidropónicos AXIÓN - IOT: pH, conductividad eléctrica (EC), nivel de agua, temperatura, actuadores y tendencias.">
-    <meta name="keywords" content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
+    <meta name="description"
+        content="Panel principal de monitoreo en tiempo real para cultivos hidropónicos AXIÓN - IOT: pH, conductividad eléctrica (EC), nivel de agua, temperatura, actuadores y tendencias.">
+    <meta name="keywords"
+        content="hidroponía, IoT, monitoreo agrícola, sensores pH, conductividad eléctrica, ESP32-S3, AXIÓN">
     <meta name="author" content="AXIÓN - IOT">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://axion-iot.local/index.html">
@@ -15,13 +17,15 @@
     <meta property="og:site_name" content="AXIÓN - IOT">
     <meta property="og:locale" content="es_PE">
     <meta property="og:title" content="AXIÓN - IOT | Dashboard de Monitoreo Hidropónico">
-    <meta property="og:description" content="Supervisa en tiempo real sensores de pH, EC, nivel de agua, temperatura, actuadores y gráficas de tendencia de tu sistema hidropónico.">
+    <meta property="og:description"
+        content="Supervisa en tiempo real sensores de pH, EC, nivel de agua, temperatura, actuadores y gráficas de tendencia de tu sistema hidropónico.">
     <meta property="og:url" content="https://axion-iot.local/index.html">
     <meta property="og:image" content="assets/img/og-axion-preview.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="AXIÓN - IOT | Dashboard de Monitoreo Hidropónico">
-    <meta name="twitter:description" content="Supervisa en tiempo real sensores de pH, EC, nivel de agua, temperatura y actuadores en tu cultivo hidropónico.">
+    <meta name="twitter:description"
+        content="Supervisa en tiempo real sensores de pH, EC, nivel de agua, temperatura y actuadores en tu cultivo hidropónico.">
     <meta name="twitter:image" content="assets/img/og-axion-preview.png">
 
     <script type="application/ld+json">
@@ -49,10 +53,6 @@
         <aside id="contenedor-sidebar"></aside>
 
         <main id="contenedor-base">
-            <header class="encabezado-modulo">
-                <h1>Dashboard de Monitoreo en Tiempo Real</h1>
-                <p class="subtitulo-modulo">Supervisión continua de variables fisicoquímicas, actuadores y tendencias del cultivo.</p>
-            </header>
 
             <section class="dashboard-grid" aria-label="Monitoreo del cultivo en tiempo real">
 
@@ -69,10 +69,16 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-ec" class="valor-principal valor-normal">1200 µS/cm</p>
                         <p id="ref-ec" class="rango-referencia">Rango normal: 800 - 1800 µS/cm</p>
+                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
+                            <span class="submetrica-item">Voltaje crudo: <strong>1.184 V</strong></span>
+                            <span class="submetrica-item">ADC Raw: <strong>1469</strong></span>
+                            <span class="submetrica-item">Temp. Usada: <strong>23.45 °C</strong></span>
+                        </div>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-ec" class="dato-inferior">TDS Estimado: 600 ppm</span>
+                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -89,10 +95,16 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-ph" class="valor-principal valor-normal">6.10 pH</p>
                         <p id="ref-ph" class="rango-referencia">Rango normal: 5.50 - 6.50 pH</p>
+                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
+                            <span class="submetrica-item">Temp. Interna: <strong>23.5 °C</strong></span>
+                            <span class="submetrica-item">Estado Modbus: <strong>OK</strong></span>
+                            <span class="submetrica-item">Error CRC: <strong>0x0000</strong></span>
+                        </div>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-ph" class="dato-inferior">Sensor RS485 Industrial</span>
+                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -109,10 +121,16 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-nivel" class="valor-principal valor-normal">85%</p>
                         <p id="ref-nivel" class="rango-referencia">Nivel normal: 20% - 90%</p>
+                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
+                            <span class="submetrica-item">Profundidad real: <strong>1.133 m</strong></span>
+                            <span class="submetrica-item">Presión: <strong>10.56 kPa</strong></span>
+                            <span class="submetrica-item">Señal cruda: <strong>12.45 mA</strong></span>
+                        </div>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-nivel" class="dato-inferior">Volumen estimado: 350 Litros</span>
+                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -129,10 +147,15 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-temp-agua" class="valor-principal valor-normal">21.5 °C</p>
                         <p id="ref-temp-agua" class="rango-referencia">Rango normal: 18.0 - 24.0 °C</p>
+                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
+                            <span class="submetrica-item">Resistencia: <strong>109.13 Ω</strong></span>
+                            <span class="submetrica-item">Estado cable: <strong>Normal (3 hilos)</strong></span>
+                        </div>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-temp-agua" class="dato-inferior">Compensando pH y EC</span>
+                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -160,6 +183,12 @@
                             <strong id="actualizacion-esp32" class="valor-sistema">Hace 2 segundos</strong>
                         </li>
                     </ul>
+
+                    <div class="submetricas-tecnicas submetricas-sistema"
+                        aria-label="Métricas de diagnóstico del microcontrolador">
+                        <span class="submetrica-item">Consumo estimado: <strong>160 mA</strong></span>
+                        <span class="submetrica-item">Buffer offline: <strong>0% (0 tramas pendientes)</strong></span>
+                    </div>
                 </article>
 
             </section>
@@ -237,33 +266,40 @@
                     <div class="tendencias-layout">
                         <div class="tendencias-grafica-col">
                             <div class="contenedor-canvas-tendencias">
-                                <canvas id="grafica-tendencias" role="img" aria-label="Gráfica de tendencia de las últimas 24 horas"></canvas>
+                                <canvas id="grafica-tendencias" role="img"
+                                    aria-label="Gráfica de tendencia de las últimas 24 horas"></canvas>
                             </div>
 
-                            <div id="leyenda-tendencias" class="leyenda-tendencias" aria-label="Leyenda de la gráfica"></div>
+                            <div id="leyenda-tendencias" class="leyenda-tendencias" aria-label="Leyenda de la gráfica">
+                            </div>
                         </div>
 
                         <aside class="tendencias-filtros-panel" aria-label="Filtros de fecha y hora para tendencias">
                             <h4 class="titulo-filtros-tendencia">Intervalo de Consulta</h4>
 
                             <div class="campo-filtro-minimal">
-                                <label for="tendencia-fecha-inicio" class="etiqueta-filtro-minimal">Fecha inicial</label>
-                                <input type="date" id="tendencia-fecha-inicio" name="fechaInicioTendencia" class="input-filtro-minimal">
+                                <label for="tendencia-fecha-inicio" class="etiqueta-filtro-minimal">Fecha
+                                    inicial</label>
+                                <input type="date" id="tendencia-fecha-inicio" name="fechaInicioTendencia"
+                                    class="input-filtro-minimal">
                             </div>
 
                             <div class="campo-filtro-minimal">
                                 <label for="tendencia-hora-inicio" class="etiqueta-filtro-minimal">Hora inicial</label>
-                                <input type="time" id="tendencia-hora-inicio" name="horaInicioTendencia" class="input-filtro-minimal" value="00:00">
+                                <input type="time" id="tendencia-hora-inicio" name="horaInicioTendencia"
+                                    class="input-filtro-minimal" value="00:00">
                             </div>
 
                             <div class="campo-filtro-minimal">
                                 <label for="tendencia-fecha-fin" class="etiqueta-filtro-minimal">Fecha final</label>
-                                <input type="date" id="tendencia-fecha-fin" name="fechaFinTendencia" class="input-filtro-minimal">
+                                <input type="date" id="tendencia-fecha-fin" name="fechaFinTendencia"
+                                    class="input-filtro-minimal">
                             </div>
 
                             <div class="campo-filtro-minimal">
                                 <label for="tendencia-hora-fin" class="etiqueta-filtro-minimal">Hora final</label>
-                                <input type="time" id="tendencia-hora-fin" name="horaFinTendencia" class="input-filtro-minimal" value="23:59">
+                                <input type="time" id="tendencia-hora-fin" name="horaFinTendencia"
+                                    class="input-filtro-minimal" value="23:59">
                             </div>
                         </aside>
                     </div>

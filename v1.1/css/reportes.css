@@ -471,10 +471,79 @@
     z-index: 2100;
 }
 
+/* ==========================================================================
+   SECCIÓN DE CONTRASTE MANUAL VS. IOT (RF-PUB-06)
+   ========================================================================== */
+.fila-carga-bitacora {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+}
+
+.grupo-archivo-bitacora {
+    flex: 1 1 280px;
+}
+
+.campo-archivo-csv {
+    padding: 7px 10px;
+    cursor: pointer;
+}
+
+.campo-archivo-csv::file-selector-button {
+    margin-right: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: calc(var(--font-size-base) - 1px);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.grid-metricas-contraste {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.tarjeta-metrica-contraste {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.etiqueta-metrica-contraste {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.valor-metrica-contraste {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.valor-metrica-normal {
+    color: #22c55e;
+}
+
+body.tema-claro .valor-metrica-normal {
+    color: #16a34a;
+}
+
 @media (max-width: 1024px) {
     .grid-filtros-fecha,
     .grid-checkbox-variables,
-    .grid-respaldos {
+    .grid-respaldos,
+    .grid-metricas-contraste {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
@@ -482,7 +551,8 @@
 @media (max-width: 768px) {
     .grid-filtros-fecha,
     .grid-checkbox-variables,
-    .grid-respaldos {
+    .grid-respaldos,
+    .grid-metricas-contraste {
         grid-template-columns: 1fr;
     }
 

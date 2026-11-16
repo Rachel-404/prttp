@@ -20,6 +20,7 @@
                 <div class="grupo-campo">
                     <label for="filtro-intervalo" class="etiqueta-campo">Intervalo de Datos</label>
                     <select id="filtro-intervalo" name="intervalo" class="campo-control">
+                        <option value="crudo">Crudo (Sin agregación)</option>
                         <option value="1m">Cada 1 minuto</option>
                         <option value="15m">Cada 15 minutos</option>
                         <option value="1h" selected>Cada 1 hora (Promedio)</option>
@@ -108,7 +109,48 @@
         </div>
     </article>
 
-    <!-- Tarjeta 3: Exportación Manual de Reportes -->
+    <!-- Tarjeta 3: Contraste Manual vs. IoT (RF-PUB-06) -->
+    <article class="card" id="card-contraste-manual">
+        <header class="titulo-card">
+            <h3>Contraste Manual vs. IoT</h3>
+            <span class="texto-guia">Validación estadística frente a bitácora de laboratorio</span>
+        </header>
+
+        <div class="cuerpo-card">
+            <div class="fila-carga-bitacora">
+                <div class="grupo-campo grupo-archivo-bitacora">
+                    <label for="input-bitacora-csv" class="etiqueta-campo">Cargar bitácora manual en formato CSV</label>
+                    <input type="file" id="input-bitacora-csv" accept=".csv" class="campo-control campo-archivo-csv" />
+                </div>
+
+                <button type="button" id="btn-superponer-lecturas" class="btn-modal btn-modal-activar btn-con-icono">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    <span>Superponer lecturas</span>
+                </button>
+            </div>
+
+            <div class="grid-metricas-contraste" aria-label="Indicadores estadísticos de concordancia">
+                <div class="tarjeta-metrica-contraste">
+                    <span class="etiqueta-metrica-contraste">Diferencia Media</span>
+                    <strong class="valor-metrica-contraste">0.02 unidades</strong>
+                </div>
+
+                <div class="tarjeta-metrica-contraste">
+                    <span class="etiqueta-metrica-contraste">Error Cuadrático Medio (RMSE)</span>
+                    <strong class="valor-metrica-contraste">0.045</strong>
+                </div>
+
+                <div class="tarjeta-metrica-contraste">
+                    <span class="etiqueta-metrica-contraste">Concordancia Bland-Altman</span>
+                    <strong class="valor-metrica-contraste valor-metrica-normal">98.4 % dentro de límites</strong>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Tarjeta 4: Exportación Manual de Reportes -->
     <article class="card">
         <header class="titulo-card">
             <h3>Exportación Manual de Reportes</h3>
@@ -147,6 +189,32 @@
                         <polyline points="9 15 12 18 15 15"></polyline>
                     </svg>
                     <span>Exportar Reporte PDF</span>
+                </button>
+
+                <button type="button" class="btn-modal btn-modal-cancelar btn-con-icono btn-exportar-formato" data-formato="JSON" title="Datos estructurados en formato JSON">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                    <span>Exportar JSON</span>
+                </button>
+
+                <button type="button" class="btn-modal btn-modal-cancelar btn-con-icono btn-exportar-formato" data-formato="PNG" title="Gráfico en alta resolución (300 DPI)">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <span>Exportar Gráfico PNG (300 DPI)</span>
+                </button>
+
+                <button type="button" class="btn-modal btn-modal-cancelar btn-con-icono btn-exportar-formato" data-formato="SVG" title="Vector escalable para publicación científica">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                    <span>Exportar Vector SVG</span>
                 </button>
             </div>
         </div>

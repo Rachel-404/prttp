@@ -199,7 +199,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!formTecnico) return;
         if (selectConexion) selectConexion.value = estadoTecnicoTemp.tipoConexion;
         if (selectLongitud) selectLongitud.value = estadoTecnicoTemp.longitudCable;
-        if (selectInterfaz) selectInterfaz.value = estadoTecnicoTemp.interfazLector;
+        if (selectInterfaz) {
+            selectInterfaz.value = estadoTecnicoTemp.interfazLector;
+            actualizarBloqueInterfaz();
+        }
         if (inputPines) inputPines.value = estadoTecnicoTemp.pinesEsp32;
         if (inputRref) inputRref.value = estadoTecnicoTemp.rrefOhmios.toFixed(1);
         if (inputR0) inputR0.value = estadoTecnicoTemp.r0Ohmios.toFixed(1);
@@ -340,7 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const tipoConexion = selectConexion.value;
         const longitudCable = selectLongitud.value;
         const interfazLector = selectInterfaz.value;
-        const pinesEsp32 = (inputPines.value || "").trim();
+        const pinesEsp32 = inputPines ? (inputPines.value || "").trim() : estadoTecnicoTemp.pinesEsp32;
         const rrefOhmios = Number.parseFloat(inputRref.value);
         const r0Ohmios = Number.parseFloat(inputR0.value);
         const coeficienteAlpha = Number.parseFloat(inputAlpha.value);
@@ -533,6 +536,18 @@ document.addEventListener("DOMContentLoaded", () => {
             btnAcordeonTecnico.setAttribute("aria-expanded", abierto ? "true" : "false");
             if (!abierto) cerrarAyudasContextuales();
         });
+    }
+
+    function actualizarBloqueInterfaz() {
+        const grupoSpi = document.getElementById("grupo-temp-spi");
+        const grupoAdc = document.getElementById("grupo-temp-adc");
+        const esAdc = selectInterfaz && selectInterfaz.value === "ANALOG_ADC";
+        if (grupoSpi) grupoSpi.hidden = esAdc;
+        if (grupoAdc) grupoAdc.hidden = !esAdc;
+    }
+
+    if (selectInterfaz) {
+        selectInterfaz.addEventListener("change", actualizarBloqueInterfaz);
     }
 
     if (formTecnico) {

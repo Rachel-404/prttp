@@ -22,7 +22,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnIngresar = document.getElementById("btn-ingresar");
 
     const modalRecuperar = document.getElementById("modal-recuperar-acceso");
+    const formRecuperar = document.getElementById("form-recuperar-acceso");
     const btnCerrarRecuperar = document.getElementById("btn-cerrar-recuperar");
+    const toastLogin = document.getElementById("toast-login");
+    let toastTimer = null;
+
+    function mostrarToastLogin(mensaje) {
+        if (!toastLogin) return;
+        toastLogin.textContent = mensaje;
+        toastLogin.hidden = false;
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+            toastLogin.hidden = true;
+        }, 4000);
+    }
 
     function aplicarPreferenciasVisuales() {
         const modo = localStorage.getItem(CLAVE_TEMA) || "oscuro";
@@ -119,6 +132,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modalRecuperar) {
         modalRecuperar.addEventListener("click", (e) => {
             if (e.target === modalRecuperar) cerrarModalRecuperar();
+        });
+    }
+
+    if (formRecuperar) {
+        formRecuperar.addEventListener("submit", (e) => {
+            e.preventDefault();
+            formRecuperar.reset();
+            cerrarModalRecuperar();
+            mostrarToastLogin("Contraseña restablecida (simulación). Ya puedes iniciar sesión con tu nueva clave.");
         });
     }
 

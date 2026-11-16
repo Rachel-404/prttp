@@ -285,6 +285,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (displayCorreo) displayCorreo.textContent = correoAlertas;
         inputPasswordActual.value = "";
+        const inputPasswordNueva = document.getElementById("password-nueva");
+        const inputPasswordConfirmar = document.getElementById("password-confirmar");
+        if (inputPasswordNueva) inputPasswordNueva.value = "";
+        if (inputPasswordConfirmar) inputPasswordConfirmar.value = "";
 
         abrirModal({
             titulo: "Cambios Guardados",
