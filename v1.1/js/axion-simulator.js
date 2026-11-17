@@ -1,5 +1,7 @@
 (function (global) {
     const INTERVALO_MS = 3000;
+    const CICLO_MS = 60000;
+    const AMPLITUD_ONDA = 1.25;
     const COOLDOWN_ALERTA_MS = 15000;
     const CLAVE_ALERTAS = "axion_proto_alertas";
 
@@ -8,19 +10,28 @@
     let modoForzado = "normal"; // "normal" | "ph_critico" | "nivel_bajo" | "pt100_desconectada"
     const ultimoCooldownPorSensor = {};
 
-    const NOMINALES = {
-        temperatura_amb: 24.5,
-        humedad_amb: 65.2,
-        temperatura_solucion: 21.8,
-        nivel_ph: 6.25,
-        tds_ppm: 550.0,
-        nivel_tanque_cm: 125.5
+    const DESFASES_RAD = {
+        ec: 0.0,
+        ph: 1.2,
+        nivel: 2.4,
+        pt100: 3.6,
+        dht22: 4.8
     };
 
-    function fluctuar(centro, amplitud, decimales) {
-        const delta = (Math.random() * 2 - 1) * amplitud;
-        const val = centro + delta;
-        return decimales > 0 ? Number(val.toFixed(decimales)) : Math.round(val);
+    function calcularOnda(progreso, desfaseRad = 0) {
+        return AMPLITUD_ONDA * Math.sin(2 * Math.PI * progreso + desfaseRad);
+    }
+
+    function generarValorCiclico(min, max, onda, decimales = 1, minimoFisico = 0) {
+        const minNum = Number(min);
+        const maxNum = Number(max);
+        if (!Number.isFinite(minNum) || !Number.isFinite(maxNum) || maxNum <= minNum) {
+            return minimoFisico;
+        }
+        const centro = (minNum + maxNum) / 2;
+        const semiRango = (maxNum - minNum) / 2;
+        const raw = Math.max(minimoFisico, centro + onda * semiRango);
+        return decimales > 0 ? Number(raw.toFixed(decimales)) : Math.round(raw);
     }
 
     function leerCacheSeguro(clave, defecto = {}) {
@@ -89,10 +100,10 @@
                     claveSensor === "ph"
                         ? "views/sensores/ph/index.html"
                         : claveSensor === "pt100"
-                          ? "views/sensores/nivel-temperatura/index.html?tab=temperatura"
-                          : claveSensor === "nivel"
-                            ? "views/sensores/nivel-temperatura/index.html"
-                            : "index.html"
+                            ? "views/sensores/nivel-temperatura/index.html?tab=temperatura"
+                            : claveSensor === "nivel"
+                                ? "views/sensores/nivel-temperatura/index.html"
+                                : "index.html"
             };
             const actualizada = [nuevaAlerta, ...(Array.isArray(lista) ? lista : [])].slice(0, 12);
             localStorage.setItem(CLAVE_ALERTAS, JSON.stringify(actualizada));
@@ -111,12 +122,17 @@
         const cfgTemp = leerCacheSeguro("temp_agua", { activo: true, minNormal: 18.0, maxNormal: 24.0 });
         const cfgDht = leerCacheSeguro("dht22", { activo: true, tempMin: 18.0, tempMax: 28.0, humMin: 50, humMax: 80 });
 
-        const tempAmb = fluctuar(NOMINALES.temperatura_amb, 0.4, 1);
-        const humAmb = fluctuar(NOMINALES.humedad_amb, 1.5, 1);
-        let tempSol = fluctuar(NOMINALES.temperatura_solucion, 0.3, 1);
-        let nivelPh = fluctuar(NOMINALES.nivel_ph, 0.15, 2);
-        const tdsPpm = fluctuar(NOMINALES.tds_ppm, 15, 1);
-        let nivelCm = fluctuar(NOMINALES.nivel_tanque_cm, 2.0, 1);
+        const progreso = (Date.now() % CICLO_MS) / CICLO_MS;
+
+        const ecUs = generarValorCiclico(cfgEc.minNormal, cfgEc.maxNormal, calcularOnda(progreso, DESFASES_RAD.ec), 0, 0);
+        const tdsPpm = Number((ecUs * 0.5).toFixed(1));
+        let nivelPh = generarValorCiclico(cfgPh.minNormal, cfgPh.maxNormal, calcularOnda(progreso, DESFASES_RAD.ph), 2, 0);
+        const nivelPct = generarValorCiclico(cfgNivel.minNormal, cfgNivel.maxNormal, calcularOnda(progreso, DESFASES_RAD.nivel), 1, 0);
+        let nivelCm = Number(((nivelPct / 100) * 140).toFixed(1));
+        let tempSol = generarValorCiclico(cfgTemp.minNormal, cfgTemp.maxNormal, calcularOnda(progreso, DESFASES_RAD.pt100), 1, 0);
+        const tempAmb = generarValorCiclico(cfgDht.tempMin, cfgDht.tempMax, calcularOnda(progreso, DESFASES_RAD.dht22), 1, 0);
+        const humAmb = generarValorCiclico(cfgDht.humMin, cfgDht.humMax, calcularOnda(progreso, DESFASES_RAD.dht22 + 0.6), 1, 0);
+
         let estadoPt100 = cfgTemp.activo !== false ? "ok" : "pausado";
 
         if (modoForzado === "ph_critico") {
@@ -126,6 +142,8 @@
         } else if (modoForzado === "pt100_desconectada") {
             estadoPt100 = "error";
         }
+
+        const rssi = Math.round(-61 + 4 * Math.sin(2 * Math.PI * progreso));
 
         const trama = {
             ts: new Date().toISOString(),
@@ -146,11 +164,10 @@
                 tds: cfgEc.activo !== false ? "ok" : "pausado",
                 nivel: cfgNivel.activo !== false ? "ok" : "pausado"
             },
-            rssi: fluctuar(-61, 3, 0)
+            rssi
         };
 
         if (trama.estado.tds === "ok") {
-            const ecUs = Math.round(tdsPpm * 2);
             const estEc = evaluarUmbral(ecUs, Number(cfgEc.minNormal), Number(cfgEc.maxNormal));
             if (estEc === "Crítico") {
                 registrarAlertaEnHeader("ec", estEc, "Conductividad EC fuera de rango", `Lectura: ${ecUs} µS/cm`);
@@ -162,8 +179,13 @@
                 registrarAlertaEnHeader("ph", estPh, "pH RS485 fuera de umbral", `Lectura: ${nivelPh.toFixed(2)} pH`);
             }
         }
-        if (trama.estado.nivel === "ok" && modoForzado === "nivel_bajo") {
-            registrarAlertaEnHeader("nivel", "Advertencia", "Nivel de agua próximo al mínimo", `Lectura: ${nivelCm} cm`);
+        if (trama.estado.nivel === "ok") {
+            const estNivel = evaluarUmbral(nivelPct, Number(cfgNivel.minNormal), Number(cfgNivel.maxNormal));
+            if (estNivel === "Crítico") {
+                registrarAlertaEnHeader("nivel", estNivel, "Nivel de agua crítico", `Lectura: ${Math.round(nivelPct)}%`);
+            } else if (modoForzado === "nivel_bajo") {
+                registrarAlertaEnHeader("nivel", "Advertencia", "Nivel de agua próximo al mínimo", `Lectura: ${nivelCm} cm`);
+            }
         }
         if (modoForzado === "pt100_desconectada") {
             registrarAlertaEnHeader("pt100", "Advertencia", "Desconexión temporal PT100", "Circuito abierto detectado en sonda RTD");
@@ -299,6 +321,7 @@
         iniciarStream,
         pausarStream,
         emitirTrama,
+        generarValorCiclico,
         establecerModo: (modo) => {
             modoForzado = modo || "normal";
             emitirTrama();
