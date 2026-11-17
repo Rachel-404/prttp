@@ -377,9 +377,9 @@
 
     <!-- Modal de confirmación operativa (EC / TDS V1.0) -->
     <div id="modal-confirmacion-ec" class="modal-overlay" hidden>
-        <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-mensaje" aria-live="polite">
-            <h4 id="modal-titulo" class="modal-titulo"></h4>
-            <p id="modal-mensaje" class="modal-mensaje"></p>
+        <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modal-ec-titulo" aria-describedby="modal-ec-mensaje" aria-live="polite">
+            <h4 id="modal-ec-titulo" class="modal-titulo"></h4>
+            <p id="modal-ec-mensaje" class="modal-mensaje"></p>
             <div class="modal-acciones">
                 <button type="button" id="btn-modal-cancelar-ec" class="btn-modal btn-modal-cancelar">Cancelar</button>
                 <button type="button" id="btn-modal-aceptar-ec" class="btn-modal btn-modal-pausar">Aceptar</button>
@@ -388,9 +388,10 @@
     </div>
 
     <!-- Notificación breve de orden enviada -->
-    <div id="toast-notificacion" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
+    <div id="toast-ec" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
 
     <script src="../../../js/main.js"></script>
+    <script src="../../../js/axion-cache.js"></script>
     <script src="../../../js/ec.js"></script>
 </body>
 

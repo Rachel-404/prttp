@@ -1,36 +1,69 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Configuración de rangos operativos de referencia para cada sensor del cultivo
+    const cache = window.AxionCache;
+
+    const UNIDADES_NIVEL = {
+        pct: { sufijo: "%", factor: 1, decimales: 0 },
+        cm: { sufijo: "cm", factor: 1, decimales: 0 },
+        L: { sufijo: "L", factor: 4.12, decimales: 0 },
+        kPa: { sufijo: "kPa", factor: 0.124, decimales: 2 },
+        MPa: { sufijo: "MPa", factor: 0.000124, decimales: 4 },
+        mH2O: { sufijo: "mH2O", factor: 0.0126, decimales: 2 },
+        mmH2O: { sufijo: "mmH2O", factor: 12.6, decimales: 0 },
+        inH2O: { sufijo: "inH2O", factor: 0.496, decimales: 1 },
+        m: { sufijo: "m", factor: 0.0133, decimales: 2 },
+        mm: { sufijo: "mm", factor: 13.3, decimales: 0 }
+    };
+
     const CONFIG_SENSORES = {
         ec: {
+            claveCache: "ec",
             minNormal: 800,
             maxNormal: 1800,
             margenAdvertencia: 200,
             unidad: "µS/cm",
             decimales: 0,
             idValor: "valor-ec",
+            idRef: "ref-ec",
             idBadge: "badge-ec",
             idTextoBadge: "texto-badge-ec",
             idExtra: "extra-ec",
             formatearExtra: (valor) => `TDS Estimado: ${Math.round(valor * 0.5)} ppm`
         },
         ph: {
+            claveCache: "ph",
             minNormal: 5.5,
             maxNormal: 6.5,
             margenAdvertencia: 0.3,
             unidad: "pH",
             decimales: 2,
             idValor: "valor-ph",
+            idRef: "ref-ph",
             idBadge: "badge-ph",
             idTextoBadge: "texto-badge-ph",
             idExtra: "extra-ph"
         },
+        phAnalogo: {
+            claveCache: "ph_analogo",
+            minNormal: 5.5,
+            maxNormal: 6.5,
+            margenAdvertencia: 0.3,
+            unidad: "pH",
+            decimales: 2,
+            idValor: "valor-ph-analogo",
+            idRef: "ref-ph-analogo",
+            idBadge: "badge-ph-analogo",
+            idTextoBadge: "texto-badge-ph-analogo",
+            idExtra: "extra-ph-analogo"
+        },
         nivel: {
+            claveCache: "nivel_agua",
             minNormal: 20,
             maxNormal: 90,
             margenAdvertencia: 5,
             unidad: "%",
             decimales: 0,
             idValor: "valor-nivel",
+            idRef: "ref-nivel",
             idBadge: "badge-nivel",
             idTextoBadge: "texto-badge-nivel",
             idExtra: "extra-nivel",
@@ -38,38 +71,76 @@ document.addEventListener("DOMContentLoaded", () => {
                 `Volumen estimado: ${Number.isFinite(litros) ? Math.round(litros) : Math.round((porcentaje / 85) * 350)} Litros`
         },
         tempAgua: {
+            claveCache: "temp_agua",
             minNormal: 18.0,
             maxNormal: 24.0,
             margenAdvertencia: 1.5,
             unidad: "°C",
             decimales: 1,
             idValor: "valor-temp-agua",
+            idRef: "ref-temp-agua",
             idBadge: "badge-temp-agua",
             idTextoBadge: "texto-badge-temp-agua",
             idExtra: "extra-temp-agua"
         }
     };
 
-    // Estado en tiempo real del Dashboard
     const estadoDashboard = {
         ec: { valor: 1200, enLinea: true },
         ph: { valor: 6.1, enLinea: true },
+        phAnalogo: { valor: 5.85, enLinea: true },
         nivel: { valor: 85, litros: 350, enLinea: true },
         tempAgua: { valor: 21.5, enLinea: true },
         esp32: {
             conectado: true,
             wifiTexto: "Excelente (-58 dBm)",
             alimentacion: "5V USB-C",
-            segundosDesdeActualizacion: 2
+            segundosDesdeActualizacion: 2,
+            muestreoSeg: 2,
+            envioSeg: 10
         }
     };
 
-    /**
-     * Evalúa el nivel de alerta del valor:
-     * - "valor-normal" (Verde): valor dentro del rango normal [minNormal, maxNormal]
-     * - "valor-advertencia" (Naranja): desviación moderada en zona de advertencia
-     * - "valor-critico" (Rojo): nivel crítico o sin señal
-     */
+    function cargarConfiguracionDesdeCache() {
+        if (!cache) return;
+
+        Object.keys(CONFIG_SENSORES).forEach((clave) => {
+            const cfg = CONFIG_SENSORES[clave];
+            const guardado = cache.leerDeCache(cfg.claveCache);
+            if (!guardado) return;
+
+            if (typeof guardado.activo === "boolean") {
+                estadoDashboard[clave].enLinea = guardado.activo;
+            }
+            if (Number.isFinite(Number(guardado.minNormal))) {
+                cfg.minNormal = Number(guardado.minNormal);
+            }
+            if (Number.isFinite(Number(guardado.maxNormal))) {
+                cfg.maxNormal = Number(guardado.maxNormal);
+            }
+
+            if (clave === "nivel" && guardado.unidadPrincipal && UNIDADES_NIVEL[guardado.unidadPrincipal]) {
+                const u = UNIDADES_NIVEL[guardado.unidadPrincipal];
+                cfg.unidad = u.sufijo;
+                cfg.decimales = u.decimales;
+                const baseValor = Number(guardado.valorActual ?? 85);
+                estadoDashboard.nivel.valor = Number((baseValor * u.factor).toFixed(u.decimales));
+                if (guardado.unidadPrincipal !== "pct") {
+                    cfg.minNormal = Number((Number(guardado.nivelMinCm ?? 15) * u.factor).toFixed(u.decimales));
+                    cfg.maxNormal = Number((Number(guardado.nivelMaxCm ?? 90) * u.factor).toFixed(u.decimales));
+                    cfg.margenAdvertencia = Math.max(1, (cfg.maxNormal - cfg.minNormal) * 0.1);
+                }
+            }
+        });
+
+        const nodo = cache.leerDeCache("nodo_maestro");
+        if (nodo) {
+            estadoDashboard.esp32.wifiTexto = nodo.ssid ? `${nodo.ssid} (-58 dBm)` : "Excelente (-58 dBm)";
+            estadoDashboard.esp32.muestreoSeg = Number(nodo.muestreoSeg || 2);
+            estadoDashboard.esp32.envioSeg = Number(nodo.envioSeg || 10);
+        }
+    }
+
     function evaluarClaseColor(valor, cfg, enLinea) {
         if (!enLinea || !Number.isFinite(valor)) {
             return "valor-critico";
@@ -85,11 +156,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return "valor-critico";
     }
 
-    function actualizarBadgeConexion(elBadge, elTexto, enLinea, textoConectado = "Normal") {
+    function actualizarBadgeEstado(elBadge, elTexto, estadoBadge, texto) {
         if (!elBadge || !elTexto) return;
-        elBadge.classList.toggle("conectado", Boolean(enLinea));
-        elBadge.classList.toggle("sin-senal", !enLinea);
-        elTexto.textContent = enLinea ? textoConectado : "Sin Señal";
+        elBadge.classList.remove("conectado", "advertencia", "critico", "sin-senal");
+        elBadge.classList.add(estadoBadge);
+        elTexto.textContent = texto;
+    }
+
+    function formatearNumero(valor, decimales) {
+        return decimales > 0 ? Number(valor).toFixed(decimales) : String(Math.round(valor));
     }
 
     function renderizarTarjetaSensor(clave) {
@@ -98,22 +173,38 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!cfg || !estado) return;
 
         const elValor = document.getElementById(cfg.idValor);
+        const elRef = document.getElementById(cfg.idRef);
         const elBadge = document.getElementById(cfg.idBadge);
         const elTextoBadge = document.getElementById(cfg.idTextoBadge);
         const elExtra = document.getElementById(cfg.idExtra);
 
-        actualizarBadgeConexion(elBadge, elTextoBadge, estado.enLinea, "Normal");
+        if (elRef) {
+            const minTxt = formatearNumero(cfg.minNormal, cfg.decimales);
+            const maxTxt = formatearNumero(cfg.maxNormal, cfg.decimales);
+            const prefijo = clave === "nivel" ? "Nivel normal" : "Rango normal";
+            elRef.textContent = `${prefijo}: ${minTxt} - ${maxTxt} ${cfg.unidad}`;
+        }
+
+        const claseColor = evaluarClaseColor(estado.valor, cfg, estado.enLinea);
+
+        if (!estado.enLinea) {
+            actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Pausado");
+        } else if (claseColor === "valor-normal") {
+            actualizarBadgeEstado(elBadge, elTextoBadge, "conectado", "Normal");
+        } else if (claseColor === "valor-advertencia") {
+            actualizarBadgeEstado(elBadge, elTextoBadge, "advertencia", "Advertencia");
+        } else {
+            actualizarBadgeEstado(elBadge, elTextoBadge, "critico", "Crítico");
+        }
 
         if (elValor) {
-            const claseColor = evaluarClaseColor(estado.valor, cfg, estado.enLinea);
             elValor.classList.remove("valor-normal", "valor-advertencia", "valor-critico");
             elValor.classList.add(claseColor);
 
             if (!estado.enLinea || !Number.isFinite(estado.valor)) {
                 elValor.textContent = `-- ${cfg.unidad}`;
             } else {
-                const numeroFormateado =
-                    cfg.decimales > 0 ? estado.valor.toFixed(cfg.decimales) : String(Math.round(estado.valor));
+                const numeroFormateado = formatearNumero(estado.valor, cfg.decimales);
                 elValor.textContent = `${numeroFormateado} ${cfg.unidad}`;
             }
         }
@@ -130,8 +221,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const elWifi = document.getElementById("wifi-esp32");
         const elAlimentacion = document.getElementById("alimentacion-esp32");
         const elActualizacion = document.getElementById("actualizacion-esp32");
+        const elSubmetricaSistema = document.querySelector("#card-microcontrolador .submetricas-sistema");
 
-        actualizarBadgeConexion(elBadge, elTextoBadge, esp.conectado, "Conectado");
+        actualizarBadgeEstado(elBadge, elTextoBadge, esp.conectado ? "conectado" : "sin-senal", esp.conectado ? "Conectado" : "Sin Señal");
 
         if (elWifi) {
             elWifi.textContent = esp.conectado ? esp.wifiTexto : "Sin conexión";
@@ -143,22 +235,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const seg = Math.max(0, Math.round(esp.segundosDesdeActualizacion));
             elActualizacion.textContent = seg === 1 ? "Hace 1 segundo" : `Hace ${seg} segundos`;
         }
+        if (elSubmetricaSistema) {
+            elSubmetricaSistema.textContent = `160 mA · Muestreo ${esp.muestreoSeg}s / Envío ${esp.envioSeg}s · Buffer 0%`;
+        }
     }
 
     function renderizarTodo() {
+        cargarConfiguracionDesdeCache();
         Object.keys(CONFIG_SENSORES).forEach(renderizarTarjetaSensor);
         renderizarMicrocontrolador();
     }
 
-    /**
-     * Permite actualizar cualquier tarjeta en tiempo real desde WebSocket/MQTT o eventos:
-     * Ejemplo:
-     * window.actualizarDashboardAxion({
-     *   ph: { valor: 5.55, enLinea: true }, // Naranja (advertencia)
-     *   ec: { valor: 2100, enLinea: true }, // Rojo (crítico)
-     *   nivel: { valor: 85, litros: 350, enLinea: false } // Sin Señal (rojo)
-     * })
-     */
     function actualizarDashboardAxion(nuevosDatos = {}) {
         Object.keys(CONFIG_SENSORES).forEach((clave) => {
             if (nuevosDatos[clave] && typeof nuevosDatos[clave] === "object") {
@@ -185,19 +272,24 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.detail) actualizarDashboardAxion(e.detail);
     });
 
-    // Sincronización del estado de los 6 relés desde localStorage / módulo reles.js
     const CLAVE_RELES_ESTADO = "axion_reles_estado";
     const ESTADOS_RELES_DEFAULT = [
-        { canal: 1, nombre: "Electrobomba 1 (Recirculación Principal)", encendido: true },
+        { canal: 1, nombre: "Electrobomba 1 (Recirculación Principal)", encendido: false },
         { canal: 2, nombre: "Electrobomba 2 (Dosificación / Oxigenación)", encendido: false },
         { canal: 3, nombre: "Electrobomba 3 (Llenado / Auxiliar)", encendido: false },
-        { canal: 4, nombre: "Reflector (Iluminación del Cultivo)", encendido: true },
+        { canal: 4, nombre: "Reflector (Iluminación del Cultivo)", encendido: false },
         { canal: 5, nombre: "Canal Reserva 1 (Disponible)", encendido: false },
         { canal: 6, nombre: "Canal Reserva 2 (Disponible)", encendido: false }
     ];
 
     function renderizarEquiposDashboard() {
         let canales = ESTADOS_RELES_DEFAULT;
+        if (cache) {
+            const cacheReles = cache.leerDeCache("reles");
+            if (Array.isArray(cacheReles.canales) && cacheReles.canales.length === 6) {
+                canales = cacheReles.canales;
+            }
+        }
         try {
             const raw = localStorage.getItem(CLAVE_RELES_ESTADO);
             if (raw) {
@@ -226,7 +318,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     window.addEventListener("storage", (e) => {
-        if (e.key === CLAVE_RELES_ESTADO) renderizarEquiposDashboard();
+        if (!e.key) return;
+        if (e.key === CLAVE_RELES_ESTADO || e.key === `${cache?.PREFIJO || "axion_proto_"}reles`) {
+            renderizarEquiposDashboard();
+        }
+        if (e.key.startsWith(cache?.PREFIJO || "axion_proto_")) {
+            renderizarTodo();
+        }
     });
 
     renderizarEquiposDashboard();

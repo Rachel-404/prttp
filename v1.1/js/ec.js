@@ -176,6 +176,18 @@ document.addEventListener("DOMContentLoaded", () => {
     function persistirEstado() {
         estadoModuloEc.ultimaActualizacion = new Date().toISOString();
         localStorage.setItem(CLAVE_CONFIG_EC, JSON.stringify(estadoModuloEc));
+        if (window.AxionCache) {
+            window.AxionCache.guardarEnCache("ec", {
+                activo: estadoModuloEc.activo,
+                frecuenciaSeg: estadoModuloEc.frecuenciaLecturaSeg,
+                ecMinMs: estadoModuloEc.ecMinimo,
+                ecMaxMs: estadoModuloEc.ecMaximo,
+                tdsMin: estadoModuloEc.tdsMinimo,
+                tdsMax: estadoModuloEc.tdsMaximo,
+                minNormal: Math.round(estadoModuloEc.ecMinimo * 1000),
+                maxNormal: Math.round(estadoModuloEc.ecMaximo * 1000)
+            });
+        }
     }
 
     function persistirCalibracion() {

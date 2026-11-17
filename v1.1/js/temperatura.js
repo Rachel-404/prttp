@@ -145,6 +145,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function persistirEstado() {
         estadoModuloTemp.ultimaActualizacion = new Date().toISOString();
         localStorage.setItem(CLAVE_CONFIG_TEMP, JSON.stringify(estadoModuloTemp));
+        if (window.AxionCache) {
+            window.AxionCache.guardarEnCache("temp_agua", {
+                activo: estadoModuloTemp.activo,
+                frecuenciaSeg: estadoModuloTemp.frecuenciaLecturaSeg,
+                minNormal: estadoModuloTemp.tempMinimaAgua,
+                maxNormal: estadoModuloTemp.tempMaximaAgua,
+                compensarOtros: estadoModuloTemp.compensarOtrosSensores
+            });
+        }
     }
 
     function persistirCalibracion() {

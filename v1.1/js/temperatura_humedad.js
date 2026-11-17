@@ -152,6 +152,16 @@ document.addEventListener("DOMContentLoaded", () => {
     function persistirEstado() {
         estadoModuloDht22.ultimaActualizacion = new Date().toISOString();
         localStorage.setItem(CLAVE_CONFIG_DHT22, JSON.stringify(estadoModuloDht22));
+        if (window.AxionCache) {
+            window.AxionCache.guardarEnCache("dht22", {
+                activo: estadoModuloDht22.activo,
+                frecuenciaSeg: estadoModuloDht22.frecuenciaLecturaSeg,
+                tempMin: estadoModuloDht22.tempMinima,
+                tempMax: estadoModuloDht22.tempMaxima,
+                humMin: estadoModuloDht22.humedadMinima,
+                humMax: estadoModuloDht22.humedadMaxima
+            });
+        }
     }
 
     function persistirCalibracion() {

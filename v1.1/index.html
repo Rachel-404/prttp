@@ -69,16 +69,11 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-ec" class="valor-principal valor-normal">1200 µS/cm</p>
                         <p id="ref-ec" class="rango-referencia">Rango normal: 800 - 1800 µS/cm</p>
-                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
-                            <span class="submetrica-item">Voltaje crudo: <strong>1.184 V</strong></span>
-                            <span class="submetrica-item">ADC Raw: <strong>1469</strong></span>
-                            <span class="submetrica-item">Temp. Usada: <strong>23.45 °C</strong></span>
-                        </div>
+                        <p class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">1.184 V · 1469 Raw · 23.45 °C</p>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-ec" class="dato-inferior">TDS Estimado: 600 ppm</span>
-                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -95,16 +90,11 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-ph" class="valor-principal valor-normal">6.10 pH</p>
                         <p id="ref-ph" class="rango-referencia">Rango normal: 5.50 - 6.50 pH</p>
-                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
-                            <span class="submetrica-item">Temp. Interna: <strong>23.5 °C</strong></span>
-                            <span class="submetrica-item">Estado Modbus: <strong>OK</strong></span>
-                            <span class="submetrica-item">Error CRC: <strong>0x0000</strong></span>
-                        </div>
+                        <p class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">23.5 °C · Modbus OK · CRC 0x0000</p>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-ph" class="dato-inferior">Sensor RS485 Industrial</span>
-                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -121,16 +111,11 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-ph-analogo" class="valor-principal valor-normal">5.85 pH</p>
                         <p id="ref-ph-analogo" class="rango-referencia">Rango normal: 5.50 - 6.50 pH</p>
-                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
-                            <span class="submetrica-item">Voltaje: <strong>1704.5 mV</strong></span>
-                            <span class="submetrica-item">Eficiencia: <strong>98.5%</strong></span>
-                            <span class="submetrica-item">Uso: <strong>42.5 días</strong></span>
-                        </div>
+                        <p class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">1704.5 mV · 98.5% Salud · 42.5 días</p>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-ph-analogo" class="dato-inferior">Sonda SEN0169-V2</span>
-                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -147,16 +132,11 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-nivel" class="valor-principal valor-normal">85%</p>
                         <p id="ref-nivel" class="rango-referencia">Nivel normal: 20% - 90%</p>
-                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
-                            <span class="submetrica-item">Profundidad real: <strong>1.133 m</strong></span>
-                            <span class="submetrica-item">Presión: <strong>10.56 kPa</strong></span>
-                            <span class="submetrica-item">Señal cruda: <strong>12.45 mA</strong></span>
-                        </div>
+                        <p class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">1.133 m · 10.56 kPa · 12.45 mA</p>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-nivel" class="dato-inferior">Volumen estimado: 350 Litros</span>
-                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -173,15 +153,11 @@
                     <div class="cuerpo-sensor" aria-live="polite">
                         <p id="valor-temp-agua" class="valor-principal valor-normal">21.5 °C</p>
                         <p id="ref-temp-agua" class="rango-referencia">Rango normal: 18.0 - 24.0 °C</p>
-                        <div class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">
-                            <span class="submetrica-item">Resistencia: <strong>109.13 Ω</strong></span>
-                            <span class="submetrica-item">Estado cable: <strong>Normal (3 hilos)</strong></span>
-                        </div>
+                        <p class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">109.13 Ω · 3 hilos</p>
                     </div>
 
                     <footer class="pie-sensor">
                         <span id="extra-temp-agua" class="dato-inferior">Compensando pH y EC</span>
-                        <span class="actualizacion-sensor">Actualizado hace 2 s</span>
                     </footer>
                 </article>
 
@@ -210,11 +186,7 @@
                         </li>
                     </ul>
 
-                    <div class="submetricas-tecnicas submetricas-sistema"
-                        aria-label="Métricas de diagnóstico del microcontrolador">
-                        <span class="submetrica-item">Consumo estimado: <strong>160 mA</strong></span>
-                        <span class="submetrica-item">Buffer offline: <strong>0% (0 tramas pendientes)</strong></span>
-                    </div>
+                    <p class="submetricas-tecnicas submetricas-sistema" aria-label="Métricas de diagnóstico del microcontrolador">160 mA · Buffer 0% (0 tramas)</p>
                 </article>
 
             </section>
@@ -336,6 +308,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/axion-cache.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/dashboard_charts.js"></script>
 </body>

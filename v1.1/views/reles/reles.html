@@ -150,9 +150,9 @@
 
     <!-- Modal de confirmación operativa -->
     <div id="modal-confirmacion-reles" class="modal-overlay" hidden>
-        <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-mensaje" aria-live="polite">
-            <h4 id="modal-titulo" class="modal-titulo"></h4>
-            <p id="modal-mensaje" class="modal-mensaje"></p>
+        <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modal-reles-titulo" aria-describedby="modal-reles-mensaje" aria-live="polite">
+            <h4 id="modal-reles-titulo" class="modal-titulo"></h4>
+            <p id="modal-reles-mensaje" class="modal-mensaje"></p>
             <div class="modal-acciones">
                 <button type="button" id="btn-modal-cancelar-reles" class="btn-modal btn-modal-cancelar">Cancelar</button>
                 <button type="button" id="btn-modal-aceptar-reles" class="btn-modal btn-modal-activar">Aceptar</button>
@@ -161,9 +161,10 @@
     </div>
 
     <!-- Notificación breve de orden enviada -->
-    <div id="toast-notificacion" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
+    <div id="toast-reles" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
 
     <script src="../../js/main.js"></script>
+    <script src="../../js/axion-cache.js"></script>
     <script src="../../js/reles.js"></script>
 </body>
 

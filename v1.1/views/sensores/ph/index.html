@@ -443,9 +443,9 @@
 
     <!-- Modal de confirmación operativa (SEN0708) -->
     <div id="modal-confirmacion-ph" class="modal-overlay" hidden>
-        <div class="modal-caja" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="modal-titulo" aria-describedby="modal-mensaje">
-            <h4 id="modal-titulo" class="modal-titulo"></h4>
-            <p id="modal-mensaje" class="modal-mensaje"></p>
+        <div class="modal-caja" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="modal-ph-titulo" aria-describedby="modal-ph-mensaje">
+            <h4 id="modal-ph-titulo" class="modal-titulo"></h4>
+            <p id="modal-ph-mensaje" class="modal-mensaje"></p>
             <footer class="modal-acciones">
                 <button type="button" id="btn-modal-cancelar" class="btn-modal btn-modal-cancelar">Cancelar</button>
                 <button type="button" id="btn-modal-aceptar" class="btn-modal btn-modal-pausar">Aceptar</button>
@@ -454,9 +454,10 @@
     </div>
 
     <!-- Notificación breve de orden enviada -->
-    <div id="toast-notificacion" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
+    <div id="toast-ph" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
 
     <script src="../../../js/main.js"></script>
+    <script src="../../../js/axion-cache.js"></script>
     <script src="../../../js/ph.js"></script>
 </body>
 

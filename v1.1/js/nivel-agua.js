@@ -194,6 +194,17 @@ document.addEventListener("DOMContentLoaded", () => {
     function persistirEstado() {
         estadoModuloNa.ultimaActualizacion = new Date().toISOString();
         localStorage.setItem(CLAVE_CONFIG_NA, JSON.stringify(estadoModuloNa));
+        if (window.AxionCache) {
+            window.AxionCache.guardarEnCache("nivel_agua", {
+                activo: estadoModuloNa.activo,
+                frecuenciaSeg: estadoModuloNa.frecuenciaLecturaSeg,
+                unidadPrincipal: estadoModuloNa.unidadPrincipal,
+                nivelMinCm: estadoModuloNa.nivelMinimoCm,
+                nivelMaxCm: estadoModuloNa.nivelMaximoCm,
+                minNormal: estadoModuloNa.nivelMinimoCm,
+                maxNormal: estadoModuloNa.nivelMaximoCm
+            });
+        }
     }
 
     function persistirTanque() {

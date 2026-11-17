@@ -94,6 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function persistirOperacion() {
         localStorage.setItem(CLAVE_RELES_ESTADO, JSON.stringify(estadoOperacionReles));
+        if (window.AxionCache) {
+            window.AxionCache.guardarEnCache("reles", {
+                canales: estadoOperacionReles.canales
+            });
+        }
     }
 
     function persistirTecnico() {

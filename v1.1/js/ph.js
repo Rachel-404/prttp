@@ -166,6 +166,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function persistirEstado() {
         estadoModuloPh.ultimaActualizacion = new Date().toISOString();
         localStorage.setItem(CLAVE_CONFIG_PH, JSON.stringify(estadoModuloPh));
+        if (window.AxionCache) {
+            window.AxionCache.guardarEnCache("ph", {
+                activo: estadoModuloPh.activo,
+                frecuenciaSeg: estadoModuloPh.frecuenciaLecturaSeg,
+                minNormal: estadoModuloPh.phMinimo,
+                maxNormal: estadoModuloPh.phMaximo,
+                tempMax: estadoModuloPh.tempMaximaAgua
+            });
+        }
     }
 
     function persistirCalibracion() {
