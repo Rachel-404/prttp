@@ -222,11 +222,12 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem(CLAVE_TEMA_LOCAL, modoTema);
         localStorage.setItem(CLAVE_TIPOGRAFIA_LOCAL, JSON.stringify(prefsTipografia));
         if (window.AxionCache) {
+            const prevTipo = window.AxionCache.leerDeCache("tipografia");
             window.AxionCache.guardarEnCache("tipografia", prefsTipografia);
             window.AxionCache.registrarAuditoria(
-                "Configuración Tipográfica",
-                "Tema / Escala",
-                modoTema,
+                "Sistema y Tipografía",
+                "Escala Tipográfica",
+                `${prevTipo.titlePx}/${prevTipo.subtitlePx}/${prevTipo.basePx} px`,
                 `${prefsTipografia.titlePx}/${prefsTipografia.subtitlePx}/${prefsTipografia.basePx} px`
             );
         }
@@ -352,21 +353,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    const selectFiltroAuditoria = document.getElementById("filtro-auditoria-modulo");
+    const btnExportarAuditoria = document.getElementById("btn-exportar-auditoria-csv");
+
     function renderizarBitacoraAuditoria() {
-        const tbody = document.getElementById("tbody-auditoria-sistema");
-        if (!tbody || !window.AxionCache) return;
-        const registros = window.AxionCache.obtenerAuditoria();
-        tbody.innerHTML = "";
-        registros.forEach((item) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${item.fechaHora}</td>
-                <td>${item.modulo}</td>
-                <td>${item.parametro}</td>
-                <td><strong>${item.cambio}</strong></td>
-                <td>${item.usuario}</td>
-            `;
-            tbody.appendChild(tr);
+        if (!window.AxionCache) return;
+        const filtro = selectFiltroAuditoria ? selectFiltroAuditoria.value : "todos";
+        window.AxionCache.renderizarTablaAuditoria("tbody-auditoria-sistema", filtro);
+    }
+
+    if (selectFiltroAuditoria) {
+        selectFiltroAuditoria.addEventListener("change", renderizarBitacoraAuditoria);
+    }
+
+    if (btnExportarAuditoria) {
+        btnExportarAuditoria.addEventListener("click", () => {
+            mostrarToast("Bitácora de auditoría exportada en formato CSV.");
         });
     }
 

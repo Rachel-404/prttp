@@ -557,11 +557,12 @@ document.addEventListener("DOMContentLoaded", () => {
             new CustomEvent("ec:configuracionGuardada", { detail: { ...estadoModuloEc } })
         );
         console.info("Configuración Bloque 1 (EC / TDS V1.0) guardada:", estadoModuloEc);
-        if (window.registrarAuditoria) {
+        if (window.registrarAuditoria && window.AxionCache) {
+            const prev = window.AxionCache.leerDeCache("ec");
             window.registrarAuditoria(
-                "Conductividad (EC/TDS)",
+                "Conductividad / TDS",
                 "Umbrales EC",
-                "Anterior",
+                `${prev.ecMinMs} - ${prev.ecMaxMs} mS/cm`,
                 `${estadoModuloEc.ecMinimo} - ${estadoModuloEc.ecMaximo} mS/cm`
             );
         }

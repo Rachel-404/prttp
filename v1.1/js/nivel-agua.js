@@ -622,11 +622,12 @@ document.addEventListener("DOMContentLoaded", () => {
             new CustomEvent("nivelAgua:configuracionGuardada", { detail: { ...estadoModuloNa } })
         );
         console.info("Configuración Bloque 1 (LMP633-NCN) guardada:", estadoModuloNa);
-        if (window.registrarAuditoria) {
+        if (window.registrarAuditoria && window.AxionCache) {
+            const prev = window.AxionCache.leerDeCache("nivel_agua");
             window.registrarAuditoria(
-                "Nivel de Agua",
+                "Nivel y Temperatura",
                 "Umbrales y Unidad",
-                "Anterior",
+                `${prev.nivelMinCm} - ${prev.nivelMaxCm} cm (${prev.unidadPrincipal})`,
                 `${estadoModuloNa.nivelMinimoCm} - ${estadoModuloNa.nivelMaximoCm} cm (${estadoModuloNa.unidadPrincipal})`
             );
         }

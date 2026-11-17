@@ -71,17 +71,20 @@ document.addEventListener("DOMContentLoaded", () => {
         formControl.addEventListener("submit", (e) => {
             e.preventDefault();
             if (window.AxionCache) {
+                const prev = window.AxionCache.leerDeCache(CLAVE_CACHE);
+                const nuevoMin = Number(inputPhMin?.value || 5.5);
+                const nuevoMax = Number(inputPhMax?.value || 6.5);
                 window.AxionCache.guardarEnCache(CLAVE_CACHE, {
                     frecuenciaSeg: Number(selectFrecuencia?.value || 10),
-                    minNormal: Number(inputPhMin?.value || 5.5),
-                    maxNormal: Number(inputPhMax?.value || 6.5),
+                    minNormal: nuevoMin,
+                    maxNormal: nuevoMax,
                     fuenteTemperatura: selectFuenteTemp?.value || "pt100"
                 });
                 window.AxionCache.registrarAuditoria(
-                    "pH Analógico 24/7",
+                    "pH Analógico",
                     "Umbrales pH",
-                    "Anterior",
-                    `${inputPhMin?.value || "5.50"} - ${inputPhMax?.value || "6.50"} pH`
+                    `${prev.minNormal} - ${prev.maxNormal} pH`,
+                    `${nuevoMin} - ${nuevoMax} pH`
                 );
             }
             mostrarToast("Configuración operativa de pH Analógico guardada.");

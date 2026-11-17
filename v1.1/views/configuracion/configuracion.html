@@ -228,14 +228,37 @@
                     </form>
                 </article>
 
-                <!-- SECCIÓN 3: Bitácora de Auditoría del Sistema (CU-17) -->
-                <section class="card card-config-ancha" aria-label="Bitácora de Auditoría del Sistema">
+                <!-- SECCIÓN 3: Bitácora de Auditoría de Configuración (CU-17) -->
+                <section class="card card-config-ancha" aria-label="Bitácora de Auditoría de Configuración">
                     <header class="titulo-card">
-                        <h3>Bitácora de Auditoría del Sistema</h3>
-                        <span class="texto-guia">Registro cronológico de cambios aplicados en módulos y parámetros</span>
+                        <h3>Bitácora de Auditoría de Configuración</h3>
                     </header>
 
                     <div class="cuerpo-card">
+                        <p class="texto-guia">Registro cronológico inmutable de modificaciones realizadas sobre parámetros críticos, umbrales y hardware.</p>
+
+                        <div class="fila-dos-cols" style="align-items: end;">
+                            <div class="grupo-campo">
+                                <label for="filtro-auditoria-modulo" class="etiqueta-campo">Filtrar por módulo</label>
+                                <select id="filtro-auditoria-modulo" class="campo-control">
+                                    <option value="todos" selected>Todos los módulos</option>
+                                    <option value="Conductividad / TDS">Conductividad / TDS</option>
+                                    <option value="pH RS485">pH RS485</option>
+                                    <option value="pH Analógico">pH Analógico</option>
+                                    <option value="Nivel y Temperatura">Nivel y Temperatura</option>
+                                    <option value="Control de Equipos">Control de Equipos</option>
+                                    <option value="Nodo ESP32-S3">Nodo ESP32-S3</option>
+                                    <option value="Sistema y Tipografía">Sistema y Tipografía</option>
+                                </select>
+                            </div>
+
+                            <div class="acciones-card" style="border-top: none; padding-top: 0; margin-top: 0;">
+                                <button type="button" id="btn-exportar-auditoria-csv" class="btn-modal btn-modal-activar">
+                                    Exportar Bitácora CSV
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="contenedor-tabla-registros">
                             <table class="tabla-historial" aria-label="Bitácora de auditoría de configuración">
                                 <thead>
@@ -243,8 +266,8 @@
                                         <th>Fecha y Hora</th>
                                         <th>Módulo</th>
                                         <th>Parámetro Modificado</th>
-                                        <th>Cambio Realizado</th>
-                                        <th>Usuario</th>
+                                        <th>Detalle del Cambio</th>
+                                        <th>Responsable</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-auditoria-sistema" aria-live="polite"></tbody>

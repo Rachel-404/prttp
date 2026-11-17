@@ -122,8 +122,11 @@ document.addEventListener("DOMContentLoaded", () => {
         formConectividad.addEventListener("submit", (e) => {
             e.preventDefault();
             if (window.AxionCache) {
+                const prev = window.AxionCache.leerDeCache(CLAVE_CACHE);
+                const nuevoProto = (selectProtocolo?.value || "mqtt").toUpperCase();
+                const nuevoSsid = (inputSsid?.value || "").trim() || "AXION_LAB_HIDROPONIA";
                 window.AxionCache.guardarEnCache(CLAVE_CACHE, {
-                    ssid: (inputSsid?.value || "").trim() || "AXION_LAB_HIDROPONIA",
+                    ssid: nuevoSsid,
                     asignacionIp: selectIp?.value || "dhcp",
                     ipLocal: inputIpLocal?.value || "192.168.1.120",
                     mascara: inputMascara?.value || "255.255.255.0",
@@ -137,10 +140,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     habilitarTls: Boolean(chkTls?.checked)
                 });
                 window.AxionCache.registrarAuditoria(
-                    "Controlador ESP32-S3",
+                    "Nodo ESP32-S3",
                     "Conectividad / Protocolo",
-                    "Anterior",
-                    `${(selectProtocolo?.value || "mqtt").toUpperCase()} (${inputSsid?.value || "Wi-Fi"})`
+                    `${(prev.protocolo || "mqtt").toUpperCase()} (${prev.ssid})`,
+                    `${nuevoProto} (${nuevoSsid})`
                 );
             }
             mostrarToast("Configuración de conectividad y transporte guardada.");

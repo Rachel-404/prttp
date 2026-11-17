@@ -130,25 +130,25 @@
         ],
         auditoria: [
             {
-                fechaHora: "16/11/2026 18:10",
+                fechaHora: "16/11/2026 18:10:00",
                 modulo: "pH RS485",
-                parametro: "pH Máximo",
+                parametro: "Umbral Máximo de pH",
                 cambio: "6.50 pH → 6.80 pH",
-                usuario: "Admin Único"
+                usuario: "Administrador Único"
             },
             {
-                fechaHora: "16/11/2026 17:45",
-                modulo: "Nivel de Agua",
+                fechaHora: "16/11/2026 17:45:12",
+                modulo: "Nivel y Temperatura",
                 parametro: "Unidad Principal",
                 cambio: "cm → kPa",
-                usuario: "Admin Único"
+                usuario: "Administrador Único"
             },
             {
-                fechaHora: "16/11/2026 16:20",
-                modulo: "Controlador ESP32-S3",
+                fechaHora: "16/11/2026 16:20:05",
+                modulo: "Nodo ESP32-S3",
                 parametro: "Frecuencia de Envío",
                 cambio: "15 s → 10 s",
-                usuario: "Admin Único"
+                usuario: "Administrador Único"
             }
         ],
         retencion_backup: {
@@ -219,25 +219,66 @@
         }
     }
 
-    function obtenerAuditoria() {
-        const lista = leerDeCache("auditoria", VALORES_DEFECTO.auditoria);
-        return Array.isArray(lista) ? lista : clonar(VALORES_DEFECTO.auditoria);
+    function obtenerAuditoria(filtroModulo = "todos") {
+        let lista = [];
+        try {
+            const raw = localStorage.getItem(`${PREFIJO}auditoria`);
+            if (!raw) {
+                lista = clonar(VALORES_DEFECTO.auditoria);
+                localStorage.setItem(`${PREFIJO}auditoria`, JSON.stringify(lista));
+            } else {
+                const parsed = JSON.parse(raw);
+                lista = Array.isArray(parsed) ? parsed : clonar(VALORES_DEFECTO.auditoria);
+            }
+        } catch (err) {
+            lista = clonar(VALORES_DEFECTO.auditoria);
+        }
+        if (filtroModulo && filtroModulo !== "todos") {
+            return lista.filter((item) => item.modulo === filtroModulo);
+        }
+        return lista;
+    }
+
+    function renderizarTablaAuditoria(tbodyId = "tbody-auditoria-sistema", filtroModulo = "todos") {
+        const tbody = document.getElementById(tbodyId);
+        if (!tbody) return;
+        const registros = obtenerAuditoria(filtroModulo);
+        tbody.innerHTML = "";
+        if (registros.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5">No hay registros de cambios para el módulo seleccionado.</td></tr>';
+            return;
+        }
+        registros.forEach((item) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${item.fechaHora}</td>
+                <td>${item.modulo}</td>
+                <td>${item.parametro}</td>
+                <td><strong>${item.cambio}</strong></td>
+                <td>${item.usuario}</td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
 
     function registrarAuditoria(modulo, parametro, valorAnterior, valorNuevo) {
+        if (String(valorAnterior) === String(valorNuevo)) return null;
         const ahora = new Date();
         const pad = (n) => String(n).padStart(2, "0");
-        const fechaHora = `${pad(ahora.getDate())}/${pad(ahora.getMonth() + 1)}/${ahora.getFullYear()} ${pad(ahora.getHours())}:${pad(ahora.getMinutes())}`;
+        const fechaHora = `${pad(ahora.getDate())}/${pad(ahora.getMonth() + 1)}/${ahora.getFullYear()} ${pad(ahora.getHours())}:${pad(ahora.getMinutes())}:${pad(ahora.getSeconds())}`;
         const registro = {
             fechaHora,
-            modulo: String(modulo || "Sistema"),
+            modulo: String(modulo || "Sistema y Tipografía"),
             parametro: String(parametro || "Parámetro"),
             cambio: `${valorAnterior} → ${valorNuevo}`,
-            usuario: "Admin Único"
+            usuario: "Administrador Único"
         };
-        const actual = obtenerAuditoria();
-        const nuevaLista = [registro, ...actual].slice(0, 50);
+        const actual = obtenerAuditoria("todos");
+        actual.unshift(registro);
+        const nuevaLista = actual.slice(0, 50);
         guardarEnCache("auditoria", nuevaLista);
+        const selectFiltro = document.getElementById("filtro-auditoria-modulo");
+        renderizarTablaAuditoria("tbody-auditoria-sistema", selectFiltro ? selectFiltro.value : "todos");
         document.dispatchEvent(new CustomEvent("axion:auditoriaActualizada", { detail: nuevaLista }));
         return registro;
     }
@@ -252,6 +293,7 @@
         restaurarClaveCache,
         limpiarCacheSistema,
         obtenerAuditoria,
+        renderizarTablaAuditoria,
         registrarAuditoria
     };
 })(window);

@@ -697,11 +697,12 @@ document.addEventListener("DOMContentLoaded", () => {
             new CustomEvent("ph:configuracionGuardada", { detail: { ...estadoModuloPh } })
         );
         console.info("Configuración Bloque 1 (SEN0708) guardada:", estadoModuloPh);
-        if (window.registrarAuditoria) {
+        if (window.registrarAuditoria && window.AxionCache) {
+            const prev = window.AxionCache.leerDeCache("ph");
             window.registrarAuditoria(
                 "pH RS485",
                 "Umbrales pH",
-                "Anterior",
+                `${prev.minNormal} - ${prev.maxNormal} pH`,
                 `${estadoModuloPh.phMinimo} - ${estadoModuloPh.phMaximo} pH`
             );
         }

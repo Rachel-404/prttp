@@ -474,11 +474,12 @@ document.addEventListener("DOMContentLoaded", () => {
             })
         );
         console.info("Configuración Bloque 1 (RTD PT100) guardada:", estadoModuloTemp);
-        if (window.registrarAuditoria) {
+        if (window.registrarAuditoria && window.AxionCache) {
+            const prev = window.AxionCache.leerDeCache("temp_agua");
             window.registrarAuditoria(
-                "Temperatura PT100",
-                "Umbrales Térmicos",
-                "Anterior",
+                "Nivel y Temperatura",
+                "Umbrales Térmicos PT100",
+                `${prev.minNormal} - ${prev.maxNormal} °C`,
                 `${estadoModuloTemp.tempMinimaAgua} - ${estadoModuloTemp.tempMaximaAgua} °C`
             );
         }
