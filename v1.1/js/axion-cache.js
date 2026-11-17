@@ -23,18 +23,6 @@
             tempMax: 24.0,
             valorActual: 6.1
         },
-        ph_analogo: {
-            activo: true,
-            frecuenciaSeg: 10,
-            minNormal: 5.5,
-            maxNormal: 6.5,
-            fuenteTemperatura: "pt100",
-            voltajeNeutro: 1500.0,
-            voltajeAcido: 2032.4,
-            fechaInstalacion: "2026-10-05",
-            canalAdc1: "GPIO4_ADC1",
-            valorActual: 5.85
-        },
         nivel_agua: {
             activo: true,
             frecuenciaSeg: 10,

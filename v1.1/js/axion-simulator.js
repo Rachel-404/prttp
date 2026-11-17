@@ -11,7 +11,6 @@
     const NOMINALES = {
         ec: 1210,
         ph: 6.1,
-        phAnalogo: 5.9,
         nivel: 84.5,
         tempAgua: 21.5,
         dhtTemp: 22.8,
@@ -108,14 +107,12 @@
     function generarTrama() {
         const cfgEc = leerCacheSeguro("ec", { activo: true, minNormal: 800, maxNormal: 1800 });
         const cfgPh = leerCacheSeguro("ph", { activo: true, minNormal: 5.5, maxNormal: 6.5 });
-        const cfgPhA = leerCacheSeguro("ph_analogo", { activo: true, minNormal: 5.5, maxNormal: 6.5 });
         const cfgNivel = leerCacheSeguro("nivel_agua", { activo: true, minNormal: 20, maxNormal: 90 });
         const cfgTemp = leerCacheSeguro("temp_agua", { activo: true, minNormal: 18.0, maxNormal: 24.0 });
         const cfgDht = leerCacheSeguro("dht22", { activo: true, tempMin: 18.0, tempMax: 28.0, humMin: 50, humMax: 80 });
 
         let valEc = fluctuar(NOMINALES.ec, 30, 0);
         let valPh = fluctuar(NOMINALES.ph, 0.15, 2);
-        let valPhA = fluctuar(NOMINALES.phAnalogo, 0.15, 2);
         let valNivel = fluctuar(NOMINALES.nivel, 1.5, 0);
         let valTemp = fluctuar(NOMINALES.tempAgua, 0.3, 1);
         let tempEnLinea = cfgTemp.activo !== false;
@@ -133,7 +130,6 @@
             timestamp: new Date().toISOString(),
             ec: cfgEc.activo !== false ? { valor: valEc, enLinea: true } : { enLinea: false },
             ph: cfgPh.activo !== false ? { valor: valPh, enLinea: true } : { enLinea: false },
-            phAnalogo: cfgPhA.activo !== false ? { valor: valPhA, enLinea: true } : { enLinea: false },
             nivel: cfgNivel.activo !== false
                 ? { valor: valNivel, litros: Math.round((valNivel / 100) * 412), enLinea: true }
                 : { enLinea: false },

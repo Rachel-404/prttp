@@ -42,19 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
             idTextoBadge: "texto-badge-ph",
             idExtra: "extra-ph"
         },
-        phAnalogo: {
-            claveCache: "ph_analogo",
-            minNormal: 5.5,
-            maxNormal: 6.5,
-            margenAdvertencia: 0.3,
-            unidad: "pH",
-            decimales: 2,
-            idValor: "valor-ph-analogo",
-            idRef: "ref-ph-analogo",
-            idBadge: "badge-ph-analogo",
-            idTextoBadge: "texto-badge-ph-analogo",
-            idExtra: "extra-ph-analogo"
-        },
         nivel: {
             claveCache: "nivel_agua",
             minNormal: 20,
@@ -88,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const estadoDashboard = {
         ec: { valor: 1200, enLinea: true },
         ph: { valor: 6.1, enLinea: true },
-        phAnalogo: { valor: 5.85, enLinea: true },
         nivel: { valor: 85, litros: 350, enLinea: true },
         tempAgua: { valor: 21.5, enLinea: true },
         esp32: {
@@ -146,13 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const subEc = document.querySelector("#card-ec .submetricas-tecnicas");
             if (subEc) {
                 subEc.textContent = `1.184 V · 1469 Raw · ${atcEc.valor.toFixed(1)} °C (${atcEc.origen})`;
-            }
-
-            const cfgPhA = cache.leerDeCache("ph_analogo");
-            const atcPhA = cache.resolverTemperaturaAtc(cfgPhA.fuenteTemperatura || "pt100", 25.0);
-            const subPhA = document.querySelector("#card-ph-analogo .submetricas-tecnicas");
-            if (subPhA) {
-                subPhA.textContent = `1704.5 mV · 98.5% Salud · ${atcPhA.valor.toFixed(1)} °C (${atcPhA.origen})`;
             }
         }
     }
