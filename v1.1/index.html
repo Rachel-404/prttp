@@ -140,7 +140,28 @@
                     </footer>
                 </article>
 
-                <!-- Tarjeta 5: Estado del Microcontrolador -->
+                <!-- Tarjeta 5: Microclima Ambiental (DHT22) -->
+                <article class="card card-sensor" id="card-dht22">
+                    <header class="titulo-card">
+                        <h3><a href="views/sensores/temperatura_humedad/temperatura_humedad.html">Microclima Ambiental</a></h3>
+                        <span id="badge-dht22" class="badge-conexion conectado" role="status" aria-live="polite">
+                            <span class="punto-estado" aria-hidden="true"></span>
+                            <span id="texto-badge-dht22">Óptimo</span>
+                        </span>
+                    </header>
+
+                    <div class="cuerpo-sensor" aria-live="polite">
+                        <p id="val-temp-amb" class="valor-principal valor-normal">24.5 °C</p>
+                        <p id="ref-dht22" class="rango-referencia">Humedad relativa: <strong id="val-hum-amb">65.2 %</strong></p>
+                        <p class="submetricas-tecnicas" aria-label="Métricas de diagnóstico">DHT22 · Aire y Humedad</p>
+                    </div>
+
+                    <footer class="pie-sensor">
+                        <span id="extra-dht22" class="dato-inferior">Aire: 18.0 – 28.0 °C · Humedad: 50 – 80 %</span>
+                    </footer>
+                </article>
+
+                <!-- Tarjeta 6: Estado del Microcontrolador -->
                 <article class="card card-sensor card-sistema" id="card-microcontrolador">
                     <header class="titulo-card">
                         <h3>Microcontrolador ESP32-S3</h3>

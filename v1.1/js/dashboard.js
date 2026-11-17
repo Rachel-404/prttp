@@ -77,6 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
         ph: { valor: 6.1, enLinea: true },
         nivel: { valor: 85, litros: 350, enLinea: true },
         tempAgua: { valor: 21.5, enLinea: true },
+        dht22: {
+            temperatura: 24.5,
+            humedad: 65.2,
+            enLinea: true,
+            tempMin: 18.0,
+            tempMax: 28.0,
+            humMin: 50,
+            humMax: 80
+        },
         esp32: {
             conectado: true,
             wifiTexto: "Excelente (-58 dBm)",
@@ -124,6 +133,15 @@ document.addEventListener("DOMContentLoaded", () => {
             estadoDashboard.esp32.wifiTexto = nodo.ssid ? `${nodo.ssid} (-58 dBm)` : "Excelente (-58 dBm)";
             estadoDashboard.esp32.muestreoSeg = Number(nodo.muestreoSeg || 2);
             estadoDashboard.esp32.envioSeg = Number(nodo.envioSeg || 10);
+        }
+
+        const cfgDht = cache.leerDeCache("dht22");
+        if (cfgDht) {
+            if (typeof cfgDht.activo === "boolean") estadoDashboard.dht22.enLinea = cfgDht.activo;
+            if (Number.isFinite(Number(cfgDht.tempMin))) estadoDashboard.dht22.tempMin = Number(cfgDht.tempMin);
+            if (Number.isFinite(Number(cfgDht.tempMax))) estadoDashboard.dht22.tempMax = Number(cfgDht.tempMax);
+            if (Number.isFinite(Number(cfgDht.humMin))) estadoDashboard.dht22.humMin = Number(cfgDht.humMin);
+            if (Number.isFinite(Number(cfgDht.humMax))) estadoDashboard.dht22.humMax = Number(cfgDht.humMax);
         }
 
         if (typeof cache.resolverTemperaturaAtc === "function") {
@@ -235,9 +253,60 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function evaluarNivelMargen5(valor, min, max) {
+        if (!Number.isFinite(valor) || !Number.isFinite(min) || !Number.isFinite(max) || max <= min) return 0;
+        if (valor < min || valor > max) return 2; // Crítico
+        const margen = (max - min) * 0.05;
+        if (valor <= min + margen || valor >= max - margen) return 1; // Advertencia
+        return 0; // Normal
+    }
+
+    function renderizarTarjetaDht22() {
+        const d = estadoDashboard.dht22;
+        const elTemp = document.getElementById("val-temp-amb");
+        const elHum = document.getElementById("val-hum-amb");
+        const elBadge = document.getElementById("badge-dht22");
+        const elTextoBadge = document.getElementById("texto-badge-dht22");
+        const elExtra = document.getElementById("extra-dht22");
+
+        if (elExtra) {
+            elExtra.textContent = `Aire: ${d.tempMin.toFixed(1)} – ${d.tempMax.toFixed(1)} °C · Humedad: ${Math.round(d.humMin)} – ${Math.round(d.humMax)} %`;
+        }
+
+        if (!d.enLinea) {
+            actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Pausado");
+            if (elTemp) {
+                elTemp.classList.remove("valor-normal", "valor-advertencia", "valor-critico");
+                elTemp.classList.add("valor-critico");
+                elTemp.textContent = "-- °C";
+            }
+            if (elHum) elHum.textContent = "-- %";
+            return;
+        }
+
+        const nivelTemp = evaluarNivelMargen5(d.temperatura, d.tempMin, d.tempMax);
+        const nivelHum = evaluarNivelMargen5(d.humedad, d.humMin, d.humMax);
+        const peorNivel = Math.max(nivelTemp, nivelHum);
+
+        const claseValor = peorNivel === 2 ? "valor-critico" : peorNivel === 1 ? "valor-advertencia" : "valor-normal";
+        const claseBadge = peorNivel === 2 ? "critico" : peorNivel === 1 ? "advertencia" : "conectado";
+        const textoBadge = peorNivel === 2 ? "Crítico" : peorNivel === 1 ? "Advertencia" : "Óptimo";
+
+        actualizarBadgeEstado(elBadge, elTextoBadge, claseBadge, textoBadge);
+        if (elTemp) {
+            elTemp.classList.remove("valor-normal", "valor-advertencia", "valor-critico");
+            elTemp.classList.add(claseValor);
+            elTemp.textContent = `${Number(d.temperatura).toFixed(1)} °C`;
+        }
+        if (elHum) {
+            elHum.textContent = `${Number(d.humedad).toFixed(1)} %`;
+        }
+    }
+
     function renderizarTodo() {
         cargarConfiguracionDesdeCache();
         Object.keys(CONFIG_SENSORES).forEach(renderizarTarjetaSensor);
+        renderizarTarjetaDht22();
         renderizarMicrocontrolador();
     }
 
@@ -250,6 +319,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 };
             }
         });
+
+        if (nuevosDatos.dht22 && typeof nuevosDatos.dht22 === "object") {
+            estadoDashboard.dht22 = {
+                ...estadoDashboard.dht22,
+                ...nuevosDatos.dht22
+            };
+        }
 
         if (nuevosDatos.esp32 && typeof nuevosDatos.esp32 === "object") {
             estadoDashboard.esp32 = {
@@ -280,6 +356,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     enLinea: trama.estado.nivel === "ok"
                 },
                 tempAgua: { valor: Number(trama.datos.temperatura_solucion), enLinea: trama.estado.pt100 === "ok" },
+                dht22: {
+                    temperatura: Number(trama.datos.temperatura_amb),
+                    humedad: Number(trama.datos.humedad_amb),
+                    enLinea: trama.estado.dht22 === "ok"
+                },
                 esp32: {
                     conectado: true,
                     wifiTexto: `Conectado (${trama.rssi} dBm)`,
@@ -345,6 +426,16 @@ document.addEventListener("DOMContentLoaded", () => {
             renderizarTodo();
         }
     });
+
+    const cardDht22 = document.getElementById("card-dht22");
+    if (cardDht22) {
+        cardDht22.style.cursor = "pointer";
+        cardDht22.addEventListener("click", (e) => {
+            if (!e.target.closest("a")) {
+                window.location.href = "views/sensores/temperatura_humedad/temperatura_humedad.html";
+            }
+        });
+    }
 
     renderizarEquiposDashboard();
     renderizarTodo();

@@ -103,7 +103,9 @@
                             ? "views/sensores/nivel-temperatura/index.html?tab=temperatura"
                             : claveSensor === "nivel"
                                 ? "views/sensores/nivel-temperatura/index.html"
-                                : "index.html"
+                                : claveSensor === "dht22"
+                                    ? "views/sensores/temperatura_humedad/temperatura_humedad.html"
+                                    : "index.html"
             };
             const actualizada = [nuevaAlerta, ...(Array.isArray(lista) ? lista : [])].slice(0, 12);
             localStorage.setItem(CLAVE_ALERTAS, JSON.stringify(actualizada));
@@ -193,6 +195,13 @@
             const estTemp = evaluarUmbral(tempSol, Number(cfgTemp.minNormal), Number(cfgTemp.maxNormal));
             if (estTemp === "Crítico") {
                 registrarAlertaEnHeader("pt100", estTemp, "Temperatura del agua fuera de rango", `Lectura: ${tempSol} °C`);
+            }
+        }
+        if (trama.estado.dht22 === "ok") {
+            const estDhtT = evaluarUmbral(tempAmb, Number(cfgDht.tempMin), Number(cfgDht.tempMax));
+            const estDhtH = evaluarUmbral(humAmb, Number(cfgDht.humMin), Number(cfgDht.humMax));
+            if (estDhtT === "Crítico" || estDhtH === "Crítico") {
+                registrarAlertaEnHeader("dht22", "Crítico", "Microclima DHT22 fuera de rango", `Aire: ${tempAmb} °C · Humedad: ${humAmb} %`);
             }
         }
 
