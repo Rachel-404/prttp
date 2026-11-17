@@ -50,7 +50,7 @@ body.tema-claro .login-card {
     border-radius: 14px;
     background-color: var(--bg-main);
     border: 1px solid rgba(22, 163, 74, 0.45);
-    color: #16a34a;
+    color: var(--color-ok);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -80,30 +80,6 @@ body.tema-claro .login-card {
     display: flex;
     flex-direction: column;
     gap: 16px;
-}
-
-.etiqueta-campo {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-.campo-control {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: var(--font-size-base);
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.campo-control:focus {
-    border-color: #16a34a;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.18);
 }
 
 .campo-password-wrapper {
@@ -139,7 +115,7 @@ body.tema-claro .login-card {
 }
 
 .btn-ver-password:focus-visible {
-    outline: 2px solid #16a34a;
+    outline: 2px solid var(--color-ok);
     outline-offset: 1px;
 }
 
@@ -166,7 +142,7 @@ body.tema-claro .login-card {
     width: 16px;
     height: 16px;
     margin: 0;
-    accent-color: #16a34a;
+    accent-color: var(--color-ok);
     cursor: pointer;
 }
 
@@ -174,7 +150,7 @@ body.tema-claro .login-card {
     padding: 0;
     border: none;
     background: transparent;
-    color: #16a34a;
+    color: var(--color-ok);
     font-family: inherit;
     font-size: var(--font-size-base);
     font-weight: 600;
@@ -184,12 +160,12 @@ body.tema-claro .login-card {
 }
 
 .enlace-recuperar:hover {
-    color: #15803d;
+    color: var(--color-ok-hover);
     text-decoration: underline;
 }
 
 .enlace-recuperar:focus-visible {
-    outline: 2px solid #16a34a;
+    outline: 2px solid var(--color-ok);
     outline-offset: 2px;
     border-radius: 4px;
 }
@@ -200,7 +176,7 @@ body.tema-claro .login-card {
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     font-size: var(--font-size-base);
     line-height: 1.4;
     font-weight: 500;
@@ -214,60 +190,44 @@ body.tema-claro .login-card {
 }
 
 .login-feedback.es-error {
-    border: 1px solid #991b1b;
-    background-color: #7f1d1d;
-    color: #fee2e2;
+    border: 1px solid var(--color-critico-borde);
+    background-color: var(--color-critico-fondo);
+    color: var(--color-critico-suave);
 }
 
 .login-feedback.es-error .punto-feedback {
-    background-color: #ef4444;
+    background-color: var(--color-critico-brillante);
 }
 
 body.tema-claro .login-feedback.es-error {
-    background-color: #fee2e2;
-    border-color: #fca5a5;
-    color: #7f1d1d;
+    background-color: var(--color-critico-suave);
+    border-color: var(--color-critico-claro);
+    color: var(--color-critico-fondo);
 }
 
 .login-feedback.es-exito {
-    border: 1px solid #15803d;
+    border: 1px solid var(--color-ok-hover);
     background-color: rgba(22, 163, 74, 0.16);
-    color: #dcfce7;
+    color: var(--color-ok-suave);
 }
 
 .login-feedback.es-exito .punto-feedback {
-    background-color: #22c55e;
+    background-color: var(--color-ok-brillante);
 }
 
 body.tema-claro .login-feedback.es-exito {
-    background-color: #dcfce7;
+    background-color: var(--color-ok-suave);
     border-color: #86efac;
     color: #14532d;
 }
-
 /* BOTÓN PRINCIPAL */
-.btn-modal {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-family: inherit;
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, opacity 0.2s ease;
-}
-
-.btn-modal-activar {
-    background-color: #16a34a;
-    color: #ffffff;
-}
 
 .btn-modal-activar:hover:not(:disabled) {
-    background-color: #15803d;
+    background-color: var(--color-ok-hover);
 }
 
 .btn-modal-activar:focus-visible {
-    outline: 2px solid #16a34a;
+    outline: 2px solid var(--color-ok);
     outline-offset: 2px;
 }
 
@@ -307,7 +267,7 @@ body.tema-claro .login-feedback.es-exito {
 }
 
 .enlace-retorno-publico:focus-visible {
-    outline: 2px solid #16a34a;
+    outline: 2px solid var(--color-ok);
     outline-offset: 2px;
     border-radius: 4px;
 }
@@ -316,16 +276,6 @@ body.tema-claro .login-feedback.es-exito {
     display: flex;
     flex-direction: column;
     gap: 12px;
-}
-
-.btn-modal-cancelar {
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
-}
-
-.btn-modal-cancelar:hover {
-    background-color: var(--hover-bg);
 }
 
 @media (max-width: 480px) {

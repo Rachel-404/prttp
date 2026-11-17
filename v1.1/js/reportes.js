@@ -741,8 +741,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Inicialización global
+    const esAdmin = Boolean(window.AxionAuth && window.AxionAuth.esAdministrador());
+    const btnTabRespaldos = document.getElementById("tab-respaldos");
+    const tituloModulo = document.querySelector(".titulo-modulo-reportes h1");
+    if (!esAdmin) {
+        if (btnTabRespaldos) btnTabRespaldos.hidden = true;
+        if (tituloModulo) tituloModulo.textContent = "Reportes e Investigación";
+    }
+
     inicializarFechasPorDefecto();
-    cargarEstadosBackup();
+    if (esAdmin) cargarEstadosBackup();
 
     botonesPestana.forEach((boton) => {
         boton.addEventListener("click", () => {

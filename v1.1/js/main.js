@@ -21,6 +21,31 @@ function obtenerSesionActiva() {
     }
 }
 
+function esRutaProtegidaAdmin(pathname) {
+    const p = String(pathname || "").toLowerCase();
+    if (!p.includes("/views/")) return false;
+    if (p.includes("/views/reportes/")) return false;
+    return true;
+}
+
+function verificarAccesoRutaActual() {
+    if (obtenerSesionActiva()) return true;
+    if (esRutaProtegidaAdmin(window.location.pathname)) {
+        const destino = new URL("login.html", BASE_URL);
+        destino.searchParams.set("redirect", window.location.href);
+        window.location.replace(destino.href);
+        return false;
+    }
+    return true;
+}
+
+window.AxionAuth = {
+    obtenerSesionActiva,
+    esAdministrador: () => Boolean(obtenerSesionActiva())
+};
+
+verificarAccesoRutaActual();
+
 function inicializarSesionHeader(headerContainer) {
     if (!headerContainer) return;
 
@@ -69,7 +94,7 @@ function inicializarSesionHeader(headerContainer) {
         btnCerrarSesion.addEventListener("click", () => {
             localStorage.removeItem(CLAVE_SESION_ADMIN);
             sessionStorage.removeItem(CLAVE_SESION_ADMIN);
-            window.location.href = new URL("login.html", BASE_URL).href;
+            window.location.href = new URL("index.html", BASE_URL).href;
         });
     }
 }
@@ -182,7 +207,50 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    cargarComponente("views/partials/sidebar.html", "contenedor-sidebar");
+    cargarComponente("views/partials/sidebar.html", "contenedor-sidebar").then(() => {
+        const sidebarContainer = document.getElementById("contenedor-sidebar");
+        if (!sidebarContainer) return;
+        const autenticado = Boolean(obtenerSesionActiva());
+        sidebarContainer.querySelectorAll('[data-solo-admin="true"]').forEach((el) => {
+            el.hidden = !autenticado;
+        });
+        const labelReportes = sidebarContainer.querySelector("#sidebar-label-reportes");
+        if (labelReportes && !autenticado) {
+            labelReportes.textContent = "Reportes e Investigación";
+        }
+
+        const btnToggleConfig = sidebarContainer.querySelector("#btn-toggle-config-nav");
+        const submenuSensores = sidebarContainer.querySelector("#submenu-sensores");
+
+        if (btnToggleConfig && submenuSensores) {
+            btnToggleConfig.addEventListener("click", () => {
+                const abierto = !submenuSensores.hidden;
+                submenuSensores.hidden = abierto;
+                btnToggleConfig.setAttribute("aria-expanded", abierto ? "false" : "true");
+            });
+        }
+
+        const rutaActual = window.location.pathname.replace(/\/index\.html$/i, "/");
+        sidebarContainer.querySelectorAll("a[href]").forEach((enlace) => {
+            try {
+                const rutaEnlace = new URL(enlace.href, window.location.origin).pathname.replace(/\/index\.html$/i, "/");
+                if (rutaActual === rutaEnlace) {
+                    const itemSubmenu = enlace.closest(".opcionII");
+                    if (itemSubmenu) {
+                        itemSubmenu.classList.add("activo");
+                        if (submenuSensores && btnToggleConfig) {
+                            submenuSensores.hidden = false;
+                            btnToggleConfig.setAttribute("aria-expanded", "true");
+                        }
+                    } else {
+                        enlace.classList.add("activo");
+                    }
+                }
+            } catch (e) {
+                // Ignorar URLs inválidas
+            }
+        });
+    });
 });
 
 function inicializarCentroAlertas(headerContainer) {
@@ -302,7 +370,9 @@ function inicializarCentroAlertas(headerContainer) {
         const alertas = leerAlertas().map((a) => (a.id === id ? { ...a, leida: true } : a));
         guardarAlertas(alertas);
         renderizarAlertas();
-        window.location.href = new URL(destinoRel, BASE_URL).href;
+        if (obtenerSesionActiva()) {
+            window.location.href = new URL(destinoRel, BASE_URL).href;
+        }
     }
 
     btnAlertas.addEventListener("click", (e) => {

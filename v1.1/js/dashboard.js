@@ -398,15 +398,37 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    const cardDht22 = document.getElementById("card-dht22");
-    if (cardDht22) {
-        cardDht22.style.cursor = "pointer";
-        cardDht22.addEventListener("click", (e) => {
-            if (!e.target.closest("a")) {
-                window.location.href = "views/sensores/temperatura_humedad/temperatura_humedad.html";
-            }
-        });
+    const esAdmin = Boolean(window.AxionAuth && window.AxionAuth.esAdministrador());
+    const enlaceGestionarEquipos = document.querySelector(".enlace-gestionar-equipos");
+    if (enlaceGestionarEquipos) {
+        enlaceGestionarEquipos.hidden = !esAdmin;
     }
+
+    const rutasTarjetasAdmin = [
+        ["card-ec", "views/sensores/ec/index.html"],
+        ["card-ph", "views/sensores/ph/index.html"],
+        ["card-nivel", "views/sensores/nivel-temperatura/index.html?tab=nivel"],
+        ["card-temp-agua", "views/sensores/nivel-temperatura/index.html?tab=temperatura"],
+        ["card-dht22", "views/sensores/temperatura_humedad/temperatura_humedad.html"],
+        ["card-microcontrolador", "views/nodo-maestro/index.html"]
+    ];
+
+    rutasTarjetasAdmin.forEach(([id, ruta]) => {
+        const card = document.getElementById(id);
+        if (!card) return;
+        const linkInterno = card.querySelector("h3 a");
+        if (esAdmin) {
+            card.style.cursor = "pointer";
+            card.addEventListener("click", (e) => {
+                if (!e.target.closest("a")) {
+                    window.location.href = ruta;
+                }
+            });
+        } else if (linkInterno) {
+            linkInterno.removeAttribute("href");
+            linkInterno.style.cursor = "default";
+        }
+    });
 
     renderizarEquiposDashboard();
     renderizarTodo();

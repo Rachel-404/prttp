@@ -193,6 +193,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 sondaTempAsociada: estadoModuloEc.sondaTempAsociada,
                 tempManualAtc,
                 factorCalibracionK: Number(inputFactorK?.value || 1.0),
+                kValue: estadoTecnicoEc.kValue,
+                coeficienteTermico: estadoTecnicoEc.coeficienteTermico,
                 atenuacionAdc: selectAtenuacion?.value || "11db"
             });
         }

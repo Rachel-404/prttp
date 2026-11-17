@@ -315,28 +315,79 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        let passwordVigente = "axion2026";
+        try {
+            const rawGuardada = localStorage.getItem(CLAVE_CUENTA_ADMIN);
+            if (rawGuardada) {
+                const cuentaGuardada = JSON.parse(rawGuardada);
+                if (cuentaGuardada && typeof cuentaGuardada.passwordAdmin === "string" && cuentaGuardada.passwordAdmin.length > 0) {
+                    passwordVigente = cuentaGuardada.passwordAdmin;
+                }
+            }
+        } catch (err) {
+            console.warn("No se pudo leer la contraseña vigente:", err);
+        }
+
+        if (passwordActual !== passwordVigente) {
+            errorCuenta.textContent = "La Contraseña Actual ingresada es incorrecta.";
+            errorCuenta.hidden = false;
+            inputPasswordActual.focus();
+            return;
+        }
+
+        const inputPasswordNueva = document.getElementById("password-nueva");
+        const inputPasswordConfirmar = document.getElementById("password-confirmar");
+        const passwordNueva = (inputPasswordNueva?.value || "").trim();
+        const passwordConfirmar = (inputPasswordConfirmar?.value || "").trim();
+
+        let passwordFinal = passwordVigente;
+        let cambioPassword = false;
+
+        if (passwordNueva || passwordConfirmar) {
+            if (passwordNueva.length < 6) {
+                errorCuenta.textContent = "La Nueva Contraseña debe tener al menos 6 caracteres.";
+                errorCuenta.hidden = false;
+                if (inputPasswordNueva) inputPasswordNueva.focus();
+                return;
+            }
+            if (passwordNueva !== passwordConfirmar) {
+                errorCuenta.textContent = "La Nueva Contraseña y su confirmación no coinciden.";
+                errorCuenta.hidden = false;
+                if (inputPasswordConfirmar) inputPasswordConfirmar.focus();
+                return;
+            }
+            passwordFinal = passwordNueva;
+            cambioPassword = true;
+        }
+
         const datosCuenta = {
             nombreVisible,
             correoAlertas,
             expiracionMinutos,
+            passwordAdmin: passwordFinal,
             ultimaActualizacion: new Date().toISOString()
         };
         localStorage.setItem(CLAVE_CUENTA_ADMIN, JSON.stringify(datosCuenta));
 
         if (displayCorreo) displayCorreo.textContent = correoAlertas;
         inputPasswordActual.value = "";
-        const inputPasswordNueva = document.getElementById("password-nueva");
-        const inputPasswordConfirmar = document.getElementById("password-confirmar");
         if (inputPasswordNueva) inputPasswordNueva.value = "";
         if (inputPasswordConfirmar) inputPasswordConfirmar.value = "";
 
         if (window.registrarAuditoria) {
-            window.registrarAuditoria("Cuenta Administrativa", "Perfil y Sesión", "Anterior", `${expiracionMinutos} min`);
+            window.registrarAuditoria(
+                "Cuenta Administrativa",
+                cambioPassword ? "Perfil y Contraseña" : "Perfil y Sesión",
+                "Anterior",
+                cambioPassword ? `Contraseña actualizada · ${expiracionMinutos} min` : `${expiracionMinutos} min`
+            );
         }
 
         abrirModal({
             titulo: "Cambios Guardados",
-            mensaje: "La configuración de la Cuenta Administrativa (Admin Único) se actualizó correctamente.",
+            mensaje: cambioPassword
+                ? "La configuración y la nueva contraseña de la Cuenta Administrativa se actualizaron correctamente."
+                : "La configuración de la Cuenta Administrativa (Admin Único) se actualizó correctamente.",
             claseBoton: "btn-modal-activar"
         });
     });

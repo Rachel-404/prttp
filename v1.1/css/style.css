@@ -10,6 +10,38 @@
     --font-size-title: 24px;
     --font-size-subtitle: 18px;
     --font-size-base: 14px;
+
+    /* ===== TOKENS DEL SISTEMA DE DISEÑO (comunes a ambos temas) ===== */
+    /* Semáforo: Verde = Normal/Óptimo */
+    --color-ok: #16a34a;
+    --color-ok-hover: #15803d;
+    --color-ok-brillante: #22c55e;
+    --color-ok-suave: #dcfce7;
+    /* Semáforo: Naranja = Advertencia */
+    --color-advertencia: #f59e0b;
+    --color-advertencia-oscuro: #d97706;
+    /* Semáforo: Rojo = Crítico/Pausado */
+    --color-critico: #dc2626;
+    --color-critico-hover: #b91c1c;
+    --color-critico-brillante: #ef4444;
+    --color-critico-borde: #991b1b;
+    --color-critico-fondo: #7f1d1d;
+    --color-critico-suave: #fee2e2;
+    --color-critico-claro: #fca5a5;
+    /* Neutros */
+    --color-blanco: #ffffff;
+    --color-neutro: #64748b;
+    --color-neutro-oscuro: #475569;
+    --color-neutro-claro: #94a3b8;
+    /* Radios */
+    --radio-sm: 8px;
+    --radio-md: 10px;
+    --radio-lg: 12px;
+    --radio-pill: 50px;
+    /* Sombras */
+    --sombra-popover: 0 12px 24px rgba(0, 0, 0, 0.35);
+    --sombra-modal: 0 18px 40px rgba(0, 0, 0, 0.4);
+    --sombra-toast: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 body.tema-claro {
@@ -124,7 +156,7 @@ body.tema-claro .hmbrgs {
 }
 
 body.tema-claro .btn-menu:hover .hmbrgs {
-    background: #475569;
+    background: var(--color-neutro-oscuro);
 }
 
 body.tema-claro .contenedor-opcion,
@@ -156,7 +188,7 @@ body.tema-claro .opcionII:hover {
     border: 1px solid var(--border-color);
     min-height: 200px;
     width: 100%;
-    border-radius: 10px;
+    border-radius: var(--radio-md);
 }
 
 /* ENCABEZADO COMÚN DE MÓDULO (H1 VISIBLE) */
@@ -208,7 +240,7 @@ body.tema-claro .opcionII:hover {
     gap: 15px;
     color: var(--text-main);
     font-size: var(--font-size-base);
-    border-bottom: 1px solid #4c596f;
+    border-bottom: 1px solid var(--border-color);
     padding: 15px 20px 10px 20px;
     width: 100%;
 }
@@ -236,7 +268,7 @@ body.tema-claro .opcionII:hover {
 .campo-control {
     width: 100%;
     padding: 8px 12px;
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     border: 1px solid var(--border-color);
     background-color: var(--bg-main);
     color: var(--text-main);
@@ -280,10 +312,10 @@ body.tema-claro .opcionII:hover {
 .mensaje-error-form {
     margin: 0;
     padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #991b1b;
-    background-color: #7f1d1d;
-    color: #fee2e2;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--color-critico-borde);
+    background-color: var(--color-critico-fondo);
+    color: var(--color-critico-suave);
     font-size: calc(var(--font-size-base) - 1px);
 }
 
@@ -322,7 +354,7 @@ body.tema-claro .opcionII:hover {
     gap: 12px;
     padding: 12px 14px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     background-color: var(--bg-main);
 }
 
@@ -349,7 +381,7 @@ body.tema-claro .opcionII:hover {
     margin: 0;
     padding: 14px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     background-color: var(--bg-main);
 }
 
@@ -414,11 +446,11 @@ body.tema-claro .opcionII:hover {
     left: 0;
     width: 260px;
     padding: 10px 12px;
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     border: 1px solid var(--border-color);
     background-color: var(--bg-card);
     color: var(--text-main);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--sombra-popover);
     z-index: 30;
 }
 
@@ -430,9 +462,9 @@ body.tema-claro .opcionII:hover {
 .txt-descr {
     font-size: calc(var(--font-size-base) - 2px);
     padding: 6px 14px;
-    border-radius: 50px;
+    border-radius: var(--radio-pill);
     font-weight: 700;
-    color: #fff;
+    color: var(--color-blanco);
     border: none;
     cursor: pointer;
     font-family: inherit;
@@ -440,16 +472,16 @@ body.tema-claro .opcionII:hover {
 }
 
 .txt-descr.activo {
-    background-color: #16a34a;
+    background-color: var(--color-ok);
 }
 
 .txt-descr.inactivo {
-    background-color: #dc2626;
+    background-color: var(--color-critico);
 }
 
 .btn-modal {
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     padding: 8px 14px;
     font-family: inherit;
     font-size: calc(var(--font-size-base) - 1px);
@@ -469,21 +501,21 @@ body.tema-claro .opcionII:hover {
 }
 
 .btn-modal-pausar {
-    background: #dc2626;
-    color: #fff;
+    background: var(--color-critico);
+    color: var(--color-blanco);
 }
 
 .btn-modal-pausar:hover {
-    background: #b91c1c;
+    background: var(--color-critico-hover);
 }
 
 .btn-modal-activar {
-    background: #16a34a;
-    color: #fff;
+    background: var(--color-ok);
+    color: var(--color-blanco);
 }
 
 .btn-modal-activar:hover {
-    background: #15803d;
+    background: var(--color-ok-hover);
 }
 
 .modal-overlay {
@@ -504,9 +536,9 @@ body.tema-claro .opcionII:hover {
     background: var(--bg-navbar);
     color: var(--text-main);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: var(--radio-lg);
     padding: 20px;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--sombra-modal);
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -542,10 +574,10 @@ body.tema-claro .opcionII:hover {
     color: var(--text-main);
     border: 1px solid var(--border-color);
     padding: 10px 16px;
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     font-size: calc(var(--font-size-base) - 1px);
     font-weight: 600;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--sombra-toast);
     z-index: 2100;
 }
 
@@ -667,7 +699,7 @@ body.tema-claro .opcionII:hover {
     width: 100%;
     overflow-x: auto;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
 }
 
 .tabla-historial {
@@ -720,21 +752,21 @@ body.tema-claro .opcionII:hover {
 }
 
 .estado-normal .punto-estado {
-    background-color: #22c55e;
+    background-color: var(--color-ok-brillante);
 }
 
 .estado-advertencia .punto-estado {
-    background-color: #f59e0b;
+    background-color: var(--color-advertencia);
 }
 
 .estado-critico .punto-estado {
-    background-color: #ef4444;
+    background-color: var(--color-critico-brillante);
 }
 
 .barra-progreso-estado {
     width: 100%;
     height: 12px;
-    accent-color: #16a34a;
+    accent-color: var(--color-ok);
 }
 
 .barra-filtros-auditoria {

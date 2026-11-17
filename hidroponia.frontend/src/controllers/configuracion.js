@@ -1,0 +1,475 @@
+export default function initController() {
+    const __docListeners = [];
+    const __winListeners = [];
+    const __observers = [];
+    const __origDocAdd = document.addEventListener.bind(document);
+    const __origWinAdd = window.addEventListener.bind(window);
+    const __OrigMO = window.MutationObserver;
+
+    const __docProxy = (type, fn, opts) => {
+        __docListeners.push([type, fn, opts]);
+        return __origDocAdd(type, fn, opts);
+    };
+    const __winProxy = (type, fn, opts) => {
+        __winListeners.push([type, fn, opts]);
+        return __origWinAdd(type, fn, opts);
+    };
+    class __TrackedMO extends __OrigMO {
+        constructor(cb) {
+            super(cb);
+            __observers.push(this);
+        }
+    }
+
+    document.addEventListener = __docProxy;
+    window.addEventListener = __winProxy;
+    window.MutationObserver = __TrackedMO;
+
+    try {
+        (function () {
+
+    const CLAVE_TEMA_LOCAL = "axion_tema";
+    const CLAVE_TIPOGRAFIA_LOCAL = "axion_tipografia";
+    const CLAVE_CUENTA_ADMIN = "axion_cuenta_admin";
+
+    const DEFAULTS_TIPOGRAFIA_PX = {
+        titlePx: 24,
+        subtitlePx: 18,
+        basePx: 14
+    };
+
+    const estadoTipografia = { ...DEFAULTS_TIPOGRAFIA_PX };
+
+    // Referencias DOM - Bloque 1: Apariencia y Accesibilidad
+    const formApariencia = document.getElementById("form-apariencia");
+    const selectTema = document.getElementById("select-tema-general");
+    const steppersTipografia = Array.from(document.querySelectorAll(".stepper-control[data-stepper]"));
+
+    // Referencias DOM - Bloque 2: Cuenta Administrativa
+    const formCuenta = document.getElementById("form-cuenta-admin");
+    const displayCorreo = document.getElementById("perfil-correo-display");
+    const inputNombreVisible = document.getElementById("nombre-visible");
+    const inputCorreoAlertas = document.getElementById("correo-alertas");
+    const inputExpiracion = document.getElementById("expiracion-sesion");
+    const inputPasswordActual = document.getElementById("password-actual");
+    const errorCuenta = document.getElementById("error-cuenta-admin");
+    const enlaceRegenerar = document.getElementById("enlace-regenerar-seguridad");
+
+    // Referencias DOM - Modal y Toast
+    const modal = document.getElementById("modal-config-general");
+    const modalTitulo = document.getElementById("modal-config-titulo");
+    const modalMensaje = document.getElementById("modal-config-mensaje");
+    const btnCerrarModal = document.getElementById("btn-modal-cerrar-config");
+    const toast = document.getElementById("toast-config");
+
+    if (!formApariencia || !formCuenta || !modal) return;
+
+    let alCerrarModal = null;
+    let toastTimer = null;
+
+    function mostrarToast(texto) {
+        if (!toast) return;
+        toast.textContent = texto;
+        toast.hidden = false;
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+            toast.hidden = true;
+        }, 3000);
+    }
+
+    function abrirModal({ titulo, mensaje, claseBoton, onCerrar }) {
+        modalTitulo.textContent = titulo;
+        modalMensaje.textContent = mensaje;
+        btnCerrarModal.className = `btn-modal ${claseBoton || "btn-modal-activar"}`;
+        alCerrarModal = typeof onCerrar === "function" ? onCerrar : null;
+        modal.hidden = false;
+        btnCerrarModal.focus();
+    }
+
+    function cerrarModal() {
+        modal.hidden = true;
+        if (alCerrarModal) {
+            const cb = alCerrarModal;
+            alCerrarModal = null;
+            cb();
+        }
+    }
+
+    function ajustarValorRango(valor, min, max, fallback) {
+        const num = Number.parseFloat(valor);
+        if (!Number.isFinite(num)) return fallback;
+        return Math.min(max, Math.max(min, Math.round(num)));
+    }
+
+    function renderizarSteppers() {
+        steppersTipografia.forEach((stepper) => {
+            const clave = stepper.dataset.stepper;
+            const min = Number(stepper.dataset.min);
+            const max = Number(stepper.dataset.max);
+            const valor = ajustarValorRango(estadoTipografia[clave], min, max, DEFAULTS_TIPOGRAFIA_PX[clave]);
+            estadoTipografia[clave] = valor;
+
+            const spanValor = stepper.querySelector(".stepper-valor");
+            const btnMenos = stepper.querySelector('[data-accion="decrementar"]');
+            const btnMas = stepper.querySelector('[data-accion="incrementar"]');
+
+            if (spanValor) spanValor.textContent = `${valor} px`;
+            if (btnMenos) btnMenos.disabled = valor <= min;
+            if (btnMas) btnMas.disabled = valor >= max;
+        });
+    }
+
+    function aplicarVariablesTipograficas() {
+        const root = document.documentElement;
+        const prefs = {
+            titlePx: estadoTipografia.titlePx,
+            subtitlePx: estadoTipografia.subtitlePx,
+            basePx: estadoTipografia.basePx,
+            title: `${estadoTipografia.titlePx}px`,
+            subtitle: `${estadoTipografia.subtitlePx}px`,
+            base: `${estadoTipografia.basePx}px`
+        };
+
+        root.style.setProperty("--font-size-title", prefs.title);
+        root.style.setProperty("--font-size-subtitle", prefs.subtitle);
+        root.style.setProperty("--font-size-base", prefs.base);
+        renderizarSteppers();
+
+        return prefs;
+    }
+
+    function aplicarTemaSeleccionado(modo) {
+        let esClaro = modo === "claro";
+        if (modo === "sistema") {
+            esClaro = Boolean(
+                window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches
+            );
+        }
+
+        document.body.classList.toggle("tema-claro", esClaro);
+
+        const btnNavbarTema = document.querySelector("#contenedor-navbar .btn-tema");
+        const iconoNavbarTema = document.querySelector(
+            "#contenedor-navbar .icono-tema .material-symbols-outlined"
+        );
+        if (btnNavbarTema) btnNavbarTema.classList.toggle("modo-claro", esClaro);
+        if (iconoNavbarTema) iconoNavbarTema.textContent = esClaro ? "light_mode" : "dark_mode";
+    }
+
+    function actualizarEtiquetasOpcionesTema(modoActual) {
+        Array.from(selectTema.options).forEach((opt) => {
+            if (opt.value === "oscuro") {
+                opt.textContent = modoActual === "oscuro" ? "Modo Oscuro (Actual)" : "Modo Oscuro";
+            } else if (opt.value === "claro") {
+                opt.textContent = modoActual === "claro" ? "Modo Claro (Actual)" : "Modo Claro";
+            } else if (opt.value === "sistema") {
+                opt.textContent =
+                    modoActual === "sistema"
+                        ? "Sincronizar con el Sistema (Actual)"
+                        : "Sincronizar con el Sistema";
+            }
+        });
+    }
+
+    function cargarPreferenciasIniciales() {
+        const modoTema = localStorage.getItem(CLAVE_TEMA_LOCAL) || "oscuro";
+        if (["oscuro", "claro", "sistema"].includes(modoTema)) {
+            selectTema.value = modoTema;
+        }
+        actualizarEtiquetasOpcionesTema(selectTema.value);
+
+        try {
+            const rawTipo = localStorage.getItem(CLAVE_TIPOGRAFIA_LOCAL) || localStorage.getItem("axion_proto_tipografia");
+            if (rawTipo) {
+                const tipo = JSON.parse(rawTipo);
+                if (Number.isFinite(Number(tipo.titlePx))) estadoTipografia.titlePx = Number(tipo.titlePx);
+                if (Number.isFinite(Number(tipo.subtitlePx))) estadoTipografia.subtitlePx = Number(tipo.subtitlePx);
+                if (Number.isFinite(Number(tipo.basePx))) estadoTipografia.basePx = Number(tipo.basePx);
+            }
+        } catch (err) {
+            console.warn("No se pudo restaurar la tipografía:", err);
+        }
+        aplicarVariablesTipograficas();
+
+        try {
+            const rawCuenta = localStorage.getItem(CLAVE_CUENTA_ADMIN);
+            if (rawCuenta) {
+                const cuenta = JSON.parse(rawCuenta);
+                if (cuenta.nombreVisible) inputNombreVisible.value = cuenta.nombreVisible;
+                if (cuenta.correoAlertas) {
+                    inputCorreoAlertas.value = cuenta.correoAlertas;
+                    if (displayCorreo) displayCorreo.textContent = cuenta.correoAlertas;
+                }
+                if (Number.isFinite(Number(cuenta.expiracionMinutos))) {
+                    inputExpiracion.value = String(cuenta.expiracionMinutos);
+                }
+            }
+        } catch (err) {
+            console.warn("No se pudo restaurar la cuenta administrativa:", err);
+        }
+    }
+
+    // Control Stepper (- / +) con bloqueo en límites y guardado inmediato en caché
+    steppersTipografia.forEach((stepper) => {
+        const clave = stepper.dataset.stepper;
+        const min = Number(stepper.dataset.min);
+        const max = Number(stepper.dataset.max);
+        const step = Number(stepper.dataset.step) || 1;
+
+        stepper.addEventListener("click", (e) => {
+            const btn = e.target.closest(".stepper-btn");
+            if (!btn || btn.disabled) return;
+            const delta = btn.dataset.accion === "incrementar" ? step : -step;
+            estadoTipografia[clave] = ajustarValorRango(
+                estadoTipografia[clave] + delta,
+                min,
+                max,
+                DEFAULTS_TIPOGRAFIA_PX[clave]
+            );
+            const prefs = aplicarVariablesTipograficas();
+            localStorage.setItem(CLAVE_TIPOGRAFIA_LOCAL, JSON.stringify(prefs));
+            if (window.AxionCache) {
+                window.AxionCache.guardarEnCache("tipografia", prefs);
+            }
+        });
+    });
+
+    // Vista previa en tiempo real al cambiar tema en el selector
+    selectTema.addEventListener("change", () => {
+        aplicarTemaSeleccionado(selectTema.value);
+    });
+
+    // Bloque 1 - Guardar Apariencia
+    formApariencia.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const modoTema = selectTema.value;
+        const prefsTipografia = aplicarVariablesTipograficas();
+
+        aplicarTemaSeleccionado(modoTema);
+        actualizarEtiquetasOpcionesTema(modoTema);
+
+        localStorage.setItem(CLAVE_TEMA_LOCAL, modoTema);
+        localStorage.setItem(CLAVE_TIPOGRAFIA_LOCAL, JSON.stringify(prefsTipografia));
+        if (window.AxionCache) {
+            const prevTipo = window.AxionCache.leerDeCache("tipografia");
+            window.AxionCache.guardarEnCache("tipografia", prefsTipografia);
+            window.AxionCache.registrarAuditoria(
+                "Sistema y Tipografía",
+                "Escala Tipográfica",
+                `${prevTipo.titlePx}/${prevTipo.subtitlePx}/${prevTipo.basePx} px`,
+                `${prefsTipografia.titlePx}/${prefsTipografia.subtitlePx}/${prefsTipografia.basePx} px`
+            );
+        }
+
+        mostrarToast("Apariencia y tipografía aplicadas.");
+    });
+
+    // Sincronizar si el usuario cambia el tema desde el switch de la barra superior
+    const observadorTemaNavbar = new MutationObserver(() => {
+        const esClaro = document.body.classList.contains("tema-claro");
+        const modoGuardado = localStorage.getItem(CLAVE_TEMA_LOCAL);
+        if (modoGuardado === "claro" || modoGuardado === "oscuro") {
+            selectTema.value = esClaro ? "claro" : "oscuro";
+            actualizarEtiquetasOpcionesTema(selectTema.value);
+        }
+    });
+    observadorTemaNavbar.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    // Bloque 2 - Regenerar Token / Cambiar Contraseña
+    if (enlaceRegenerar) {
+        enlaceRegenerar.addEventListener("click", (e) => {
+            e.preventDefault();
+            const nuevoToken = `axn_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
+            abrirModal({
+                titulo: "Token de Acceso Regenerado",
+                mensaje: `Se generó un nuevo token temporal de sesión administrativa (${nuevoToken}). Para cambiar tu contraseña, ingresa primero tu contraseña actual y guarda los cambios.`,
+                claseBoton: "btn-modal-activar"
+            });
+        });
+    }
+
+    // Bloque 2 - Validación y guardado de Cuenta Administrativa
+    [inputNombreVisible, inputCorreoAlertas, inputExpiracion, inputPasswordActual].forEach((campo) => {
+        if (campo) {
+            campo.addEventListener("input", () => {
+                if (errorCuenta) {
+                    errorCuenta.textContent = "";
+                    errorCuenta.hidden = true;
+                }
+            });
+        }
+    });
+
+    formCuenta.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (errorCuenta) {
+            errorCuenta.textContent = "";
+            errorCuenta.hidden = true;
+        }
+
+        const nombreVisible = (inputNombreVisible.value || "").trim();
+        const correoAlertas = (inputCorreoAlertas.value || "").trim();
+        const expiracionMinutos = Number.parseInt(inputExpiracion.value, 10);
+        const passwordActual = (inputPasswordActual.value || "").trim();
+
+        if (!nombreVisible) {
+            errorCuenta.textContent = "El campo Nombre Visible no puede estar vacío.";
+            errorCuenta.hidden = false;
+            inputNombreVisible.focus();
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoAlertas)) {
+            errorCuenta.textContent = "Ingresa un Correo de Alertas válido.";
+            errorCuenta.hidden = false;
+            inputCorreoAlertas.focus();
+            return;
+        }
+
+        if (!Number.isFinite(expiracionMinutos) || expiracionMinutos < 1 || expiracionMinutos > 1440) {
+            errorCuenta.textContent = "La Expiración de Sesión debe estar entre 1 y 1440 minutos.";
+            errorCuenta.hidden = false;
+            inputExpiracion.focus();
+            return;
+        }
+
+        // Validación de seguridad obligatoria mediante modal limpio
+        if (!passwordActual) {
+            abrirModal({
+                titulo: "Contraseña Requerida",
+                mensaje: "Por seguridad, debes ingresar tu Contraseña Actual para confirmar y guardar los cambios de la cuenta administrativa.",
+                claseBoton: "btn-modal-advertencia",
+                onCerrar: () => inputPasswordActual.focus()
+            });
+            return;
+        }
+
+        let passwordVigente = "axion2026";
+        try {
+            const rawGuardada = localStorage.getItem(CLAVE_CUENTA_ADMIN);
+            if (rawGuardada) {
+                const cuentaGuardada = JSON.parse(rawGuardada);
+                if (cuentaGuardada && typeof cuentaGuardada.passwordAdmin === "string" && cuentaGuardada.passwordAdmin.length > 0) {
+                    passwordVigente = cuentaGuardada.passwordAdmin;
+                }
+            }
+        } catch (err) {
+            console.warn("No se pudo leer la contraseña vigente:", err);
+        }
+
+        if (passwordActual !== passwordVigente) {
+            errorCuenta.textContent = "La Contraseña Actual ingresada es incorrecta.";
+            errorCuenta.hidden = false;
+            inputPasswordActual.focus();
+            return;
+        }
+
+        const inputPasswordNueva = document.getElementById("password-nueva");
+        const inputPasswordConfirmar = document.getElementById("password-confirmar");
+        const passwordNueva = (inputPasswordNueva?.value || "").trim();
+        const passwordConfirmar = (inputPasswordConfirmar?.value || "").trim();
+
+        let passwordFinal = passwordVigente;
+        let cambioPassword = false;
+
+        if (passwordNueva || passwordConfirmar) {
+            if (passwordNueva.length < 6) {
+                errorCuenta.textContent = "La Nueva Contraseña debe tener al menos 6 caracteres.";
+                errorCuenta.hidden = false;
+                if (inputPasswordNueva) inputPasswordNueva.focus();
+                return;
+            }
+            if (passwordNueva !== passwordConfirmar) {
+                errorCuenta.textContent = "La Nueva Contraseña y su confirmación no coinciden.";
+                errorCuenta.hidden = false;
+                if (inputPasswordConfirmar) inputPasswordConfirmar.focus();
+                return;
+            }
+            passwordFinal = passwordNueva;
+            cambioPassword = true;
+        }
+
+        const datosCuenta = {
+            nombreVisible,
+            correoAlertas,
+            expiracionMinutos,
+            passwordAdmin: passwordFinal,
+            ultimaActualizacion: new Date().toISOString()
+        };
+        localStorage.setItem(CLAVE_CUENTA_ADMIN, JSON.stringify(datosCuenta));
+
+        if (displayCorreo) displayCorreo.textContent = correoAlertas;
+        inputPasswordActual.value = "";
+        if (inputPasswordNueva) inputPasswordNueva.value = "";
+        if (inputPasswordConfirmar) inputPasswordConfirmar.value = "";
+
+        if (window.registrarAuditoria) {
+            window.registrarAuditoria(
+                "Cuenta Administrativa",
+                cambioPassword ? "Perfil y Contraseña" : "Perfil y Sesión",
+                "Anterior",
+                cambioPassword ? `Contraseña actualizada · ${expiracionMinutos} min` : `${expiracionMinutos} min`
+            );
+        }
+
+        abrirModal({
+            titulo: "Cambios Guardados",
+            mensaje: cambioPassword
+                ? "La configuración y la nueva contraseña de la Cuenta Administrativa se actualizaron correctamente."
+                : "La configuración de la Cuenta Administrativa (Admin Único) se actualizó correctamente.",
+            claseBoton: "btn-modal-activar"
+        });
+    });
+
+    btnCerrarModal.addEventListener("click", cerrarModal);
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) cerrarModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.hidden) {
+            cerrarModal();
+        }
+    });
+
+    const selectFiltroAuditoria = document.getElementById("filtro-auditoria-modulo");
+    const btnExportarAuditoria = document.getElementById("btn-exportar-auditoria-csv");
+
+    function renderizarBitacoraAuditoria() {
+        if (!window.AxionCache) return;
+        const filtro = selectFiltroAuditoria ? selectFiltroAuditoria.value : "todos";
+        window.AxionCache.renderizarTablaAuditoria("tbody-auditoria-sistema", filtro);
+    }
+
+    if (selectFiltroAuditoria) {
+        selectFiltroAuditoria.addEventListener("change", renderizarBitacoraAuditoria);
+    }
+
+    if (btnExportarAuditoria) {
+        btnExportarAuditoria.addEventListener("click", () => {
+            mostrarToast("Bitácora de auditoría exportada en formato CSV.");
+        });
+    }
+
+    document.addEventListener("axion:auditoriaActualizada", renderizarBitacoraAuditoria);
+    window.addEventListener("storage", (e) => {
+        if (e.key === "axion_proto_auditoria") renderizarBitacoraAuditoria();
+    });
+
+    cargarPreferenciasIniciales();
+    renderizarBitacoraAuditoria();
+
+        })();
+    } finally {
+        document.addEventListener = __origDocAdd;
+        window.addEventListener = __origWinAdd;
+        window.MutationObserver = __OrigMO;
+    }
+
+    return () => {
+        __docListeners.forEach(([t, fn, opts]) => document.removeEventListener(t, fn, opts));
+        __winListeners.forEach(([t, fn, opts]) => window.removeEventListener(t, fn, opts));
+        __observers.forEach((obs) => obs.disconnect());
+    };
+}

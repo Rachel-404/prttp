@@ -17,6 +17,7 @@ const API_BASE_URL = "http://localhost:8080/api/v1";
             coeficienteTermico: 0.02,
             tempManualAtc: 25.0,
             factorCalibracionK: 1.0,
+            kValue: 0.5,
             atenuacionAdc: "11db",
             valorActual: 1200
         },
@@ -28,9 +29,9 @@ const API_BASE_URL = "http://localhost:8080/api/v1";
             tempMax: 24.0,
             baudRate: 9600,
             slaveId: 1,
-            calPh401: 4.01,
-            calPh700: 7.0,
-            calPh1001: 10.01,
+            calPh400: 4.0,
+            calPh686: 6.86,
+            calPh918: 9.18,
             valorActual: 6.1
         },
         nivel_agua: {

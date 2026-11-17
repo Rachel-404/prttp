@@ -1,0 +1,235 @@
+.reles-columna-unica {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.card-reles {
+    width: 100%;
+    min-height: unset;
+}
+
+.titulo-card h3 {
+    font-size: calc(var(--font-size-subtitle) - 2px);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.encabezado-reles {
+    gap: 16px;
+}
+
+.control-modo-global {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.selector-modo-reles {
+    width: auto;
+    min-width: 240px;
+}
+
+.aviso-modo-auto {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-muted);
+    font-size: calc(var(--font-size-base) - 1px);
+    line-height: 1.45;
+}
+
+/* ==========================================================================
+   CUADRÍCULA DE 6 TARJETAS INDIVIDUALES DE RELÉS
+   ========================================================================== */
+.grid-reles-canales {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    width: 100%;
+}
+
+.tarjeta-canal-rele {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    border-radius: var(--radio-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.cabecera-canal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.etiqueta-canal-num {
+    font-size: calc(var(--font-size-base) - 2px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+}
+
+.estado-rele-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px;
+    border-radius: var(--radio-pill);
+    font-size: calc(var(--font-size-base) - 2px);
+    font-weight: 700;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    white-space: nowrap;
+}
+
+.punto-estado-rele {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.estado-rele-badge.encendido {
+    color: var(--color-ok-brillante);
+}
+
+.estado-rele-badge.encendido .punto-estado-rele {
+    background-color: var(--color-ok-brillante);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.estado-rele-badge.apagado {
+    color: var(--color-neutro-claro);
+}
+
+.estado-rele-badge.apagado .punto-estado-rele {
+    background-color: var(--color-neutro);
+}
+
+body.tema-claro .estado-rele-badge.encendido {
+    color: var(--color-ok);
+}
+
+body.tema-claro .estado-rele-badge.apagado {
+    color: var(--color-neutro);
+}
+
+.cuerpo-canal {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-nombre-rele {
+    font-weight: 600;
+    background-color: var(--bg-card);
+}
+
+.pie-canal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.texto-accion-rele {
+    font-size: calc(var(--font-size-base) - 1px);
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* Toggle Switch CSS Puro (Verde activo / Gris inactivo) */
+.switch-rele {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.switch-rele input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider-rele {
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    background-color: var(--color-neutro-oscuro);
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.slider-rele::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    border-radius: 50%;
+    background-color: var(--color-blanco);
+    transition: transform 0.2s ease;
+}
+
+.switch-rele input:checked + .slider-rele {
+    background-color: var(--color-ok);
+}
+
+.switch-rele input:checked + .slider-rele::before {
+    transform: translateX(22px);
+}
+
+.switch-rele input:disabled + .slider-rele {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.grid-pines-reles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+
+.campo-logica-disparo {
+    max-width: 380px;
+}
+
+@media (max-width: 1150px) {
+
+    .grid-reles-canales,
+    .grid-pines-reles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+
+    .grid-reles-canales,
+    .grid-pines-reles {
+        grid-template-columns: 1fr;
+    }
+
+    .selector-modo-reles,
+    .campo-logica-disparo {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+}

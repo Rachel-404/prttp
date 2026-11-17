@@ -177,9 +177,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const correoAutorizado = obtenerCorreoAutorizado();
+            let passwordAutorizada = CREDENCIAL_ADMIN.passwordDemo;
+            try {
+                const rawCuenta = localStorage.getItem(CLAVE_CUENTA_ADMIN);
+                if (rawCuenta) {
+                    const cuenta = JSON.parse(rawCuenta);
+                    if (cuenta && typeof cuenta.passwordAdmin === "string" && cuenta.passwordAdmin.length > 0) {
+                        passwordAutorizada = cuenta.passwordAdmin;
+                    }
+                }
+            } catch (err) {
+                console.warn("No se pudo leer la contraseña administrativa:", err);
+            }
+
             const esCorreoValido =
                 correo === CREDENCIAL_ADMIN.correoDefecto || correo === correoAutorizado;
-            const esPasswordValida = password === CREDENCIAL_ADMIN.passwordDemo;
+            const esPasswordValida = password === passwordAutorizada;
 
             if (!esCorreoValido || !esPasswordValida) {
                 mostrarFeedback(
@@ -212,6 +225,19 @@ document.addEventListener("DOMContentLoaded", () => {
             mostrarFeedback("exito", "Acceso autorizado. Redirigiendo al dashboard principal...");
 
             setTimeout(() => {
+                const params = new URLSearchParams(window.location.search);
+                const redirect = params.get("redirect");
+                if (redirect) {
+                    try {
+                        const urlDestino = new URL(redirect, window.location.href);
+                        if (urlDestino.origin === window.location.origin) {
+                            window.location.href = urlDestino.href;
+                            return;
+                        }
+                    } catch (e) {
+                        // Ruta inválida; usar fallback
+                    }
+                }
                 window.location.href = "index.html";
             }, 650);
         });

@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const FRECUENCIAS_VALIDAS = [5, 10, 30, 60, 300];
     const BUFFERS_SEGUNDO_PUNTO = {
-        "4.01": "Sobre Rojo (pH 4.01)",
+        "4.00": "Sobre Rojo (pH 4.00)",
         "9.18": "Sobre Azul (pH 9.18)"
     };
     const UARTS_VALIDOS = ["UART1", "UART2"];
@@ -175,9 +175,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 tempMax: estadoModuloPh.tempMaximaAgua,
                 baudRate: Number(document.getElementById("tec-baud-rate")?.value || 9600),
                 slaveId: Number(document.getElementById("tec-slave-id")?.value || 1),
-                calPh401: Number(document.getElementById("ph-cal-401")?.value || 1950),
-                calPh700: Number(document.getElementById("ph-cal-700")?.value || 1500),
-                calPh1001: Number(document.getElementById("ph-cal-1001")?.value || 1050)
+                calPh400: Number(document.getElementById("ph-cal-400")?.value || 4.0),
+                calPh686: Number(document.getElementById("ph-cal-686")?.value || 6.86),
+                calPh918: Number(document.getElementById("ph-cal-918")?.value || 9.18)
             });
         }
     }
@@ -522,7 +522,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Bloque 2 - Paso 2: Calibrar Segundo Punto (pH 4.01 o pH 9.18)
+    // Bloque 2 - Paso 2: Calibrar Segundo Punto (pH 4.00 o pH 9.18)
     if (btnCalibrarSegundo && selectBufferSegundo) {
         btnCalibrarSegundo.addEventListener("click", () => {
             const valorSeleccionado = selectBufferSegundo.value;

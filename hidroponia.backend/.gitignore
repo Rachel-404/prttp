@@ -1,0 +1,35 @@
+# Compilación Java / Maven / Gradle
+target/
+!.mvn/wrapper/maven-wrapper.jar
+build/
+.gradle/
+*.class
+*.jar
+*.war
+*.ear
+
+# Variables de entorno locales (mantener .env.example en el repositorio)
+.env
+.env.local
+.env.*.local
+application-local.properties
+application-local.yml
+
+# Logs
+*.log
+logs/
+
+# IDEs y editores
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

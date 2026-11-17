@@ -11,20 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
         "04:00", "06:00", "08:00", "10:00"
     ];
 
-    // Datos simulados de las últimas 24 horas por grupo de variables
+    // Datos simulados de las últimas 24 horas por variable individual
     const SERIES_TENDENCIA = {
-        ph_ec: {
-            dobleEje: true,
+        ph: {
+            dobleEje: false,
             ejes: {
                 y: {
                     titulo: "pH",
-                    sugeridoMin: 5.8,
-                    sugeridoMax: 6.4
-                },
-                y1: {
-                    titulo: "EC (µS/cm)",
-                    sugeridoMin: 1050,
-                    sugeridoMax: 1400
+                    sugeridoMin: 5.5,
+                    sugeridoMax: 6.5
                 }
             },
             datasets: [
@@ -34,47 +29,92 @@ document.addEventListener("DOMContentLoaded", () => {
                     decimales: 2,
                     yAxisID: "y",
                     color: "#10b981",
-                    fillColor: "rgba(16, 185, 129, 0.12)",
+                    fillColor: "rgba(16, 185, 129, 0.14)",
                     data: [6.05, 6.08, 6.12, 6.15, 6.11, 6.09, 6.04, 6.02, 6.06, 6.08, 6.10, 6.10]
-                },
-                {
-                    label: "Conductividad (EC)",
-                    unidad: "µS/cm",
-                    decimales: 0,
-                    yAxisID: "y1",
-                    color: "#f59e0b",
-                    fillColor: "rgba(245, 158, 11, 0.10)",
-                    data: [1180, 1210, 1245, 1260, 1230, 1215, 1195, 1190, 1185, 1195, 1205, 1200]
                 }
             ]
         },
-        temperaturas: {
+        ec: {
             dobleEje: false,
             ejes: {
                 y: {
-                    titulo: "Temperatura (°C)",
-                    sugeridoMin: 16,
-                    sugeridoMax: 28
+                    titulo: "EC (µS/cm)",
+                    sugeridoMin: 1050,
+                    sugeridoMax: 1400
                 }
             },
             datasets: [
                 {
-                    label: "Temperatura del Agua",
+                    label: "Conductividad Eléctrica (EC)",
+                    unidad: "µS/cm",
+                    decimales: 0,
+                    yAxisID: "y",
+                    color: "#f59e0b",
+                    fillColor: "rgba(245, 158, 11, 0.12)",
+                    data: [1180, 1210, 1245, 1260, 1230, 1215, 1195, 1190, 1185, 1195, 1205, 1200]
+                }
+            ]
+        },
+        temp_agua: {
+            dobleEje: false,
+            ejes: {
+                y: {
+                    titulo: "Temperatura del Agua (°C)",
+                    sugeridoMin: 18,
+                    sugeridoMax: 24
+                }
+            },
+            datasets: [
+                {
+                    label: "Temperatura del Agua (PT100)",
                     unidad: "°C",
                     decimales: 1,
                     yAxisID: "y",
                     color: "#10b981",
                     fillColor: "rgba(16, 185, 129, 0.14)",
                     data: [21.2, 21.6, 22.1, 22.3, 21.9, 21.4, 20.9, 20.6, 20.5, 20.8, 21.2, 21.5]
-                },
+                }
+            ]
+        },
+        temp_ambiente: {
+            dobleEje: false,
+            ejes: {
+                y: {
+                    titulo: "Temperatura Ambiente (°C)",
+                    sugeridoMin: 18,
+                    sugeridoMax: 28
+                }
+            },
+            datasets: [
                 {
-                    label: "Temperatura Ambiente",
+                    label: "Temperatura Ambiente (DHT22)",
                     unidad: "°C",
                     decimales: 1,
                     yAxisID: "y",
                     color: "#f59e0b",
-                    fillColor: "rgba(245, 158, 11, 0.10)",
+                    fillColor: "rgba(245, 158, 11, 0.12)",
                     data: [23.4, 24.8, 25.6, 24.9, 23.1, 21.8, 20.7, 19.9, 19.6, 20.4, 22.1, 23.2]
+                }
+            ]
+        },
+        humedad_ambiente: {
+            dobleEje: false,
+            ejes: {
+                y: {
+                    titulo: "Humedad Relativa (%)",
+                    sugeridoMin: 45,
+                    sugeridoMax: 85
+                }
+            },
+            datasets: [
+                {
+                    label: "Humedad Relativa (DHT22)",
+                    unidad: "%",
+                    decimales: 1,
+                    yAxisID: "y",
+                    color: "#38bdf8",
+                    fillColor: "rgba(56, 189, 248, 0.14)",
+                    data: [62.0, 59.5, 57.8, 60.2, 63.5, 66.8, 69.4, 71.0, 70.2, 68.1, 66.0, 65.2]
                 }
             ]
         },
@@ -89,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             datasets: [
                 {
-                    label: "Nivel del Tanque",
+                    label: "Nivel del Tanque (LMP633)",
                     unidad: "%",
                     decimales: 0,
                     yAxisID: "y",
@@ -195,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderizarGrafica(claveSerie) {
-        const configSerie = SERIES_TENDENCIA[claveSerie] || SERIES_TENDENCIA.ph_ec;
+        const configSerie = SERIES_TENDENCIA[claveSerie] || SERIES_TENDENCIA.ph;
         const coloresTema = obtenerColoresTema();
 
         const datasetsChart = configSerie.datasets.map((ds) => ({

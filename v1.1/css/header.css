@@ -33,8 +33,8 @@
 }
 
 .hmbrgs {
-    background: #ffffff;
-    border-radius: 50px;
+    background: var(--color-blanco);
+    border-radius: var(--radio-pill);
     height: 4px;
     width: 90%;
     margin: 2.5px 0;
@@ -49,7 +49,7 @@
     font-family: Arial, Helvetica, sans-serif;
     font-size: var(--font-size-subtitle);
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-blanco);
     letter-spacing: 0.5px;
 }
 
@@ -86,7 +86,7 @@
     height: 34px;
     padding: 3px;
     margin: 0;
-    border-radius: 50px;
+    border-radius: var(--radio-pill);
     border: 2px solid #334155;
     background: #0f172a;
     box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.6);
@@ -98,14 +98,14 @@
 }
 
 .btn-tema:hover {
-    border-color: #64748b;
+    border-color: var(--color-neutro);
 }
 
 .icono-tema {
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    background: #475569;
+    background: var(--color-neutro-oscuro);
     color: #f8fafc;
     display: flex;
     align-items: center;
@@ -126,7 +126,7 @@
 /* Estado Modo Claro */
 .btn-tema.modo-claro {
     background: #cbd5e1;
-    border-color: #94a3b8;
+    border-color: var(--color-neutro-claro);
     box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.25);
 }
 
@@ -155,7 +155,7 @@
     gap: 8px;
     height: 36px;
     padding: 0 12px;
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     border: 1px solid var(--border-color);
     background-color: var(--bg-main);
     color: var(--text-main);
@@ -174,7 +174,7 @@
 }
 
 .btn-perfil-header:focus-visible {
-    outline: 2px solid #16a34a;
+    outline: 2px solid var(--color-ok);
     outline-offset: 2px;
 }
 
@@ -186,7 +186,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: #16a34a;
+    background-color: var(--color-ok);
     box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
     flex-shrink: 0;
 }
@@ -210,7 +210,7 @@
     right: 0;
     min-width: 190px;
     padding: 6px;
-    border-radius: 10px;
+    border-radius: var(--radio-md);
     border: 1px solid var(--border-color);
     background-color: var(--bg-card);
     color: var(--text-main);
@@ -247,23 +247,23 @@
 }
 
 .item-cerrar-sesion {
-    color: #fca5a5;
+    color: var(--color-critico-claro);
 }
 
 .item-cerrar-sesion:hover,
 .item-cerrar-sesion:focus-visible {
     background-color: rgba(127, 29, 29, 0.35);
-    color: #fee2e2;
+    color: var(--color-critico-suave);
 }
 
 body.tema-claro .item-cerrar-sesion {
-    color: #991b1b;
+    color: var(--color-critico-borde);
 }
 
 body.tema-claro .item-cerrar-sesion:hover,
 body.tema-claro .item-cerrar-sesion:focus-visible {
-    background-color: #fee2e2;
-    color: #7f1d1d;
+    background-color: var(--color-critico-suave);
+    color: var(--color-critico-fondo);
 }
 
 @media (max-width: 560px) {
@@ -289,8 +289,8 @@ body.tema-claro .item-cerrar-sesion:focus-visible {
     height: 18px;
     padding: 0 5px;
     border-radius: 999px;
-    background-color: #ef4444;
-    color: #ffffff;
+    background-color: var(--color-critico-brillante);
+    color: var(--color-blanco);
     font-size: calc(var(--font-size-base) - 3px);
     font-weight: 700;
     line-height: 1;
@@ -322,7 +322,7 @@ body.tema-claro .item-cerrar-sesion:focus-visible {
     padding: 0;
     border: none;
     background: transparent;
-    color: #22c55e;
+    color: var(--color-ok-brillante);
     font-family: inherit;
     font-size: calc(var(--font-size-base) - 2px);
     font-weight: 600;
@@ -334,7 +334,7 @@ body.tema-claro .item-cerrar-sesion:focus-visible {
 }
 
 body.tema-claro .enlace-alertas-leidas {
-    color: #16a34a;
+    color: var(--color-ok);
 }
 
 .lista-alertas-header {
@@ -369,15 +369,15 @@ body.tema-claro .enlace-alertas-leidas {
 }
 
 .item-alerta-header.alerta-critico {
-    border-left-color: #ef4444;
+    border-left-color: var(--color-critico-brillante);
 }
 
 .item-alerta-header.alerta-advertencia {
-    border-left-color: #f59e0b;
+    border-left-color: var(--color-advertencia);
 }
 
 .item-alerta-header.alerta-normal {
-    border-left-color: #22c55e;
+    border-left-color: var(--color-ok-brillante);
 }
 
 .item-alerta-header.alerta-leida {
@@ -409,15 +409,15 @@ body.tema-claro .enlace-alertas-leidas {
 }
 
 .alerta-critico .punto-alerta-no-leida {
-    background-color: #ef4444;
+    background-color: var(--color-critico-brillante);
 }
 
 .alerta-advertencia .punto-alerta-no-leida {
-    background-color: #f59e0b;
+    background-color: var(--color-advertencia);
 }
 
 .alerta-normal .punto-alerta-no-leida {
-    background-color: #22c55e;
+    background-color: var(--color-ok-brillante);
 }
 
 .detalle-item-alerta {

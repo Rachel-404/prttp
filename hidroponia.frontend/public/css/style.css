@@ -1,0 +1,788 @@
+:root {
+    --bg-navbar: #1e293b;
+    --bg-sidebar: #161d2a;
+    --bg-main: #0f172a;
+    --bg-card: #242d3b;
+    --text-main: #f8fafc;
+    --text-muted: #d6d6d6;
+    --hover-bg: #1e293b;
+    --border-color: #334155;
+    --font-size-title: 24px;
+    --font-size-subtitle: 18px;
+    --font-size-base: 14px;
+
+    /* ===== TOKENS DEL SISTEMA DE DISEÑO (comunes a ambos temas) ===== */
+    /* Semáforo: Verde = Normal/Óptimo */
+    --color-ok: #16a34a;
+    --color-ok-hover: #15803d;
+    --color-ok-brillante: #22c55e;
+    --color-ok-suave: #dcfce7;
+    /* Semáforo: Naranja = Advertencia */
+    --color-advertencia: #f59e0b;
+    --color-advertencia-oscuro: #d97706;
+    /* Semáforo: Rojo = Crítico/Pausado */
+    --color-critico: #dc2626;
+    --color-critico-hover: #b91c1c;
+    --color-critico-brillante: #ef4444;
+    --color-critico-borde: #991b1b;
+    --color-critico-fondo: #7f1d1d;
+    --color-critico-suave: #fee2e2;
+    --color-critico-claro: #fca5a5;
+    /* Neutros */
+    --color-blanco: #ffffff;
+    --color-neutro: #64748b;
+    --color-neutro-oscuro: #475569;
+    --color-neutro-claro: #94a3b8;
+    /* Radios */
+    --radio-sm: 8px;
+    --radio-md: 10px;
+    --radio-lg: 12px;
+    --radio-pill: 50px;
+    /* Sombras */
+    --sombra-popover: 0 12px 24px rgba(0, 0, 0, 0.35);
+    --sombra-modal: 0 18px 40px rgba(0, 0, 0, 0.4);
+    --sombra-toast: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+body.tema-claro {
+    --bg-navbar: #d6d6d6;
+    --bg-sidebar: #e2e8f0;
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #334155;
+    --hover-bg: #cbd5e1;
+    --border-color: #cbd5e1;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+    font-size: var(--font-size-base);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}
+
+h1,
+h2 {
+    margin: 0;
+    font-size: var(--font-size-title);
+}
+
+h3,
+h4 {
+    margin: 0;
+    font-size: var(--font-size-subtitle);
+}
+
+p {
+    margin: 0;
+}
+
+ul,
+ol,
+li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.layout-container {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    grid-template-rows: 60px minmax(0, 1fr);
+    grid-template-areas:
+        "navbar navbar"
+        "sidebar main";
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background-color: var(--bg-main);
+}
+
+#contenedor-navbar {
+    grid-area: navbar;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-navbar);
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+}
+
+#contenedor-sidebar {
+    grid-area: sidebar;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-sidebar);
+    color: var(--text-main);
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+}
+
+#contenedor-base,
+.layout-container>*:not(#contenedor-navbar):not(#contenedor-sidebar) {
+    grid-area: main;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}
+
+/* Adaptación de textos e íconos del navbar y sidebar según tema */
+body.tema-claro .navbar-titulo {
+    color: var(--text-main);
+}
+
+body.tema-claro .hmbrgs {
+    background: var(--text-main);
+}
+
+body.tema-claro .btn-menu:hover .hmbrgs {
+    background: var(--color-neutro-oscuro);
+}
+
+body.tema-claro .contenedor-opcion,
+body.tema-claro .opcionII {
+    color: var(--text-main);
+}
+
+body.tema-claro .contenedor-opcion:hover,
+body.tema-claro .opcionII:hover {
+    background: var(--hover-bg);
+    color: #0f172a;
+}
+
+.material-symbols-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/*CARD GENERAL*/
+.card {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    min-height: 200px;
+    width: 100%;
+    border-radius: var(--radio-md);
+}
+
+/* ENCABEZADO COMÚN DE MÓDULO (H1 VISIBLE) */
+.encabezado-modulo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.encabezado-modulo h1 {
+    font-size: var(--font-size-title);
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.25;
+}
+
+.subtitulo-modulo {
+    font-size: var(--font-size-base);
+    color: var(--text-muted);
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* ==========================================================================
+   SISTEMA COMPARTIDO DE TARJETAS, FORMULARIOS, BOTONES, MODALES Y TOASTS
+   ========================================================================== */
+.ordenar-div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: max-content;
+    gap: 30px;
+    width: 100%;
+    justify-items: center;
+    align-content: start;
+}
+
+.ordenar-div > div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+.titulo-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: var(--text-main);
+    font-size: var(--font-size-base);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 20px 10px 20px;
+    width: 100%;
+}
+
+.cuerpo-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 20px 20px 20px;
+    width: 100%;
+}
+
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.etiqueta-campo {
+    font-size: calc(var(--font-size-base) - 1px);
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.campo-control {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.campo-control:focus {
+    border-color: var(--text-muted);
+}
+
+.campo-solo-lectura {
+    color: var(--text-muted);
+    cursor: default;
+    opacity: 0.9;
+}
+
+.fila-dos-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+}
+
+.fila-dos-cols > .grupo-campo {
+    min-width: 0;
+}
+
+.fila-switch {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 4px;
+}
+
+.mensaje-error-form {
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--color-critico-borde);
+    background-color: var(--color-critico-fondo);
+    color: var(--color-critico-suave);
+    font-size: calc(var(--font-size-base) - 1px);
+}
+
+.acciones-card {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+}
+
+.acciones-tecnicas {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.texto-registro {
+    font-size: var(--font-size-base);
+    color: var(--text-main);
+}
+
+.texto-guia {
+    font-size: calc(var(--font-size-base) - 1px);
+    line-height: 1.45;
+    color: var(--text-muted);
+}
+
+.registro-mantenimiento {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.paso-calibracion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radio-sm);
+    background-color: var(--bg-main);
+}
+
+.paso-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.paso-accion {
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+.paso-accion .btn-modal {
+    white-space: nowrap;
+}
+
+.subseccion-tecnica {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radio-sm);
+    background-color: var(--bg-main);
+}
+
+.subtitulo-tecnico {
+    padding: 0 6px;
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.grid-tecnico-tres {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.grid-tecnico-cuatro {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.etiqueta-con-ayuda {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ayuda-contextual {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-ayuda-campo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.btn-ayuda-campo:hover,
+.btn-ayuda-campo[aria-expanded="true"] {
+    color: var(--text-main);
+}
+
+.btn-ayuda-campo .material-symbols-outlined {
+    font-size: var(--font-size-subtitle);
+}
+
+.popover-ayuda {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 260px;
+    padding: 10px 12px;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    box-shadow: var(--sombra-popover);
+    z-index: 30;
+}
+
+.popover-ayuda-izq {
+    left: auto;
+    right: 0;
+}
+
+.txt-descr {
+    font-size: calc(var(--font-size-base) - 2px);
+    padding: 6px 14px;
+    border-radius: var(--radio-pill);
+    font-weight: 700;
+    color: var(--color-blanco);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s ease;
+}
+
+.txt-descr.activo {
+    background-color: var(--color-ok);
+}
+
+.txt-descr.inactivo {
+    background-color: var(--color-critico);
+}
+
+.btn-modal {
+    border: none;
+    border-radius: var(--radio-sm);
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: calc(var(--font-size-base) - 1px);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-modal-cancelar {
+    background: var(--bg-main);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.btn-modal-cancelar:hover {
+    background-color: var(--hover-bg);
+}
+
+.btn-modal-pausar {
+    background: var(--color-critico);
+    color: var(--color-blanco);
+}
+
+.btn-modal-pausar:hover {
+    background: var(--color-critico-hover);
+}
+
+.btn-modal-activar {
+    background: var(--color-ok);
+    color: var(--color-blanco);
+}
+
+.btn-modal-activar:hover {
+    background: var(--color-ok-hover);
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 2000;
+}
+
+.modal-caja {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-navbar);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radio-lg);
+    padding: 20px;
+    box-shadow: var(--sombra-modal);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.modal-titulo {
+    margin: 0;
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.modal-mensaje {
+    margin: 0;
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.toast-notificacion {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    max-width: 420px;
+    background: var(--bg-navbar);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 10px 16px;
+    border-radius: var(--radio-sm);
+    font-size: calc(var(--font-size-base) - 1px);
+    font-weight: 600;
+    box-shadow: var(--sombra-toast);
+    z-index: 2100;
+}
+
+@media (max-width: 1024px) {
+    .grid-tecnico-cuatro,
+    .grid-tecnico-tres {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .ordenar-div {
+        grid-template-columns: 1fr;
+    }
+
+    .fila-dos-cols,
+    .grid-tecnico-tres,
+    .grid-tecnico-cuatro {
+        grid-template-columns: 1fr;
+    }
+
+    .paso-calibracion,
+    .fila-switch {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .paso-accion {
+        width: 100%;
+    }
+}
+
+/* ==========================================================================
+   DISEÑO PLANO POR SECCIONES (CARDLESS / GITHUB SETTINGS STYLE)
+   Aplica únicamente a vistas de configuración con .vista-config-plana
+   ========================================================================== */
+.vista-config-plana .encabezado-modulo,
+.vista-config-plana .encabezado-config,
+.vista-config-plana .modulo-reportes,
+.vista-config-plana .ordenar-div,
+.vista-config-plana .config-dos-columnas,
+.vista-config-plana .grid-reles,
+.vista-config-plana > section[aria-label="Telemetría de salud del controlador"] {
+    width: 100%;
+    max-width: 100%;
+}
+
+.vista-config-plana .ordenar-div,
+.vista-config-plana .config-dos-columnas {
+    grid-template-columns: 1fr;
+    gap: 32px;
+}
+
+.vista-config-plana .card {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: unset;
+    padding: 0 0 28px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.vista-config-plana .ordenar-div > .card:last-child,
+.vista-config-plana .config-dos-columnas > .card:last-child {
+    border-bottom: none;
+    padding-bottom: 8px;
+}
+
+.vista-config-plana .titulo-card {
+    padding: 0 0 12px 0;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.vista-config-plana .titulo-card h3 {
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.vista-config-plana .cuerpo-card {
+    padding: 0;
+    gap: 18px;
+}
+
+.vista-config-plana .subseccion-tecnica {
+    background-color: transparent;
+    border: none;
+    border-top: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 18px 0 0 0;
+    margin-top: 6px;
+}
+
+.vista-config-plana .subtitulo-tecnico {
+    padding: 0 8px 0 0;
+}
+
+.vista-config-plana .paso-calibracion {
+    background-color: transparent;
+    border: none;
+    border-left: 2px solid var(--border-color);
+    border-radius: 0;
+    padding: 6px 0 6px 16px;
+}
+
+.vista-config-plana .acciones-card {
+    padding-top: 16px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ==========================================================================
+   TABLAS COMPARTIDAS (HISTORIAL, PINOUT Y BITÁCORA DE AUDITORÍA)
+   ========================================================================== */
+.contenedor-tabla-registros {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radio-sm);
+}
+
+.tabla-historial {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: var(--font-size-base);
+}
+
+.tabla-historial thead {
+    background-color: var(--bg-main);
+}
+
+.tabla-historial th,
+.tabla-historial td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+    white-space: nowrap;
+}
+
+.tabla-historial th {
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.tabla-historial tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-historial tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+.celda-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: calc(var(--font-size-base) - 1px);
+    color: var(--text-main);
+}
+
+.punto-estado {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.estado-normal .punto-estado {
+    background-color: var(--color-ok-brillante);
+}
+
+.estado-advertencia .punto-estado {
+    background-color: var(--color-advertencia);
+}
+
+.estado-critico .punto-estado {
+    background-color: var(--color-critico-brillante);
+}
+
+.barra-progreso-estado {
+    width: 100%;
+    height: 12px;
+    accent-color: var(--color-ok);
+}
+
+.barra-filtros-auditoria {
+    align-items: end;
+}
+
+.vista-config-plana .acciones-en-linea {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.telemetria-nodo-grid {
+    margin-bottom: 24px;
+}
+
+.seccion-retencion-plana {
+    margin-top: 28px;
+}

@@ -1,0 +1,83 @@
+.fila-limites {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.grid-tecnico-hardware,
+.grid-tecnico-modbus {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.grid-tecnico-hardware {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.grid-tecnico-registros {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.subtitulo-con-ayuda {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.popover-ayuda .etiqueta-campo {
+    margin-bottom: 6px;
+}
+
+.lista-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 16px;
+}
+
+.lista-checklist li {
+    list-style: disc;
+}
+
+.txt-descr:hover {
+    opacity: 0.9;
+}
+
+@media (max-width: 1100px) {
+
+    .grid-tecnico-hardware,
+    .grid-tecnico-modbus {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #ayuda-electrica {
+        left: auto;
+        right: 0;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .popover-ayuda,
+    .popover-ayuda-izq,
+    #ayuda-electrica {
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .fila-limites {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-tecnico-hardware,
+    .grid-tecnico-modbus,
+    .grid-tecnico-registros {
+        grid-template-columns: 1fr;
+    }
+}

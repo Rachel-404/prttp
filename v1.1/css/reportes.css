@@ -57,7 +57,7 @@
     background-color: var(--bg-card);
     color: var(--text-main);
     border-color: var(--border-color);
-    box-shadow: inset 0 2px 0 #16a34a;
+    box-shadow: inset 0 2px 0 var(--color-ok);
     margin-bottom: -1px;
     padding-bottom: 11px;
 }
@@ -84,45 +84,10 @@
     align-items: start;
 }
 
-.titulo-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    color: var(--text-main);
-    border-bottom: 1px solid var(--border-color);
-    padding: 15px 20px 12px 20px;
-    width: 100%;
-}
-
 .titulo-card h3 {
     font-size: var(--font-size-subtitle);
     color: var(--text-main);
     font-weight: 700;
-}
-
-.etiqueta-campo {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-.campo-control {
-    width: 100%;
-    padding: 9px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: var(--font-size-base);
-    outline: none;
-    transition: border-color 0.2s ease;
-}
-
-.campo-control:focus {
-    border-color: var(--text-muted);
 }
 
 .grid-filtros-fecha {
@@ -143,7 +108,7 @@
     align-items: center;
     gap: 8px;
     padding: 9px 12px;
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     border: 1px solid var(--border-color);
     background-color: var(--bg-main);
     color: var(--text-main);
@@ -157,7 +122,7 @@
 }
 
 .item-checkbox-variable input[type="checkbox"] {
-    accent-color: #16a34a;
+    accent-color: var(--color-ok);
     width: 16px;
     height: 16px;
     cursor: pointer;
@@ -219,50 +184,12 @@
     gap: 4px;
     padding: 12px 14px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     background-color: var(--bg-main);
 }
-
 /* ==========================================================================
    BOTONES Y MODALES DEL PROYECTO
    ========================================================================== */
-.btn-modal {
-    border: none;
-    border-radius: 8px;
-    padding: 9px 16px;
-    font-family: inherit;
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.btn-modal-cancelar {
-    background: #475569;
-    color: #f8fafc;
-}
-
-.btn-modal-cancelar:hover {
-    background: #64748b;
-}
-
-.btn-modal-pausar {
-    background: #dc2626;
-    color: #ffffff;
-}
-
-.btn-modal-pausar:hover {
-    background: #b91c1c;
-}
-
-.btn-modal-activar {
-    background: #16a34a;
-    color: #ffffff;
-}
-
-.btn-modal-activar:hover {
-    background: #15803d;
-}
 
 /* ==========================================================================
    SECCIÓN DE CONTRASTE MANUAL VS. IOT (RF-PUB-06)
@@ -307,7 +234,7 @@
     flex-direction: column;
     gap: 6px;
     padding: 14px 16px;
-    border-radius: 8px;
+    border-radius: var(--radio-sm);
     border: 1px solid var(--border-color);
     background-color: var(--bg-main);
 }
@@ -325,11 +252,11 @@
 }
 
 .valor-metrica-normal {
-    color: #22c55e;
+    color: var(--color-ok-brillante);
 }
 
 body.tema-claro .valor-metrica-normal {
-    color: #16a34a;
+    color: var(--color-ok);
 }
 
 @media (max-width: 1024px) {

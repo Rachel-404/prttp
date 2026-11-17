@@ -1,0 +1,240 @@
+.encabezado-config {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.encabezado-config h1 {
+    font-size: var(--font-size-title);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.subtitulo-pagina {
+    font-size: var(--font-size-base);
+    color: var(--text-muted);
+}
+
+.card-config-ancha {
+    width: 100%;
+    min-height: unset;
+}
+
+.titulo-card h3 {
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* Grilla interna equilibrada para evitar inputs estirados en tarjetas anchas */
+.grid-cuenta-campos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+    align-items: end;
+}
+
+.campo-tema-limitado {
+    max-width: 420px;
+}
+
+.subgrupo-tipografia {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.subtitulo-bloque {
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.grid-tipografia-tres {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, max-content));
+    gap: 16px 22px;
+    align-items: end;
+}
+
+.grid-tipografia-tres .campo-con-unidad {
+    width: 112px;
+    max-width: 100%;
+}
+
+.grid-tipografia-tres .campo-sin-borde-unidad {
+    text-align: center;
+    padding: 8px 4px 8px 10px;
+}
+
+.campo-con-unidad {
+    display: flex;
+    align-items: center;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.campo-con-unidad:focus-within {
+    border-color: var(--text-muted);
+}
+
+.campo-sin-borde-unidad {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    flex: 1;
+    min-width: 0;
+}
+
+.unidad-input {
+    padding: 0 12px 0 8px;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-muted);
+    user-select: none;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   PERFIL ADMINISTRATIVO (AVATAR CSS PURO)
+   ========================================================================== */
+.perfil-admin {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    max-width: 520px;
+}
+
+.avatar-admin {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--color-ok);
+    color: var(--color-blanco);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.datos-perfil-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rol-admin {
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.correo-admin {
+    font-size: var(--font-size-base);
+    color: var(--text-muted);
+    word-break: break-word;
+}
+
+.acciones-cuenta {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.enlace-seguridad {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.enlace-seguridad:hover {
+    color: var(--text-main);
+    text-decoration: underline;
+}
+
+.icono-llave-svg {
+    flex-shrink: 0;
+}
+
+.btn-modal-advertencia {
+    background: var(--color-advertencia-oscuro);
+    color: var(--color-blanco);
+}
+
+.btn-modal-advertencia:hover {
+    background: #b45309;
+}
+
+@media (max-width: 1050px) {
+
+    .grid-tipografia-tres {
+        grid-template-columns: repeat(2, minmax(0, max-content));
+    }
+}
+
+@media (max-width: 768px) {
+
+    .grid-cuenta-campos,
+    .grid-tipografia-tres {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-tema-limitado,
+    .perfil-admin {
+        max-width: 100%;
+    }
+}
+
+.stepper-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px;
+    border-radius: var(--radio-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.stepper-btn {
+    padding: 6px 12px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.stepper-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.stepper-valor {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    color: var(--text-main);
+    user-select: none;
+}

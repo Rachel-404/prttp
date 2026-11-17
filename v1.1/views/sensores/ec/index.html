@@ -281,10 +281,10 @@
                                         <div class="grupo-campo">
                                             <label for="tec-ec-atenuacion" class="etiqueta-campo">Atenuación del ADC</label>
                                             <select id="tec-ec-atenuacion" name="atenuacionAdc" class="campo-control">
-                                                <option value="11db" selected>11 dB (Rango 150-2450 mV)</option>
-                                                <option value="6db">6 dB</option>
-                                                <option value="2.5db">2.5 dB</option>
-                                                <option value="0db">0 dB</option>
+                                                <option value="11db" selected>11 dB (Rango 150-2450 mV) · Recomendado</option>
+                                                <option value="6db">6 dB (hasta ~1750 mV · satura la sonda)</option>
+                                                <option value="2.5db">2.5 dB (hasta ~1250 mV · satura la sonda)</option>
+                                                <option value="0db">0 dB (hasta ~950 mV · satura la sonda)</option>
                                             </select>
                                         </div>
 
@@ -321,6 +321,7 @@
                                                     </button>
                                                     <div id="ayuda-ec-kvalue" class="popover-ayuda" role="region" hidden>
                                                         <p class="texto-guia">Para convertir mS/cm a ppm (TDS = EC × 1000 × K_value).</p>
+                                                        <p class="texto-guia">0.50: base NaCl (por defecto). 0.64–0.70: soluciones nutritivas hidropónicas.</p>
                                                     </div>
                                                 </div>
                                             </div>
