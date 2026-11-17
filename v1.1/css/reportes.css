@@ -379,13 +379,13 @@
 }
 
 .etiqueta-metrica-contraste {
-    font-size: 12px;
+    font-size: calc(var(--font-size-base) - 2px);
     font-weight: 600;
     color: var(--text-muted);
 }
 
 .valor-metrica-contraste {
-    font-size: 18px;
+    font-size: var(--font-size-subtitle);
     font-weight: 700;
     color: var(--text-main);
 }

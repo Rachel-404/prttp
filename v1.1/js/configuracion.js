@@ -9,12 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
         basePx: 14
     };
 
+    const estadoTipografia = { ...DEFAULTS_TIPOGRAFIA_PX };
+
     // Referencias DOM - Bloque 1: Apariencia y Accesibilidad
     const formApariencia = document.getElementById("form-apariencia");
     const selectTema = document.getElementById("select-tema-general");
-    const inputFontTitle = document.getElementById("input-font-title");
-    const inputFontSubtitle = document.getElementById("input-font-subtitle");
-    const inputFontBase = document.getElementById("input-font-base");
+    const steppersTipografia = Array.from(document.querySelectorAll(".stepper-control[data-stepper]"));
 
     // Referencias DOM - Bloque 2: Cuenta Administrativa
     const formCuenta = document.getElementById("form-cuenta-admin");
@@ -66,34 +66,47 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function leerTamanoPx(input, min, max, fallback) {
-        const num = Number.parseFloat(input.value);
+    function ajustarValorRango(valor, min, max, fallback) {
+        const num = Number.parseFloat(valor);
         if (!Number.isFinite(num)) return fallback;
         return Math.min(max, Math.max(min, Math.round(num)));
     }
 
+    function renderizarSteppers() {
+        steppersTipografia.forEach((stepper) => {
+            const clave = stepper.dataset.stepper;
+            const min = Number(stepper.dataset.min);
+            const max = Number(stepper.dataset.max);
+            const valor = ajustarValorRango(estadoTipografia[clave], min, max, DEFAULTS_TIPOGRAFIA_PX[clave]);
+            estadoTipografia[clave] = valor;
+
+            const spanValor = stepper.querySelector(".stepper-valor");
+            const btnMenos = stepper.querySelector('[data-accion="decrementar"]');
+            const btnMas = stepper.querySelector('[data-accion="incrementar"]');
+
+            if (spanValor) spanValor.textContent = `${valor} px`;
+            if (btnMenos) btnMenos.disabled = valor <= min;
+            if (btnMas) btnMas.disabled = valor >= max;
+        });
+    }
+
     function aplicarVariablesTipograficas() {
         const root = document.documentElement;
-        const titlePx = leerTamanoPx(inputFontTitle, 16, 48, DEFAULTS_TIPOGRAFIA_PX.titlePx);
-        const subtitlePx = leerTamanoPx(inputFontSubtitle, 12, 32, DEFAULTS_TIPOGRAFIA_PX.subtitlePx);
-        const basePx = leerTamanoPx(inputFontBase, 10, 24, DEFAULTS_TIPOGRAFIA_PX.basePx);
-
-        const valTitle = `${titlePx}px`;
-        const valSubtitle = `${subtitlePx}px`;
-        const valBase = `${basePx}px`;
-
-        root.style.setProperty("--font-size-title", valTitle);
-        root.style.setProperty("--font-size-subtitle", valSubtitle);
-        root.style.setProperty("--font-size-base", valBase);
-
-        return {
-            titlePx,
-            subtitlePx,
-            basePx,
-            title: valTitle,
-            subtitle: valSubtitle,
-            base: valBase
+        const prefs = {
+            titlePx: estadoTipografia.titlePx,
+            subtitlePx: estadoTipografia.subtitlePx,
+            basePx: estadoTipografia.basePx,
+            title: `${estadoTipografia.titlePx}px`,
+            subtitle: `${estadoTipografia.subtitlePx}px`,
+            base: `${estadoTipografia.basePx}px`
         };
+
+        root.style.setProperty("--font-size-title", prefs.title);
+        root.style.setProperty("--font-size-subtitle", prefs.subtitle);
+        root.style.setProperty("--font-size-base", prefs.base);
+        renderizarSteppers();
+
+        return prefs;
     }
 
     function aplicarTemaSeleccionado(modo) {
@@ -137,12 +150,12 @@ document.addEventListener("DOMContentLoaded", () => {
         actualizarEtiquetasOpcionesTema(selectTema.value);
 
         try {
-            const rawTipo = localStorage.getItem(CLAVE_TIPOGRAFIA_LOCAL);
+            const rawTipo = localStorage.getItem(CLAVE_TIPOGRAFIA_LOCAL) || localStorage.getItem("axion_proto_tipografia");
             if (rawTipo) {
                 const tipo = JSON.parse(rawTipo);
-                if (Number.isFinite(Number(tipo.titlePx))) inputFontTitle.value = String(tipo.titlePx);
-                if (Number.isFinite(Number(tipo.subtitlePx))) inputFontSubtitle.value = String(tipo.subtitlePx);
-                if (Number.isFinite(Number(tipo.basePx))) inputFontBase.value = String(tipo.basePx);
+                if (Number.isFinite(Number(tipo.titlePx))) estadoTipografia.titlePx = Number(tipo.titlePx);
+                if (Number.isFinite(Number(tipo.subtitlePx))) estadoTipografia.subtitlePx = Number(tipo.subtitlePx);
+                if (Number.isFinite(Number(tipo.basePx))) estadoTipografia.basePx = Number(tipo.basePx);
             }
         } catch (err) {
             console.warn("No se pudo restaurar la tipografía:", err);
@@ -167,11 +180,28 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Actualización de variables CSS tipográficas en tiempo real al escribir o cambiar valor
-    [inputFontTitle, inputFontSubtitle, inputFontBase].forEach((campo) => {
-        if (!campo) return;
-        campo.addEventListener("input", () => {
-            aplicarVariablesTipograficas();
+    // Control Stepper (- / +) con bloqueo en límites y guardado inmediato en caché
+    steppersTipografia.forEach((stepper) => {
+        const clave = stepper.dataset.stepper;
+        const min = Number(stepper.dataset.min);
+        const max = Number(stepper.dataset.max);
+        const step = Number(stepper.dataset.step) || 1;
+
+        stepper.addEventListener("click", (e) => {
+            const btn = e.target.closest(".stepper-btn");
+            if (!btn || btn.disabled) return;
+            const delta = btn.dataset.accion === "incrementar" ? step : -step;
+            estadoTipografia[clave] = ajustarValorRango(
+                estadoTipografia[clave] + delta,
+                min,
+                max,
+                DEFAULTS_TIPOGRAFIA_PX[clave]
+            );
+            const prefs = aplicarVariablesTipograficas();
+            localStorage.setItem(CLAVE_TIPOGRAFIA_LOCAL, JSON.stringify(prefs));
+            if (window.AxionCache) {
+                window.AxionCache.guardarEnCache("tipografia", prefs);
+            }
         });
     });
 
@@ -191,6 +221,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         localStorage.setItem(CLAVE_TEMA_LOCAL, modoTema);
         localStorage.setItem(CLAVE_TIPOGRAFIA_LOCAL, JSON.stringify(prefsTipografia));
+        if (window.AxionCache) {
+            window.AxionCache.guardarEnCache("tipografia", prefsTipografia);
+        }
 
         mostrarToast("Apariencia y tipografía aplicadas.");
     });

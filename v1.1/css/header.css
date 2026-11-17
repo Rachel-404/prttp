@@ -47,7 +47,7 @@
 
 .navbar-titulo {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 16px;
+    font-size: var(--font-size-subtitle);
     font-weight: 700;
     color: #ffffff;
     letter-spacing: 0.5px;
@@ -118,7 +118,7 @@
 }
 
 .icono-tema .material-symbols-outlined {
-    font-size: 17px;
+    font-size: var(--font-size-subtitle);
     line-height: 1;
     user-select: none;
 }

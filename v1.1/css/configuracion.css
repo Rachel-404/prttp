@@ -161,7 +161,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: var(--font-size-subtitle);
     font-weight: 700;
     letter-spacing: 0.5px;
     flex-shrink: 0;
@@ -260,4 +260,35 @@
     .perfil-admin {
         max-width: 100%;
     }
+}
+
+.stepper-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.stepper-btn {
+    padding: 6px 12px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.stepper-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.stepper-valor {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    color: var(--text-main);
+    user-select: none;
 }

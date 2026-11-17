@@ -83,7 +83,7 @@ function resolverTemaClaro(modo) {
 
 function aplicarTipografiaGuardada() {
     try {
-        const raw = localStorage.getItem(CLAVE_TIPOGRAFIA);
+        const raw = localStorage.getItem(CLAVE_TIPOGRAFIA) || localStorage.getItem("axion_proto_tipografia");
         if (!raw) return;
         const prefs = JSON.parse(raw);
         if (prefs.title) document.documentElement.style.setProperty("--font-size-title", prefs.title);
@@ -93,6 +93,8 @@ function aplicarTipografiaGuardada() {
         console.warn("No se pudo aplicar la tipografía guardada:", e);
     }
 }
+
+aplicarTipografiaGuardada();
 
 document.addEventListener("DOMContentLoaded", () => {
     // Aplica el tema y tipografía guardados en localStorage antes de cargar fragmentos

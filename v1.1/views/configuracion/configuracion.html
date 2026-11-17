@@ -189,57 +189,33 @@
 
                             <div class="grid-tipografia-tres">
                                 <div class="grupo-campo">
-                                    <label for="input-font-title" class="etiqueta-campo">Tamaño de Títulos Principales</label>
-                                    <div class="campo-con-unidad">
-                                        <input
-                                            type="number"
-                                            id="input-font-title"
-                                            name="fontTitlePx"
-                                            class="campo-control campo-sin-borde-unidad"
-                                            min="16"
-                                            max="48"
-                                            step="1"
-                                            value="24"
-                                            required
-                                        />
-                                        <span class="unidad-input" aria-hidden="true">px</span>
+                                    <span id="label-font-title" class="etiqueta-campo">Tamaño de Títulos Principales</span>
+                                    <div class="stepper-control" role="group" aria-labelledby="label-font-title" data-stepper="titlePx" data-min="24" data-max="56" data-step="2">
+                                        <button type="button" class="btn-modal btn-modal-cancelar stepper-btn" data-accion="decrementar" aria-label="Disminuir tamaño de títulos principales">-</button>
+                                        <span id="valor-font-title" class="stepper-valor" aria-live="polite">24 px</span>
+                                        <button type="button" class="btn-modal btn-modal-cancelar stepper-btn" data-accion="incrementar" aria-label="Aumentar tamaño de títulos principales">+</button>
                                     </div>
+                                    <small class="texto-guia">Rango: 24 – 56 px</small>
                                 </div>
 
                                 <div class="grupo-campo">
-                                    <label for="input-font-subtitle" class="etiqueta-campo">Tamaño de Subtítulos</label>
-                                    <div class="campo-con-unidad">
-                                        <input
-                                            type="number"
-                                            id="input-font-subtitle"
-                                            name="fontSubtitlePx"
-                                            class="campo-control campo-sin-borde-unidad"
-                                            min="12"
-                                            max="32"
-                                            step="1"
-                                            value="18"
-                                            required
-                                        />
-                                        <span class="unidad-input" aria-hidden="true">px</span>
+                                    <span id="label-font-subtitle" class="etiqueta-campo">Tamaño de Subtítulos</span>
+                                    <div class="stepper-control" role="group" aria-labelledby="label-font-subtitle" data-stepper="subtitlePx" data-min="18" data-max="36" data-step="2">
+                                        <button type="button" class="btn-modal btn-modal-cancelar stepper-btn" data-accion="decrementar" aria-label="Disminuir tamaño de subtítulos">-</button>
+                                        <span id="valor-font-subtitle" class="stepper-valor" aria-live="polite">18 px</span>
+                                        <button type="button" class="btn-modal btn-modal-cancelar stepper-btn" data-accion="incrementar" aria-label="Aumentar tamaño de subtítulos">+</button>
                                     </div>
+                                    <small class="texto-guia">Rango: 18 – 36 px</small>
                                 </div>
 
                                 <div class="grupo-campo">
-                                    <label for="input-font-base" class="etiqueta-campo">Tamaño del Texto General</label>
-                                    <div class="campo-con-unidad">
-                                        <input
-                                            type="number"
-                                            id="input-font-base"
-                                            name="fontBasePx"
-                                            class="campo-control campo-sin-borde-unidad"
-                                            min="10"
-                                            max="24"
-                                            step="1"
-                                            value="14"
-                                            required
-                                        />
-                                        <span class="unidad-input" aria-hidden="true">px</span>
+                                    <span id="label-font-base" class="etiqueta-campo">Tamaño del Texto General</span>
+                                    <div class="stepper-control" role="group" aria-labelledby="label-font-base" data-stepper="basePx" data-min="12" data-max="24" data-step="1">
+                                        <button type="button" class="btn-modal btn-modal-cancelar stepper-btn" data-accion="decrementar" aria-label="Disminuir tamaño del texto general">-</button>
+                                        <span id="valor-font-base" class="stepper-valor" aria-live="polite">14 px</span>
+                                        <button type="button" class="btn-modal btn-modal-cancelar stepper-btn" data-accion="incrementar" aria-label="Aumentar tamaño del texto general">+</button>
                                     </div>
+                                    <small class="texto-guia">Rango: 12 – 24 px</small>
                                 </div>
                             </div>
                         </div>
@@ -271,6 +247,7 @@
     <div id="toast-config" class="toast-notificacion" role="status" aria-live="polite" hidden></div>
 
     <script src="../../js/main.js"></script>
+    <script src="../../js/axion-cache.js"></script>
     <script src="../../js/configuracion.js"></script>
 </body>
 

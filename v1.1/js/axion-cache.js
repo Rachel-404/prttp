@@ -90,6 +90,14 @@
             formatoBuffer: "cbor",
             loteTramas: 50,
             politicaDesbordamiento: "fifo"
+        },
+        tipografia: {
+            titlePx: 24,
+            subtitlePx: 18,
+            basePx: 14,
+            title: "24px",
+            subtitle: "18px",
+            base: "14px"
         }
     };
 

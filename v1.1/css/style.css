@@ -207,7 +207,7 @@ body.tema-claro .opcionII:hover {
     flex-wrap: wrap;
     gap: 15px;
     color: var(--text-main);
-    font-size: 14px;
+    font-size: var(--font-size-base);
     border-bottom: 1px solid #4c596f;
     padding: 15px 20px 10px 20px;
     width: 100%;
@@ -228,7 +228,7 @@ body.tema-claro .opcionII:hover {
 }
 
 .etiqueta-campo {
-    font-size: 13px;
+    font-size: calc(var(--font-size-base) - 1px);
     font-weight: 600;
     color: var(--text-muted);
 }
@@ -241,7 +241,7 @@ body.tema-claro .opcionII:hover {
     background-color: var(--bg-main);
     color: var(--text-main);
     font-family: inherit;
-    font-size: 13.5px;
+    font-size: var(--font-size-base);
     outline: none;
     transition: border-color 0.2s ease;
 }
@@ -278,7 +278,7 @@ body.tema-claro .opcionII:hover {
     border: 1px solid #991b1b;
     background-color: #7f1d1d;
     color: #fee2e2;
-    font-size: 13px;
+    font-size: calc(var(--font-size-base) - 1px);
 }
 
 .acciones-card {
@@ -294,12 +294,12 @@ body.tema-claro .opcionII:hover {
 }
 
 .texto-registro {
-    font-size: 13.5px;
+    font-size: var(--font-size-base);
     color: var(--text-main);
 }
 
 .texto-guia {
-    font-size: 13px;
+    font-size: calc(var(--font-size-base) - 1px);
     line-height: 1.45;
     color: var(--text-muted);
 }
@@ -349,7 +349,7 @@ body.tema-claro .opcionII:hover {
 
 .subtitulo-tecnico {
     padding: 0 6px;
-    font-size: 13.5px;
+    font-size: var(--font-size-base);
     font-weight: 700;
     color: var(--text-main);
 }
@@ -399,7 +399,7 @@ body.tema-claro .opcionII:hover {
 }
 
 .btn-ayuda-campo .material-symbols-outlined {
-    font-size: 17px;
+    font-size: var(--font-size-subtitle);
 }
 
 .popover-ayuda {
@@ -422,7 +422,7 @@ body.tema-claro .opcionII:hover {
 }
 
 .txt-descr {
-    font-size: 12px;
+    font-size: calc(var(--font-size-base) - 2px);
     padding: 6px 14px;
     border-radius: 50px;
     font-weight: 700;
@@ -446,7 +446,7 @@ body.tema-claro .opcionII:hover {
     border-radius: 8px;
     padding: 8px 14px;
     font-family: inherit;
-    font-size: 13px;
+    font-size: calc(var(--font-size-base) - 1px);
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease, opacity 0.2s ease;
@@ -508,14 +508,14 @@ body.tema-claro .opcionII:hover {
 
 .modal-titulo {
     margin: 0;
-    font-size: 16px;
+    font-size: var(--font-size-subtitle);
     font-weight: 700;
     color: var(--text-main);
 }
 
 .modal-mensaje {
     margin: 0;
-    font-size: 13.5px;
+    font-size: var(--font-size-base);
     line-height: 1.5;
     color: var(--text-muted);
 }
@@ -537,7 +537,7 @@ body.tema-claro .opcionII:hover {
     border: 1px solid var(--border-color);
     padding: 10px 16px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: calc(var(--font-size-base) - 1px);
     font-weight: 600;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     z-index: 2100;
