@@ -1,3 +1,5 @@
+const API_BASE_URL = "http://localhost:8080/api/v1";
+
 (function (global) {
     const PREFIJO = "axion_proto_";
 
@@ -12,6 +14,7 @@
             minNormal: 800,
             maxNormal: 1800,
             sondaTempAsociada: "pt100",
+            coeficienteTermico: 0.02,
             tempManualAtc: 25.0,
             factorCalibracionK: 1.0,
             atenuacionAdc: "11db",
@@ -25,9 +28,9 @@
             tempMax: 24.0,
             baudRate: 9600,
             slaveId: 1,
-            calPh401: 1950,
-            calPh700: 1500,
-            calPh1001: 1050,
+            calPh401: 4.01,
+            calPh700: 7.0,
+            calPh1001: 10.01,
             valorActual: 6.1
         },
         nivel_agua: {
@@ -51,6 +54,7 @@
             compensarOtros: true,
             tipoConexion: "3_hilos",
             rrefOhmios: 430.0,
+            filtroRed: "60Hz",
             valorActual: 21.5
         },
         dht22: {
@@ -339,6 +343,7 @@
     global.registrarAuditoria = registrarAuditoria;
 
     global.AxionCache = {
+        API_BASE_URL,
         PREFIJO,
         VALORES_DEFECTO,
         guardarEnCache,

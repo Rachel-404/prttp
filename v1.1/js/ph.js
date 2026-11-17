@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "9.18": "Sobre Azul (pH 9.18)"
     };
     const UARTS_VALIDOS = ["UART1", "UART2"];
-    const BAUDS_VALIDOS = [4800, 9600, 19200];
+    const BAUDS_VALIDOS = [9600, 19200, 115200];
     const PARIDADES_VALIDAS = ["None", "Even", "Odd"];
     const STOP_BITS_VALIDOS = [1, 2];
 
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pinTx: 17,
         pinDeRe: 21,
         slaveId: 1,
-        baudRate: 4800,
+        baudRate: 9600,
         paridad: "None",
         stopBits: 1,
         timeoutMs: 1200,

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const CLAVE_TECNICA_TEMP = "axion_temp_agua_tecnico";
 
     const FRECUENCIAS_VALIDAS = [5, 10, 30, 60, 300];
-    const CONEXIONES_VALIDAS = ["3_hilos", "2_hilos"];
+    const CONEXIONES_VALIDAS = ["3_hilos", "2_hilos", "4_hilos"];
     const LONGITUDES_VALIDAS = ["1m", "2m", "3m"];
     const INTERFACES_VALIDAS = ["SPI_MAX31865", "ANALOG_ADC"];
     const FILTROS_RED_VALIDOS = ["60Hz", "50Hz"];

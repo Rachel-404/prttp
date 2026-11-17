@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const CLAVE_CALIBRACION_DHT22 = "axion_dht22_calibracion";
     const CLAVE_TECNICA_DHT22 = "axion_dht22_tecnico";
 
-    const FRECUENCIAS_VALIDAS = [5, 10, 30, 60, 300];
+    const FRECUENCIAS_VALIDAS = [2, 5, 10, 30, 60, 300];
     const MODELOS_VALIDOS = ["DHT22", "DHT11"];
     const GPIOS_VALIDOS = ["GPIO 4", "GPIO 5", "GPIO 15", "GPIO 16", "GPIO 17", "GPIO 18", "GPIO 21"];
     const PULLUPS_VALIDOS = ["externa_10k", "interna_esp32"];
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
         modulo: "Temperatura y Humedad Ambiental",
         activo: true,
         frecuenciaLecturaSeg: 10,
-        tempMinimaAire: 16.0,
+        tempMinimaAire: 18.0,
         tempMaximaAire: 28.0,
         humedadMinima: 50,
         humedadMaxima: 80,

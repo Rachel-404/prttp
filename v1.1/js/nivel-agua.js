@@ -4,15 +4,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const CLAVE_TECNICA_NA = "axion_nivel_agua_tecnico";
 
     const FRECUENCIAS_VALIDAS = [5, 10, 30, 60, 300];
-    const UNIDADES_VALIDAS = ["cm", "pct", "L"];
-    const FORMAS_VALIDAS = ["rectangular", "cilindrico"];
+    const UNIDADES_VALIDAS = ["cm", "pct", "L", "kPa", "MPa", "mH2O", "mmH2O", "inH2O", "m", "mm"];
+    const FORMAS_VALIDAS = ["rectangular", "cilindrico", "cilindrico_horizontal"];
     const SALIDAS_VALIDAS = ["4-20mA", "0.5-4.5V", "0.5-4.5V-std", "0.5-4.5V-rad", "modbus"];
-    const PINES_ADC_VALIDOS = ["GPIO1", "GPIO2", "GPIO3", "GPIO4", "GPIO5", "GPIO6", "GPIO7"];
+    const PINES_ADC_VALIDOS = ["GPIO1", "GPIO2", "GPIO3", "GPIO4", "GPIO5", "GPIO6", "GPIO7", "GPIO8", "GPIO9", "GPIO10"];
     const BAUDS_VALIDOS = [4800, 9600, 19200, 38400];
     const RANGOS_URL_MAX_KPA = {
         C203G: 20,
         C403G: 40,
-        C104G: 100
+        C104G: 100,
+        C204G: 200,
+        C404G: 400,
+        C105G: 1000,
+        C205G: 2000
     };
     const OFFSETS_CARCASA_MM = {
         H46: 7.5,
@@ -21,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const DEFAULTS_TECNICOS_NA = {
         tipoSalida: "4-20mA",
-        resistenciaShunt: 150,
+        resistenciaShunt: 100,
         pinAdc420: "GPIO2",
         pinAdcVdc: "GPIO2",
         factorDivisorTension: 0.66,
