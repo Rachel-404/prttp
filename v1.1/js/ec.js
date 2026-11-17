@@ -176,6 +176,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function persistirEstado() {
         estadoModuloEc.ultimaActualizacion = new Date().toISOString();
         localStorage.setItem(CLAVE_CONFIG_EC, JSON.stringify(estadoModuloEc));
+        const inputTempManual = document.getElementById("ec-temp-manual");
+        const tempManualAtc = inputTempManual ? Number(inputTempManual.value || 25.0) : 25.0;
         if (window.AxionCache) {
             window.AxionCache.guardarEnCache("ec", {
                 activo: estadoModuloEc.activo,
@@ -185,9 +187,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 tdsMin: estadoModuloEc.tdsMinimo,
                 tdsMax: estadoModuloEc.tdsMaximo,
                 minNormal: Math.round(estadoModuloEc.ecMinimo * 1000),
-                maxNormal: Math.round(estadoModuloEc.ecMaximo * 1000)
+                maxNormal: Math.round(estadoModuloEc.ecMaximo * 1000),
+                sondaTempAsociada: estadoModuloEc.sondaTempAsociada,
+                tempManualAtc
             });
         }
+    }
+
+    function actualizarEstadoAtcEc() {
+        const grupoManual = document.getElementById("grupo-ec-temp-manual");
+        const inputManual = document.getElementById("ec-temp-manual");
+        const elEstado = document.getElementById("estado-atc-ec");
+        const elTexto = document.getElementById("texto-estado-atc-ec");
+        const fuente = selectSondaTemp ? selectSondaTemp.value : estadoModuloEc.sondaTempAsociada;
+
+        if (grupoManual) grupoManual.hidden = fuente !== "fijo25";
+        if (!window.AxionCache || !elEstado || !elTexto) return;
+
+        const info = window.AxionCache.resolverTemperaturaAtc(fuente, inputManual ? inputManual.value : 25.0);
+        elEstado.classList.remove("estado-normal", "estado-advertencia", "estado-critico");
+        elEstado.classList.add(info.estado === "advertencia" ? "estado-advertencia" : "estado-normal");
+        elTexto.textContent = info.mensaje;
     }
 
     function persistirCalibracion() {
@@ -262,6 +282,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         actualizarTextoCalibracion();
         sincronizarCamposTecnicos();
+        const inputManual = document.getElementById("ec-temp-manual");
+        if (inputManual && window.AxionCache) {
+            const cacheEc = window.AxionCache.leerDeCache("ec");
+            if (Number.isFinite(Number(cacheEc.tempManualAtc))) {
+                inputManual.value = Number(cacheEc.tempManualAtc).toFixed(1);
+            }
+        }
+        actualizarEstadoAtcEc();
     }
 
     function mostrarError(elementoError, mensaje) {
@@ -711,6 +739,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Inicialización al cargar
+    if (selectSondaTemp) {
+        selectSondaTemp.addEventListener("change", actualizarEstadoAtcEc);
+    }
+    const inputTempManualEc = document.getElementById("ec-temp-manual");
+    if (inputTempManualEc) {
+        inputTempManualEc.addEventListener("input", actualizarEstadoAtcEc);
+    }
+    window.addEventListener("storage", actualizarEstadoAtcEc);
+
     cargarEstadoInicial();
     sincronizarFormularioConEstado();
 });

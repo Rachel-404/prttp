@@ -40,6 +40,23 @@ document.addEventListener("DOMContentLoaded", () => {
         txtEstado.textContent = activo ? "Activo" : "Pausado";
     }
 
+    function actualizarEstadoAtcPhAnalogo() {
+        const elEstado = document.getElementById("estado-atc-ph-analogo");
+        const elTexto = document.getElementById("texto-estado-atc-ph-analogo");
+        if (!window.AxionCache || !elEstado || !elTexto) return;
+
+        const fuente = selectFuenteTemp ? selectFuenteTemp.value : "pt100";
+        const info = window.AxionCache.resolverTemperaturaAtc(fuente, 25.0);
+        elEstado.classList.remove("estado-normal", "estado-advertencia", "estado-critico");
+        elEstado.classList.add(info.estado === "advertencia" ? "estado-advertencia" : "estado-normal");
+
+        if (fuente === "pt100" && info.activa) {
+            elTexto.textContent = `Enlazado a RTD PT100 · Temperatura de compensación: ${info.valor.toFixed(1)} °C`;
+        } else {
+            elTexto.textContent = info.mensaje;
+        }
+    }
+
     function cargarDesdeCache() {
         if (!window.AxionCache) return;
         const datos = window.AxionCache.leerDeCache(CLAVE_CACHE);
@@ -52,9 +69,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (inputVoltajeAcido) inputVoltajeAcido.value = Number(datos.voltajeAcido ?? 2032.4).toFixed(1);
         if (inputFechaInst && datos.fechaInstalacion) inputFechaInst.value = datos.fechaInstalacion;
         if (selectAdc && datos.canalAdc1) selectAdc.value = datos.canalAdc1;
+        actualizarEstadoAtcPhAnalogo();
     }
 
     cargarDesdeCache();
+
+    if (selectFuenteTemp) {
+        selectFuenteTemp.addEventListener("change", actualizarEstadoAtcPhAnalogo);
+    }
+    window.addEventListener("storage", actualizarEstadoAtcPhAnalogo);
 
     if (btnEstado && txtEstado) {
         btnEstado.addEventListener("click", () => {

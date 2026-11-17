@@ -139,6 +139,22 @@ document.addEventListener("DOMContentLoaded", () => {
             estadoDashboard.esp32.muestreoSeg = Number(nodo.muestreoSeg || 2);
             estadoDashboard.esp32.envioSeg = Number(nodo.envioSeg || 10);
         }
+
+        if (typeof cache.resolverTemperaturaAtc === "function") {
+            const cfgEc = cache.leerDeCache("ec");
+            const atcEc = cache.resolverTemperaturaAtc(cfgEc.sondaTempAsociada || "pt100", cfgEc.tempManualAtc ?? 25.0);
+            const subEc = document.querySelector("#card-ec .submetricas-tecnicas");
+            if (subEc) {
+                subEc.textContent = `1.184 V · 1469 Raw · ${atcEc.valor.toFixed(1)} °C (${atcEc.origen})`;
+            }
+
+            const cfgPhA = cache.leerDeCache("ph_analogo");
+            const atcPhA = cache.resolverTemperaturaAtc(cfgPhA.fuenteTemperatura || "pt100", 25.0);
+            const subPhA = document.querySelector("#card-ph-analogo .submetricas-tecnicas");
+            if (subPhA) {
+                subPhA.textContent = `1704.5 mV · 98.5% Salud · ${atcPhA.valor.toFixed(1)} °C (${atcPhA.origen})`;
+            }
+        }
     }
 
     function evaluarClaseColor(valor, cfg, enLinea) {

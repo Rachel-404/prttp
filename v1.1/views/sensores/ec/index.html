@@ -149,13 +149,23 @@
                         </div>
 
                         <div class="grupo-campo">
-                            <label for="sonda-temp-asociada" class="etiqueta-campo">Sonda de Temperatura Asociada (0-40°C)</label>
+                            <label for="sonda-temp-asociada" class="etiqueta-campo">Fuente de Compensación Térmica (ATC)</label>
                             <select id="sonda-temp-asociada" name="sondaTempAsociada" class="campo-control">
-                                <option value="pt100" selected>Sonda PT100 (Agua)</option>
+                                <option value="pt100" selected>Sonda RTD PT100 (Tiempo real)</option>
                                 <option value="sen0708">Sensor pH RS485 SEN0708 (Interna)</option>
-                                <option value="fijo25">Valor Fijo (25 °C)</option>
+                                <option value="fijo25">Temperatura Manual Fija (25.0 °C)</option>
                             </select>
                         </div>
+
+                        <div id="grupo-ec-temp-manual" class="grupo-campo" hidden>
+                            <label for="ec-temp-manual" class="etiqueta-campo">Temperatura Manual Fija (°C)</label>
+                            <input type="number" id="ec-temp-manual" name="tempManualAtc" class="campo-control" min="0" max="50" step="0.1" value="25.0" />
+                        </div>
+
+                        <p id="estado-atc-ec" class="celda-estado estado-normal" aria-live="polite">
+                            <span class="punto-estado" aria-hidden="true"></span>
+                            <span id="texto-estado-atc-ec">Compensación térmica activa desde PT100 · Lectura actual: 21.5 °C · Coeficiente: 2.0 %/°C</span>
+                        </p>
 
                         <p id="error-control-ec" class="mensaje-error-form" role="alert" hidden></p>
 

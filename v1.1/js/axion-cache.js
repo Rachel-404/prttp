@@ -11,6 +11,8 @@
             tdsMax: 900,
             minNormal: 800,
             maxNormal: 1800,
+            sondaTempAsociada: "pt100",
+            tempManualAtc: 25.0,
             valorActual: 1200
         },
         ph: {
@@ -283,6 +285,58 @@
         return registro;
     }
 
+    function resolverTemperaturaAtc(fuente = "pt100", tempManual = 25.0) {
+        if (fuente === "pt100") {
+            const pt100 = leerDeCache("temp_agua");
+            if (pt100 && pt100.activo === false) {
+                return {
+                    activa: false,
+                    estado: "advertencia",
+                    valor: 25.0,
+                    origen: "Respaldo",
+                    mensaje: "Advertencia: PT100 pausada · Usando temperatura de respaldo (25.0 °C)"
+                };
+            }
+            const lectura = Number(pt100?.valorActual ?? 21.5);
+            return {
+                activa: true,
+                estado: "normal",
+                valor: lectura,
+                origen: "PT100",
+                mensaje: `Compensación térmica activa desde PT100 · Lectura actual: ${lectura.toFixed(1)} °C · Coeficiente: 2.0 %/°C`
+            };
+        }
+
+        if (fuente === "sen0708") {
+            const phRs485 = leerDeCache("ph");
+            if (phRs485 && phRs485.activo === false) {
+                return {
+                    activa: false,
+                    estado: "advertencia",
+                    valor: 25.0,
+                    origen: "Respaldo",
+                    mensaje: "Fuente externa pausada · Aplicando compensación por defecto (25.0 °C)"
+                };
+            }
+            return {
+                activa: true,
+                estado: "normal",
+                valor: 23.5,
+                origen: "SEN0708",
+                mensaje: "Enlazado a sonda interna SEN0708 · Temperatura: 23.5 °C"
+            };
+        }
+
+        const valFijo = Number.isFinite(Number(tempManual)) ? Number(tempManual) : 25.0;
+        return {
+            activa: true,
+            estado: "normal",
+            valor: valFijo,
+            origen: "Fija",
+            mensaje: `Temperatura manual fija activa · Valor aplicado: ${valFijo.toFixed(1)} °C`
+        };
+    }
+
     global.registrarAuditoria = registrarAuditoria;
 
     global.AxionCache = {
@@ -294,7 +348,8 @@
         limpiarCacheSistema,
         obtenerAuditoria,
         renderizarTablaAuditoria,
-        registrarAuditoria
+        registrarAuditoria,
+        resolverTemperaturaAtc
     };
 })(window);
 
