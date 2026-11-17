@@ -349,5 +349,7 @@ function inicializarCentroAlertas(headerContainer) {
         }
     });
 
+    window.addEventListener("axion:alertasActualizadas", renderizarAlertas);
+
     renderizarAlertas();
 }

@@ -288,6 +288,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.detail) actualizarDashboardAxion(e.detail);
     });
 
+    window.addEventListener("axion:telemetria", (e) => {
+        if (e.detail) actualizarDashboardAxion(e.detail);
+    });
+
     const CLAVE_RELES_ESTADO = "axion_reles_estado";
     const ESTADOS_RELES_DEFAULT = [
         { canal: 1, nombre: "Electrobomba 1 (Recirculación Principal)", encendido: false },
