@@ -697,6 +697,14 @@ document.addEventListener("DOMContentLoaded", () => {
             new CustomEvent("ph:configuracionGuardada", { detail: { ...estadoModuloPh } })
         );
         console.info("Configuración Bloque 1 (SEN0708) guardada:", estadoModuloPh);
+        if (window.registrarAuditoria) {
+            window.registrarAuditoria(
+                "pH RS485",
+                "Umbrales pH",
+                "Anterior",
+                `${estadoModuloPh.phMinimo} - ${estadoModuloPh.phMaximo} pH`
+            );
+        }
         mostrarToast("Configuración de alertas y control guardada.");
     });
 

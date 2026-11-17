@@ -228,6 +228,31 @@
                     </form>
                 </article>
 
+                <!-- SECCIÓN 3: Bitácora de Auditoría del Sistema (CU-17) -->
+                <section class="card card-config-ancha" aria-label="Bitácora de Auditoría del Sistema">
+                    <header class="titulo-card">
+                        <h3>Bitácora de Auditoría del Sistema</h3>
+                        <span class="texto-guia">Registro cronológico de cambios aplicados en módulos y parámetros</span>
+                    </header>
+
+                    <div class="cuerpo-card">
+                        <div class="contenedor-tabla-registros">
+                            <table class="tabla-historial" aria-label="Bitácora de auditoría de configuración">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha y Hora</th>
+                                        <th>Módulo</th>
+                                        <th>Parámetro Modificado</th>
+                                        <th>Cambio Realizado</th>
+                                        <th>Usuario</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-auditoria-sistema" aria-live="polite"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
             </div>
         </main>
     </div>

@@ -136,6 +136,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     usuario: inputUsuario?.value || "",
                     habilitarTls: Boolean(chkTls?.checked)
                 });
+                window.AxionCache.registrarAuditoria(
+                    "Controlador ESP32-S3",
+                    "Conectividad / Protocolo",
+                    "Anterior",
+                    `${(selectProtocolo?.value || "mqtt").toUpperCase()} (${inputSsid?.value || "Wi-Fi"})`
+                );
             }
             mostrarToast("Configuración de conectividad y transporte guardada.");
         });
@@ -153,6 +159,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     loteTramas: Number(inputLote?.value || 50),
                     politicaDesbordamiento: selectDesbordamiento?.value || "fifo"
                 });
+                window.AxionCache.registrarAuditoria(
+                    "Controlador ESP32-S3",
+                    "Temporización / Buffer",
+                    "Anterior",
+                    `${inputMuestreo?.value || 2}s / ${inputEnvio?.value || 10}s`
+                );
             }
             mostrarToast("Política de temporización y buffer offline LittleFS guardada.");
         });

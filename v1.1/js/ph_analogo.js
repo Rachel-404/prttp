@@ -77,6 +77,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     maxNormal: Number(inputPhMax?.value || 6.5),
                     fuenteTemperatura: selectFuenteTemp?.value || "pt100"
                 });
+                window.AxionCache.registrarAuditoria(
+                    "pH Analógico 24/7",
+                    "Umbrales pH",
+                    "Anterior",
+                    `${inputPhMin?.value || "5.50"} - ${inputPhMax?.value || "6.50"} pH`
+                );
             }
             mostrarToast("Configuración operativa de pH Analógico guardada.");
         });

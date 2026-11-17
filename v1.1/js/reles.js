@@ -307,6 +307,9 @@ document.addEventListener("DOMContentLoaded", () => {
             document.dispatchEvent(
                 new CustomEvent("reles:configTecnicaGuardada", { detail: { ...estadoTecnicoReles } })
             );
+            if (window.registrarAuditoria) {
+                window.registrarAuditoria("Control de Equipos", "Configuración de Pines", "Anterior", "Actualizado");
+            }
             mostrarToast("Configuración técnica de pines guardada.");
         });
 

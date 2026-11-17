@@ -513,6 +513,14 @@ document.addEventListener("DOMContentLoaded", () => {
             })
         );
         console.info("Configuración guardada (Bloque 1 - DHT22):", estadoModuloDht22);
+        if (window.registrarAuditoria) {
+            window.registrarAuditoria(
+                "Temperatura/Humedad DHT22",
+                "Umbrales Microclima",
+                "Anterior",
+                `${estadoModuloDht22.tempMinima}-${estadoModuloDht22.tempMaxima} °C / ${estadoModuloDht22.humedadMinima}-${estadoModuloDht22.humedadMaxima}%`
+            );
+        }
         mostrarToast("Configuración del microclima guardada.");
     });
 

@@ -474,6 +474,14 @@ document.addEventListener("DOMContentLoaded", () => {
             })
         );
         console.info("Configuración Bloque 1 (RTD PT100) guardada:", estadoModuloTemp);
+        if (window.registrarAuditoria) {
+            window.registrarAuditoria(
+                "Temperatura PT100",
+                "Umbrales Térmicos",
+                "Anterior",
+                `${estadoModuloTemp.tempMinimaAgua} - ${estadoModuloTemp.tempMaximaAgua} °C`
+            );
+        }
         mostrarToast("Configuración térmica y sincronización guardada.");
     });
 

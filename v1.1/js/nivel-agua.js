@@ -622,6 +622,14 @@ document.addEventListener("DOMContentLoaded", () => {
             new CustomEvent("nivelAgua:configuracionGuardada", { detail: { ...estadoModuloNa } })
         );
         console.info("Configuración Bloque 1 (LMP633-NCN) guardada:", estadoModuloNa);
+        if (window.registrarAuditoria) {
+            window.registrarAuditoria(
+                "Nivel de Agua",
+                "Umbrales y Unidad",
+                "Anterior",
+                `${estadoModuloNa.nivelMinimoCm} - ${estadoModuloNa.nivelMaximoCm} cm (${estadoModuloNa.unidadPrincipal})`
+            );
+        }
         mostrarToast("Configuración de alertas del tanque guardada.");
     });
 

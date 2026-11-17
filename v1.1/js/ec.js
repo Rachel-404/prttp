@@ -557,6 +557,14 @@ document.addEventListener("DOMContentLoaded", () => {
             new CustomEvent("ec:configuracionGuardada", { detail: { ...estadoModuloEc } })
         );
         console.info("Configuración Bloque 1 (EC / TDS V1.0) guardada:", estadoModuloEc);
+        if (window.registrarAuditoria) {
+            window.registrarAuditoria(
+                "Conductividad (EC/TDS)",
+                "Umbrales EC",
+                "Anterior",
+                `${estadoModuloEc.ecMinimo} - ${estadoModuloEc.ecMaximo} mS/cm`
+            );
+        }
         mostrarToast("Configuración de alertas y umbrales EC / TDS guardada.");
     });
 

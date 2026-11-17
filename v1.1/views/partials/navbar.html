@@ -20,6 +20,29 @@
             </button>
         </div>
 
+        <div id="centro-alertas-header" class="perfil-usuario-header">
+            <button id="btn-alertas-header" class="btn-perfil-header" type="button" aria-haspopup="true"
+                aria-expanded="false" aria-controls="dropdown-alertas-header" aria-label="Centro de alertas del sistema">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span id="badge-alertas-count" class="badge-alertas-contador">2</span>
+            </button>
+
+            <div id="dropdown-alertas-header" class="dropdown-perfil-header dropdown-alertas-panel" role="region"
+                aria-label="Alertas del sistema" hidden>
+                <div class="encabezado-alertas-dropdown">
+                    <span class="titulo-alertas-dropdown">Alertas del Sistema</span>
+                    <button type="button" id="btn-marcar-todas-leidas" class="enlace-alertas-leidas">
+                        Marcar todas como leídas
+                    </button>
+                </div>
+                <ul id="lista-alertas-header" class="lista-alertas-header" aria-live="polite"></ul>
+            </div>
+        </div>
+
         <div id="perfil-usuario-header" class="perfil-usuario-header">
             <a id="btn-header-login" class="btn-perfil-header" href="login.html" aria-label="Iniciar sesión en el sistema">
                 <svg class="icono-usuario-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

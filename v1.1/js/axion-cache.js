@@ -98,7 +98,59 @@
             title: "24px",
             subtitle: "18px",
             base: "14px"
-        }
+        },
+        alertas: [
+            {
+                id: "alerta-1",
+                nivel: "critico",
+                titulo: "pH RS485 fuera de umbral",
+                detalle: "Lectura: 6.85 pH (Máx: 6.50 pH)",
+                tiempo: "Hace 14 min",
+                leida: false,
+                urlDestino: "views/sensores/ph/index.html"
+            },
+            {
+                id: "alerta-2",
+                nivel: "advertencia",
+                titulo: "Desconexión temporal PT100",
+                detalle: "Resistencia fuera de rango (Circuito abierto)",
+                tiempo: "Hace 2 h",
+                leida: false,
+                urlDestino: "views/sensores/nivel-temperatura/index.html?tab=temperatura"
+            },
+            {
+                id: "alerta-3",
+                nivel: "normal",
+                titulo: "Sincronización Buffer Offline",
+                detalle: "142 tramas enviadas tras reconexión Wi-Fi",
+                tiempo: "Ayer, 18:30",
+                leida: true,
+                urlDestino: "views/nodo-maestro/index.html"
+            }
+        ],
+        auditoria: [
+            {
+                fechaHora: "16/11/2026 18:10",
+                modulo: "pH RS485",
+                parametro: "pH Máximo",
+                cambio: "6.50 pH → 6.80 pH",
+                usuario: "Admin Único"
+            },
+            {
+                fechaHora: "16/11/2026 17:45",
+                modulo: "Nivel de Agua",
+                parametro: "Unidad Principal",
+                cambio: "cm → kPa",
+                usuario: "Admin Único"
+            },
+            {
+                fechaHora: "16/11/2026 16:20",
+                modulo: "Controlador ESP32-S3",
+                parametro: "Frecuencia de Envío",
+                cambio: "15 s → 10 s",
+                usuario: "Admin Único"
+            }
+        ]
     };
 
     function clonar(obj) {
@@ -161,13 +213,40 @@
         }
     }
 
+    function obtenerAuditoria() {
+        const lista = leerDeCache("auditoria", VALORES_DEFECTO.auditoria);
+        return Array.isArray(lista) ? lista : clonar(VALORES_DEFECTO.auditoria);
+    }
+
+    function registrarAuditoria(modulo, parametro, valorAnterior, valorNuevo) {
+        const ahora = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        const fechaHora = `${pad(ahora.getDate())}/${pad(ahora.getMonth() + 1)}/${ahora.getFullYear()} ${pad(ahora.getHours())}:${pad(ahora.getMinutes())}`;
+        const registro = {
+            fechaHora,
+            modulo: String(modulo || "Sistema"),
+            parametro: String(parametro || "Parámetro"),
+            cambio: `${valorAnterior} → ${valorNuevo}`,
+            usuario: "Admin Único"
+        };
+        const actual = obtenerAuditoria();
+        const nuevaLista = [registro, ...actual].slice(0, 50);
+        guardarEnCache("auditoria", nuevaLista);
+        document.dispatchEvent(new CustomEvent("axion:auditoriaActualizada", { detail: nuevaLista }));
+        return registro;
+    }
+
+    global.registrarAuditoria = registrarAuditoria;
+
     global.AxionCache = {
         PREFIJO,
         VALORES_DEFECTO,
         guardarEnCache,
         leerDeCache,
         restaurarClaveCache,
-        limpiarCacheSistema
+        limpiarCacheSistema,
+        obtenerAuditoria,
+        registrarAuditoria
     };
 })(window);
 

@@ -653,3 +653,45 @@ body.tema-claro .opcionII:hover {
     margin-top: 4px;
     border-top: 1px solid var(--border-color);
 }
+
+/* ==========================================================================
+   TABLAS COMPARTIDAS (HISTORIAL, PINOUT Y BITÁCORA DE AUDITORÍA)
+   ========================================================================== */
+.contenedor-tabla-registros {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.tabla-historial {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: var(--font-size-base);
+}
+
+.tabla-historial thead {
+    background-color: var(--bg-main);
+}
+
+.tabla-historial th,
+.tabla-historial td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+    white-space: nowrap;
+}
+
+.tabla-historial th {
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.tabla-historial tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-historial tbody tr:hover {
+    background-color: var(--hover-bg);
+}

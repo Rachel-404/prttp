@@ -223,6 +223,12 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem(CLAVE_TIPOGRAFIA_LOCAL, JSON.stringify(prefsTipografia));
         if (window.AxionCache) {
             window.AxionCache.guardarEnCache("tipografia", prefsTipografia);
+            window.AxionCache.registrarAuditoria(
+                "Configuración Tipográfica",
+                "Tema / Escala",
+                modoTema,
+                `${prefsTipografia.titlePx}/${prefsTipografia.subtitlePx}/${prefsTipografia.basePx} px`
+            );
         }
 
         mostrarToast("Apariencia y tipografía aplicadas.");
@@ -323,6 +329,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (inputPasswordNueva) inputPasswordNueva.value = "";
         if (inputPasswordConfirmar) inputPasswordConfirmar.value = "";
 
+        if (window.registrarAuditoria) {
+            window.registrarAuditoria("Cuenta Administrativa", "Perfil y Sesión", "Anterior", `${expiracionMinutos} min`);
+        }
+
         abrirModal({
             titulo: "Cambios Guardados",
             mensaje: "La configuración de la Cuenta Administrativa (Admin Único) se actualizó correctamente.",
@@ -342,6 +352,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    function renderizarBitacoraAuditoria() {
+        const tbody = document.getElementById("tbody-auditoria-sistema");
+        if (!tbody || !window.AxionCache) return;
+        const registros = window.AxionCache.obtenerAuditoria();
+        tbody.innerHTML = "";
+        registros.forEach((item) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${item.fechaHora}</td>
+                <td>${item.modulo}</td>
+                <td>${item.parametro}</td>
+                <td><strong>${item.cambio}</strong></td>
+                <td>${item.usuario}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.addEventListener("axion:auditoriaActualizada", renderizarBitacoraAuditoria);
+    window.addEventListener("storage", (e) => {
+        if (e.key === "axion_proto_auditoria") renderizarBitacoraAuditoria();
+    });
+
     cargarPreferenciasIniciales();
+    renderizarBitacoraAuditoria();
 });
 
