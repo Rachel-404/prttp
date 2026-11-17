@@ -571,3 +571,85 @@ body.tema-claro .opcionII:hover {
         width: 100%;
     }
 }
+
+/* ==========================================================================
+   DISEÑO PLANO POR SECCIONES (CARDLESS / GITHUB SETTINGS STYLE)
+   Aplica únicamente a vistas de configuración con .vista-config-plana
+   ========================================================================== */
+.vista-config-plana .encabezado-modulo,
+.vista-config-plana .encabezado-config,
+.vista-config-plana .modulo-reportes,
+.vista-config-plana .ordenar-div,
+.vista-config-plana .config-dos-columnas,
+.vista-config-plana .grid-reles,
+.vista-config-plana > section[aria-label="Telemetría de salud del controlador"] {
+    width: 100%;
+    max-width: 100%;
+}
+
+.vista-config-plana .ordenar-div,
+.vista-config-plana .config-dos-columnas {
+    grid-template-columns: 1fr;
+    gap: 32px;
+}
+
+.vista-config-plana .card {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: unset;
+    padding: 0 0 28px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.vista-config-plana .ordenar-div > .card:last-child,
+.vista-config-plana .config-dos-columnas > .card:last-child {
+    border-bottom: none;
+    padding-bottom: 8px;
+}
+
+.vista-config-plana .titulo-card {
+    padding: 0 0 12px 0;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.vista-config-plana .titulo-card h3 {
+    font-size: var(--font-size-subtitle);
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.vista-config-plana .cuerpo-card {
+    padding: 0;
+    gap: 18px;
+}
+
+.vista-config-plana .subseccion-tecnica {
+    background-color: transparent;
+    border: none;
+    border-top: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 18px 0 0 0;
+    margin-top: 6px;
+}
+
+.vista-config-plana .subtitulo-tecnico {
+    padding: 0 8px 0 0;
+}
+
+.vista-config-plana .paso-calibracion {
+    background-color: transparent;
+    border: none;
+    border-left: 2px solid var(--border-color);
+    border-radius: 0;
+    padding: 6px 0 6px 16px;
+}
+
+.vista-config-plana .acciones-card {
+    padding-top: 16px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border-color);
+}
