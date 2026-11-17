@@ -172,7 +172,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 frecuenciaSeg: estadoModuloPh.frecuenciaLecturaSeg,
                 minNormal: estadoModuloPh.phMinimo,
                 maxNormal: estadoModuloPh.phMaximo,
-                tempMax: estadoModuloPh.tempMaximaAgua
+                tempMax: estadoModuloPh.tempMaximaAgua,
+                baudRate: Number(document.getElementById("tec-baud-rate")?.value || 9600),
+                slaveId: Number(document.getElementById("tec-slave-id")?.value || 1),
+                calPh401: Number(document.getElementById("ph-cal-401")?.value || 1950),
+                calPh700: Number(document.getElementById("ph-cal-700")?.value || 1500),
+                calPh1001: Number(document.getElementById("ph-cal-1001")?.value || 1050)
             });
         }
     }

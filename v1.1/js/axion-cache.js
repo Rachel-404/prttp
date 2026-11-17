@@ -13,6 +13,8 @@
             maxNormal: 1800,
             sondaTempAsociada: "pt100",
             tempManualAtc: 25.0,
+            factorCalibracionK: 1.0,
+            atenuacionAdc: "11db",
             valorActual: 1200
         },
         ph: {
@@ -21,6 +23,11 @@
             minNormal: 5.5,
             maxNormal: 6.5,
             tempMax: 24.0,
+            baudRate: 9600,
+            slaveId: 1,
+            calPh401: 1950,
+            calPh700: 1500,
+            calPh1001: 1050,
             valorActual: 6.1
         },
         nivel_agua: {
@@ -31,6 +38,8 @@
             nivelMaxCm: 90,
             minNormal: 20,
             maxNormal: 90,
+            resistenciaShunt: 100,
+            offset_cm: 0.0,
             valorActual: 85,
             litros: 350
         },
@@ -40,6 +49,8 @@
             minNormal: 18.0,
             maxNormal: 24.0,
             compensarOtros: true,
+            tipoConexion: "3_hilos",
+            rrefOhmios: 430.0,
             valorActual: 21.5
         },
         dht22: {

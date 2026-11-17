@@ -194,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function persistirEstado() {
         estadoModuloNa.ultimaActualizacion = new Date().toISOString();
         localStorage.setItem(CLAVE_CONFIG_NA, JSON.stringify(estadoModuloNa));
+        const inputOffsetCm = document.getElementById("offset_cm");
         if (window.AxionCache) {
             window.AxionCache.guardarEnCache("nivel_agua", {
                 activo: estadoModuloNa.activo,
@@ -202,7 +203,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 nivelMinCm: estadoModuloNa.nivelMinimoCm,
                 nivelMaxCm: estadoModuloNa.nivelMaximoCm,
                 minNormal: estadoModuloNa.nivelMinimoCm,
-                maxNormal: estadoModuloNa.nivelMaximoCm
+                maxNormal: estadoModuloNa.nivelMaximoCm,
+                resistenciaShunt: Number(inputShunt?.value || 100),
+                offset_cm: Number(inputOffsetCm?.value || 0.0)
             });
         }
     }

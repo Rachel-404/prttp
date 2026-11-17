@@ -178,6 +178,8 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem(CLAVE_CONFIG_EC, JSON.stringify(estadoModuloEc));
         const inputTempManual = document.getElementById("ec-temp-manual");
         const tempManualAtc = inputTempManual ? Number(inputTempManual.value || 25.0) : 25.0;
+        const inputFactorK = document.getElementById("ec-factor-k");
+        const selectAtenuacion = document.getElementById("tec-ec-atenuacion");
         if (window.AxionCache) {
             window.AxionCache.guardarEnCache("ec", {
                 activo: estadoModuloEc.activo,
@@ -189,7 +191,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 minNormal: Math.round(estadoModuloEc.ecMinimo * 1000),
                 maxNormal: Math.round(estadoModuloEc.ecMaximo * 1000),
                 sondaTempAsociada: estadoModuloEc.sondaTempAsociada,
-                tempManualAtc
+                tempManualAtc,
+                factorCalibracionK: Number(inputFactorK?.value || 1.0),
+                atenuacionAdc: selectAtenuacion?.value || "11db"
             });
         }
     }

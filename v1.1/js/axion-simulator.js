@@ -9,12 +9,12 @@
     const ultimoCooldownPorSensor = {};
 
     const NOMINALES = {
-        ec: 1210,
-        ph: 6.1,
-        nivel: 84.5,
-        tempAgua: 21.5,
-        dhtTemp: 22.8,
-        dhtHum: 66
+        temperatura_amb: 24.5,
+        humedad_amb: 65.2,
+        temperatura_solucion: 21.8,
+        nivel_ph: 6.25,
+        tds_ppm: 550.0,
+        nivel_tanque_cm: 125.5
     };
 
     function fluctuar(centro, amplitud, decimales) {
@@ -88,7 +88,7 @@
                 urlDestino:
                     claveSensor === "ph"
                         ? "views/sensores/ph/index.html"
-                        : claveSensor === "tempAgua"
+                        : claveSensor === "pt100"
                           ? "views/sensores/nivel-temperatura/index.html?tab=temperatura"
                           : claveSensor === "nivel"
                             ? "views/sensores/nivel-temperatura/index.html"
@@ -107,73 +107,70 @@
     function generarTrama() {
         const cfgEc = leerCacheSeguro("ec", { activo: true, minNormal: 800, maxNormal: 1800 });
         const cfgPh = leerCacheSeguro("ph", { activo: true, minNormal: 5.5, maxNormal: 6.5 });
-        const cfgNivel = leerCacheSeguro("nivel_agua", { activo: true, minNormal: 20, maxNormal: 90 });
+        const cfgNivel = leerCacheSeguro("nivel_agua", { activo: true, minNormal: 20, maxNormal: 90, nivelMinCm: 15, nivelMaxCm: 140 });
         const cfgTemp = leerCacheSeguro("temp_agua", { activo: true, minNormal: 18.0, maxNormal: 24.0 });
         const cfgDht = leerCacheSeguro("dht22", { activo: true, tempMin: 18.0, tempMax: 28.0, humMin: 50, humMax: 80 });
 
-        let valEc = fluctuar(NOMINALES.ec, 30, 0);
-        let valPh = fluctuar(NOMINALES.ph, 0.15, 2);
-        let valNivel = fluctuar(NOMINALES.nivel, 1.5, 0);
-        let valTemp = fluctuar(NOMINALES.tempAgua, 0.3, 1);
-        let tempEnLinea = cfgTemp.activo !== false;
+        const tempAmb = fluctuar(NOMINALES.temperatura_amb, 0.4, 1);
+        const humAmb = fluctuar(NOMINALES.humedad_amb, 1.5, 1);
+        let tempSol = fluctuar(NOMINALES.temperatura_solucion, 0.3, 1);
+        let nivelPh = fluctuar(NOMINALES.nivel_ph, 0.15, 2);
+        const tdsPpm = fluctuar(NOMINALES.tds_ppm, 15, 1);
+        let nivelCm = fluctuar(NOMINALES.nivel_tanque_cm, 2.0, 1);
+        let estadoPt100 = cfgTemp.activo !== false ? "ok" : "pausado";
 
         if (modoForzado === "ph_critico") {
-            valPh = Number((Number(cfgPh.maxNormal || 6.5) + 0.65).toFixed(2));
+            nivelPh = Number((Number(cfgPh.maxNormal || 6.5) + 0.65).toFixed(2));
         } else if (modoForzado === "nivel_bajo") {
-            valNivel = Math.max(0, Number(cfgNivel.minNormal || 20) + 1);
+            nivelCm = Math.max(0, Number(cfgNivel.nivelMinCm || 15) + 1);
         } else if (modoForzado === "pt100_desconectada") {
-            tempEnLinea = false;
-            valTemp = null;
+            estadoPt100 = "error";
         }
 
         const trama = {
-            timestamp: new Date().toISOString(),
-            ec: cfgEc.activo !== false ? { valor: valEc, enLinea: true } : { enLinea: false },
-            ph: cfgPh.activo !== false ? { valor: valPh, enLinea: true } : { enLinea: false },
-            nivel: cfgNivel.activo !== false
-                ? { valor: valNivel, litros: Math.round((valNivel / 100) * 412), enLinea: true }
-                : { enLinea: false },
-            tempAgua: tempEnLinea ? { valor: valTemp, enLinea: true } : { valor: null, enLinea: false },
-            dht22: cfgDht.activo !== false
-                ? {
-                      temperatura: fluctuar(NOMINALES.dhtTemp, 0.4, 1),
-                      humedad: fluctuar(NOMINALES.dhtHum, 2, 0),
-                      enLinea: true
-                  }
-                : { enLinea: false },
-            esp32: {
-                conectado: true,
-                segundosDesdeActualizacion: 1
-            }
+            ts: new Date().toISOString(),
+            dispositivo_id: "ESP32_HIDRO_01",
+            fw: "1.0.3",
+            datos: {
+                temperatura_amb: tempAmb,
+                humedad_amb: humAmb,
+                temperatura_solucion: tempSol,
+                nivel_ph: nivelPh,
+                tds_ppm: tdsPpm,
+                nivel_tanque_cm: nivelCm
+            },
+            estado: {
+                dht22: cfgDht.activo !== false ? "ok" : "pausado",
+                pt100: estadoPt100,
+                ph: cfgPh.activo !== false ? "ok" : "pausado",
+                tds: cfgEc.activo !== false ? "ok" : "pausado",
+                nivel: cfgNivel.activo !== false ? "ok" : "pausado"
+            },
+            rssi: fluctuar(-61, 3, 0)
         };
 
-        // Evaluación automática de umbrales sobre sensores activos
-        if (trama.ec.enLinea) {
-            const estEc = evaluarUmbral(valEc, Number(cfgEc.minNormal), Number(cfgEc.maxNormal));
+        if (trama.estado.tds === "ok") {
+            const ecUs = Math.round(tdsPpm * 2);
+            const estEc = evaluarUmbral(ecUs, Number(cfgEc.minNormal), Number(cfgEc.maxNormal));
             if (estEc === "Crítico") {
-                registrarAlertaEnHeader("ec", estEc, "Conductividad EC fuera de rango", `Lectura: ${valEc} µS/cm`);
+                registrarAlertaEnHeader("ec", estEc, "Conductividad EC fuera de rango", `Lectura: ${ecUs} µS/cm`);
             }
         }
-        if (trama.ph.enLinea) {
-            const estPh = evaluarUmbral(valPh, Number(cfgPh.minNormal), Number(cfgPh.maxNormal));
+        if (trama.estado.ph === "ok") {
+            const estPh = evaluarUmbral(nivelPh, Number(cfgPh.minNormal), Number(cfgPh.maxNormal));
             if (estPh === "Crítico") {
-                registrarAlertaEnHeader("ph", estPh, "pH RS485 fuera de umbral", `Lectura: ${valPh.toFixed(2)} pH (Rango: ${cfgPh.minNormal} - ${cfgPh.maxNormal})`);
+                registrarAlertaEnHeader("ph", estPh, "pH RS485 fuera de umbral", `Lectura: ${nivelPh.toFixed(2)} pH`);
             }
         }
-        if (trama.nivel.enLinea) {
-            const estNivel = evaluarUmbral(valNivel, Number(cfgNivel.minNormal), Number(cfgNivel.maxNormal));
-            if (estNivel === "Crítico") {
-                registrarAlertaEnHeader("nivel", estNivel, "Nivel de agua crítico", `Lectura: ${valNivel}%`);
-            } else if (estNivel === "Advertencia" && modoForzado === "nivel_bajo") {
-                registrarAlertaEnHeader("nivel", estNivel, "Nivel de agua próximo al mínimo", `Lectura: ${valNivel}%`);
-            }
+        if (trama.estado.nivel === "ok" && modoForzado === "nivel_bajo") {
+            registrarAlertaEnHeader("nivel", "Advertencia", "Nivel de agua próximo al mínimo", `Lectura: ${nivelCm} cm`);
         }
         if (modoForzado === "pt100_desconectada") {
-            registrarAlertaEnHeader("tempAgua", "Advertencia", "Desconexión temporal PT100", "Circuito abierto detectado en sonda RTD");
-        } else if (trama.tempAgua.enLinea) {
-            const estTemp = evaluarUmbral(valTemp, Number(cfgTemp.minNormal), Number(cfgTemp.maxNormal));
+            registrarAlertaEnHeader("pt100", "Advertencia", "Desconexión temporal PT100", "Circuito abierto detectado en sonda RTD");
+        } else if (trama.estado.pt100 === "ok") {
+            const estTemp = evaluarUmbral(tempSol, Number(cfgTemp.minNormal), Number(cfgTemp.maxNormal));
             if (estTemp === "Crítico") {
-                registrarAlertaEnHeader("tempAgua", estTemp, "Temperatura del agua fuera de rango", `Lectura: ${valTemp} °C`);
+                registrarAlertaEnHeader("pt100", estTemp, "Temperatura del agua fuera de rango", `Lectura: ${tempSol} °C`);
             }
         }
 
@@ -183,9 +180,6 @@
     function emitirTrama() {
         const trama = generarTrama();
         global.dispatchEvent(new CustomEvent("axion:telemetria", { detail: trama }));
-        if (typeof global.actualizarDashboardAxion === "function") {
-            global.actualizarDashboardAxion(trama);
-        }
         return trama;
     }
 
@@ -210,106 +204,18 @@
         const style = document.createElement("style");
         style.id = "axion-sim-styles";
         style.textContent = `
-            .axion-sim-widget {
-                position: fixed;
-                left: 16px;
-                bottom: 16px;
-                z-index: 2200;
-                font-family: inherit;
-                font-size: calc(var(--font-size-base, 14px) - 2px);
-            }
-            .axion-sim-toggle {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                padding: 7px 12px;
-                border-radius: 999px;
-                border: 1px solid var(--border-color, #334155);
-                background: var(--bg-card, #242d3b);
-                color: var(--text-main, #f8fafc);
-                font-family: inherit;
-                font-size: inherit;
-                font-weight: 700;
-                cursor: pointer;
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            }
-            .axion-sim-dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: #22c55e;
-            }
-            .axion-sim-dot.pausado {
-                background: #f59e0b;
-            }
-            .axion-sim-panel {
-                margin-bottom: 8px;
-                width: 260px;
-                padding: 12px;
-                border-radius: 10px;
-                border: 1px solid var(--border-color, #334155);
-                background: var(--bg-card, #242d3b);
-                color: var(--text-main, #f8fafc);
-                box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-            }
-            .axion-sim-panel[hidden] {
-                display: none;
-            }
-            .axion-sim-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding-bottom: 6px;
-                border-bottom: 1px solid var(--border-color, #334155);
-                font-weight: 700;
-            }
-            .axion-sim-close {
-                border: none;
-                background: transparent;
-                color: var(--text-muted, #94a3b8);
-                cursor: pointer;
-                font-weight: 700;
-                font-family: inherit;
-            }
-            .axion-sim-btn {
-                width: 100%;
-                text-align: left;
-                padding: 7px 10px;
-                border-radius: 6px;
-                border: 1px solid var(--border-color, #334155);
-                background: var(--bg-main, #0f172a);
-                color: var(--text-main, #f8fafc);
-                font-family: inherit;
-                font-size: inherit;
-                font-weight: 600;
-                cursor: pointer;
-            }
-            .axion-sim-btn:hover {
-                border-color: var(--text-muted, #94a3b8);
-            }
-            .axion-sim-toast {
-                position: fixed;
-                bottom: 24px;
-                right: 24px;
-                max-width: 380px;
-                padding: 10px 14px;
-                border-radius: 8px;
-                border: 1px solid var(--border-color, #334155);
-                border-left: 4px solid #ef4444;
-                background: var(--bg-navbar, #1e293b);
-                color: var(--text-main, #f8fafc);
-                font-family: inherit;
-                font-size: calc(var(--font-size-base, 14px) - 1px);
-                font-weight: 600;
-                box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-                z-index: 2300;
-            }
-            .axion-sim-toast[data-nivel="advertencia"] {
-                border-left-color: #f59e0b;
-            }
+            .axion-sim-widget { position: fixed; left: 16px; bottom: 16px; z-index: 2200; font-family: inherit; font-size: calc(var(--font-size-base, 14px) - 2px); }
+            .axion-sim-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border-color, #334155); background: var(--bg-card, #242d3b); color: var(--text-main, #f8fafc); font-family: inherit; font-size: inherit; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
+            .axion-sim-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+            .axion-sim-dot.pausado { background: #f59e0b; }
+            .axion-sim-panel { margin-bottom: 8px; width: 260px; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color, #334155); background: var(--bg-card, #242d3b); color: var(--text-main, #f8fafc); box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; gap: 8px; }
+            .axion-sim-panel[hidden] { display: none; }
+            .axion-sim-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 6px; border-bottom: 1px solid var(--border-color, #334155); font-weight: 700; }
+            .axion-sim-close { border: none; background: transparent; color: var(--text-muted, #94a3b8); cursor: pointer; font-weight: 700; font-family: inherit; }
+            .axion-sim-btn { width: 100%; text-align: left; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color, #334155); background: var(--bg-main, #0f172a); color: var(--text-main, #f8fafc); font-family: inherit; font-size: inherit; font-weight: 600; cursor: pointer; }
+            .axion-sim-btn:hover { border-color: var(--text-muted, #94a3b8); }
+            .axion-sim-toast { position: fixed; bottom: 24px; right: 24px; max-width: 380px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color, #334155); border-left: 4px solid #ef4444; background: var(--bg-navbar, #1e293b); color: var(--text-main, #f8fafc); font-family: inherit; font-size: calc(var(--font-size-base, 14px) - 1px); font-weight: 600; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35); z-index: 2300; }
+            .axion-sim-toast[data-nivel="advertencia"] { border-left-color: #f59e0b; }
         `;
         document.head.appendChild(style);
     }
@@ -399,4 +305,3 @@
         }
     };
 })(window);
-

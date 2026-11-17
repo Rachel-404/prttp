@@ -151,7 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 frecuenciaSeg: estadoModuloTemp.frecuenciaLecturaSeg,
                 minNormal: estadoModuloTemp.tempMinimaAgua,
                 maxNormal: estadoModuloTemp.tempMaximaAgua,
-                compensarOtros: estadoModuloTemp.compensarOtrosSensores
+                compensarOtros: estadoModuloTemp.compensarOtrosSensores,
+                tipoConexion: selectConexion?.value || "3_hilos",
+                rrefOhmios: Number(inputRref?.value || 430.0)
             });
         }
     }

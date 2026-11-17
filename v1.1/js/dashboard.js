@@ -268,7 +268,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     window.addEventListener("axion:telemetria", (e) => {
-        if (e.detail) actualizarDashboardAxion(e.detail);
+        const trama = e.detail;
+        if (!trama) return;
+        if (trama.datos && trama.estado) {
+            actualizarDashboardAxion({
+                ec: { valor: Math.round(Number(trama.datos.tds_ppm) * 2), enLinea: trama.estado.tds === "ok" },
+                ph: { valor: Number(trama.datos.nivel_ph), enLinea: trama.estado.ph === "ok" },
+                nivel: {
+                    valor: Math.min(100, Math.round((Number(trama.datos.nivel_tanque_cm) / 140) * 100)),
+                    litros: Math.round(Number(trama.datos.nivel_tanque_cm) * 2.8),
+                    enLinea: trama.estado.nivel === "ok"
+                },
+                tempAgua: { valor: Number(trama.datos.temperatura_solucion), enLinea: trama.estado.pt100 === "ok" },
+                esp32: {
+                    conectado: true,
+                    wifiTexto: `Conectado (${trama.rssi} dBm)`,
+                    segundosDesdeActualizacion: 1
+                }
+            });
+        } else {
+            actualizarDashboardAxion(trama);
+        }
     });
 
     const CLAVE_RELES_ESTADO = "axion_reles_estado";

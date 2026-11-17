@@ -198,6 +198,25 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- 4. Calibración de 3 Puntos (Valores ADC) -->
+                    <div class="subseccion-tecnica">
+                        <p class="subtitulo-tecnico">Calibración de 3 Puntos</p>
+                        <div class="fila-limites">
+                            <div class="grupo-campo">
+                                <label for="ph-cal-401" class="etiqueta-campo">Calibración pH 4.01 (ADC)</label>
+                                <input type="number" id="ph-cal-401" name="calPh401" class="campo-control" min="0" max="4095" step="1" value="1950" />
+                            </div>
+                            <div class="grupo-campo">
+                                <label for="ph-cal-700" class="etiqueta-campo">Calibración pH 7.00 (ADC)</label>
+                                <input type="number" id="ph-cal-700" name="calPh700" class="campo-control" min="0" max="4095" step="1" value="1500" />
+                            </div>
+                            <div class="grupo-campo">
+                                <label for="ph-cal-1001" class="etiqueta-campo">Calibración pH 10.01 (ADC)</label>
+                                <input type="number" id="ph-cal-1001" name="calPh1001" class="campo-control" min="0" max="4095" step="1" value="1050" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -290,26 +309,21 @@
                                 </div>
                             </fieldset>
 
-                            <!-- Subsección B: Protocolo de Comunicación (Modbus-RTU) -->
+                            <!-- Subsección B: Parámetros de Comunicación Modbus RTU -->
                             <fieldset class="subseccion-tecnica">
-                                <legend class="subtitulo-tecnico">Subsección B: Protocolo de Comunicación (Modbus-RTU)</legend>
+                                <legend class="subtitulo-tecnico">Parámetros de Comunicación Modbus RTU</legend>
 
                                 <div class="grid-tecnico-modbus">
                                     <div class="grupo-campo">
-                                        <label for="tec-slave-id" class="etiqueta-campo">Slave ID (Dirección del Sensor)</label>
+                                        <label for="tec-slave-id" class="etiqueta-campo">Dirección Modbus / Slave ID</label>
                                         <input type="number" id="tec-slave-id" name="slaveId" class="campo-control" min="1" max="247" step="1" value="1" required />
                                     </div>
 
                                     <div class="grupo-campo">
-                                        <label for="tec-baud-rate" class="etiqueta-campo">Baud Rate (Velocidad)</label>
+                                        <label for="tec-baud-rate" class="etiqueta-campo">Baudios</label>
                                         <select id="tec-baud-rate" name="baudRate" class="campo-control">
-                                            <option value="1200">1200 bps</option>
-                                            <option value="2400">2400 bps</option>
-                                            <option value="4800" selected>4800 bps</option>
-                                            <option value="9600">9600 bps</option>
+                                            <option value="9600" selected>9600 bps</option>
                                             <option value="19200">19200 bps</option>
-                                            <option value="38400">38400 bps</option>
-                                            <option value="57600">57600 bps</option>
                                             <option value="115200">115200 bps</option>
                                         </select>
                                     </div>
