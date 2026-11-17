@@ -150,7 +150,13 @@
                 cambio: "15 s → 10 s",
                 usuario: "Admin Único"
             }
-        ]
+        ],
+        retencion_backup: {
+            frecuenciaProgramada: "diario",
+            formatoEmpaquetado: "zip",
+            diasRetencion: 365,
+            accionVencimiento: "archivar"
+        }
     };
 
     function clonar(obj) {

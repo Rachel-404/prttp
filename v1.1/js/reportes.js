@@ -654,6 +654,51 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         });
+
+        const formRetencion = document.getElementById("form-politica-retencion");
+        const selectRetFrec = document.getElementById("retencion-frecuencia");
+        const selectRetFmt = document.getElementById("retencion-formato");
+        const inputRetDias = document.getElementById("retencion-dias");
+        const selectRetAccion = document.getElementById("retencion-accion");
+        const btnDepurarManual = document.getElementById("btn-depurar-manual");
+
+        if (window.AxionCache) {
+            const retGuardada = window.AxionCache.leerDeCache("retencion_backup");
+            if (selectRetFrec && retGuardada.frecuenciaProgramada) selectRetFrec.value = retGuardada.frecuenciaProgramada;
+            if (selectRetFmt && retGuardada.formatoEmpaquetado) selectRetFmt.value = retGuardada.formatoEmpaquetado;
+            if (inputRetDias && retGuardada.diasRetencion) inputRetDias.value = String(retGuardada.diasRetencion);
+            if (selectRetAccion && retGuardada.accionVencimiento) selectRetAccion.value = retGuardada.accionVencimiento;
+        }
+
+        if (formRetencion) {
+            formRetencion.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const dias = Math.min(1825, Math.max(30, Number.parseInt(inputRetDias?.value || "365", 10) || 365));
+                if (inputRetDias) inputRetDias.value = String(dias);
+                const payload = {
+                    frecuenciaProgramada: selectRetFrec?.value || "diario",
+                    formatoEmpaquetado: selectRetFmt?.value || "zip",
+                    diasRetencion: dias,
+                    accionVencimiento: selectRetAccion?.value || "archivar"
+                };
+                if (window.AxionCache) {
+                    window.AxionCache.guardarEnCache("retencion_backup", payload);
+                    window.AxionCache.registrarAuditoria(
+                        "Reportes y Respaldos",
+                        "Política de Retención",
+                        "Anterior",
+                        `${dias} días / ${payload.frecuenciaProgramada}`
+                    );
+                }
+                mostrarToast("Política de retención y respaldos programados guardada.");
+            });
+        }
+
+        if (btnDepurarManual) {
+            btnDepurarManual.addEventListener("click", () => {
+                mostrarToast("Depuración completada: 0 registros vencidos encontrados bajo la política actual");
+            });
+        }
     }
 
     async function cargarVistaPestana(boton) {

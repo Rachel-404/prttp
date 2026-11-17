@@ -121,3 +121,92 @@
     </article>
 </div>
 
+<!-- Políticas de Retención y Depuración Automática (RF-PUB-05 / CU-16) -->
+<section class="vista-config-plana" style="margin-top: 28px;" aria-label="Políticas de Retención y Depuración Automática">
+    <form id="form-politica-retencion" class="ordenar-div" novalidate>
+        <div class="card">
+            <header class="titulo-card">
+                <h3>Política de Respaldos Programados</h3>
+            </header>
+            <div class="cuerpo-card">
+                <p class="texto-guia">Configure la generación automática de instantáneas de seguridad de telemetría y parámetros.</p>
+
+                <div class="fila-dos-cols">
+                    <div class="grupo-campo">
+                        <label for="retencion-frecuencia" class="etiqueta-campo">Frecuencia de Respaldo Automático</label>
+                        <select id="retencion-frecuencia" name="frecuenciaProgramada" class="campo-control">
+                            <option value="diario" selected>Diario (00:00 hrs)</option>
+                            <option value="semanal">Semanal (Domingos)</option>
+                            <option value="mensual">Mensual (Día 1)</option>
+                            <option value="desactivado">Desactivado</option>
+                        </select>
+                    </div>
+
+                    <div class="grupo-campo">
+                        <label for="retencion-formato" class="etiqueta-campo">Formato de Empaquetado</label>
+                        <select id="retencion-formato" name="formatoEmpaquetado" class="campo-control">
+                            <option value="zip" selected>Archivo Comprimido (.zip con CSV + JSON)</option>
+                            <option value="json">Volcado Estructurado (.json)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="registro-mantenimiento">
+                    <span class="etiqueta-campo">Destino Local / Descarga</span>
+                    <p class="texto-registro">Almacenamiento Local / Descarga Directa (Último respaldo: Hoy, 00:00 hrs)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <header class="titulo-card">
+                <h3>Retención y Depuración de Datos Históricos</h3>
+            </header>
+            <div class="cuerpo-card">
+                <p class="texto-guia">Defina el ciclo de vida de los registros almacenados antes de su rotación o depuración automática.</p>
+
+                <div class="fila-dos-cols">
+                    <div class="grupo-campo">
+                        <label for="retencion-dias" class="etiqueta-campo">Tiempo de Retención en Base Activa (días)</label>
+                        <input
+                            type="number"
+                            id="retencion-dias"
+                            name="diasRetencion"
+                            class="campo-control"
+                            min="30"
+                            max="1825"
+                            step="1"
+                            value="365"
+                            required
+                        />
+                        <small class="texto-guia">Rango: 30 – 1825 días</small>
+                    </div>
+
+                    <div class="grupo-campo">
+                        <label for="retencion-accion" class="etiqueta-campo">Acción al Vencer Retención</label>
+                        <select id="retencion-accion" name="accionVencimiento" class="campo-control">
+                            <option value="archivar" selected>Archivar y comprimir antes de purgar</option>
+                            <option value="fifo">Depuración automática (FIFO)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="registro-mantenimiento" aria-label="Uso de almacenamiento histórico">
+                    <span class="etiqueta-campo">Indicador de Uso de Almacenamiento Histórico</span>
+                    <progress value="9.2" max="100" aria-label="Porcentaje de almacenamiento histórico usado" style="width: 100%; height: 12px; accent-color: #16a34a;"></progress>
+                    <p class="texto-registro">Espacio utilizado: <strong>184 MB / 2.0 GB (9.2 %)</strong> · Registros activos: <strong>~412,500 lecturas</strong></p>
+                </div>
+
+                <footer class="acciones-card acciones-dobles">
+                    <button type="button" id="btn-depurar-manual" class="btn-modal btn-modal-cancelar">
+                        Ejecutar Depuración Manual Ahora
+                    </button>
+                    <button type="submit" id="btn-guardar-retencion" class="btn-modal btn-modal-activar">
+                        Guardar Política de Retención
+                    </button>
+                </footer>
+            </div>
+        </div>
+    </form>
+</section>
+
