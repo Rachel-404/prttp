@@ -724,3 +724,27 @@ body.tema-claro .opcionII:hover {
 .estado-critico .punto-estado {
     background-color: #ef4444;
 }
+
+.barra-progreso-estado {
+    width: 100%;
+    height: 12px;
+    accent-color: #16a34a;
+}
+
+.barra-filtros-auditoria {
+    align-items: end;
+}
+
+.vista-config-plana .acciones-en-linea {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.telemetria-nodo-grid {
+    margin-bottom: 24px;
+}
+
+.seccion-retencion-plana {
+    margin-top: 28px;
+}
