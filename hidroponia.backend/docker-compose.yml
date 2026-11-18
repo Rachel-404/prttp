@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: axion_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: axion_hidroponia
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - axion_pgdata:/var/lib/postgresql/data
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: axion_mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
+volumes:
+  axion_pgdata:
