@@ -264,6 +264,11 @@ export default function initController() {
                         persistirOperacion();
                         renderizarTarjetasCanales();
                         enviarOrdenReleEsp32(canalObj);
+                        if (window.AxionApi) {
+                            window.AxionApi.patch(`/reles/${canalObj.canal}/estado`, {
+                                encendido: nuevoEstado
+                            }).catch(() => {});
+                        }
                     },
                     onCancelar: () => {
                         toggle.checked = !nuevoEstado;
@@ -288,6 +293,11 @@ export default function initController() {
         estadoOperacionReles.modo = selectModo.value;
         persistirOperacion();
         renderizarTarjetasCanales();
+        if (window.AxionApi) {
+            window.AxionApi.put("/reles/modo", {
+                modoOperacion: estadoOperacionReles.modo
+            }).catch(() => {});
+        }
         document.dispatchEvent(
             new CustomEvent("reles:modoCambiado", { detail: { modo: estadoOperacionReles.modo } })
         );
@@ -332,6 +342,9 @@ export default function initController() {
             estadoTecnicoReles.pines = nuevosPines;
             estadoTecnicoReles.logicaDisparo = selectLogica.value === "high" ? "high" : "low";
             persistirTecnico();
+            if (window.AxionApi) {
+                window.AxionApi.put("/reles/tecnico", estadoTecnicoReles).catch(() => {});
+            }
 
             document.dispatchEvent(
                 new CustomEvent("reles:configTecnicaGuardada", { detail: { ...estadoTecnicoReles } })

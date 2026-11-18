@@ -463,8 +463,86 @@ export default function initController() {
         }
     });
 
+    function aplicarLecturaDesdeBackend(lectura, sensoresBackend, relesBackend, dispositivoBackend) {
+        if (Array.isArray(sensoresBackend) && cache) {
+            sensoresBackend.forEach((s) => {
+                const prev = cache.leerDeCache(s.modulo) || {};
+                cache.guardarEnCache(s.modulo, {
+                    ...prev,
+                    ...(s.parametrosTecnicos || {}),
+                    activo: s.activo,
+                    frecuenciaSeg: s.frecuenciaSeg,
+                    minNormal: s.minNormal,
+                    maxNormal: s.maxNormal
+                });
+            });
+        }
+        if (lectura && cache) {
+            if (lectura.ecUsCm != null) {
+                const prevEc = cache.leerDeCache("ec") || {};
+                cache.guardarEnCache("ec", { ...prevEc, valorActual: lectura.ecUsCm });
+            }
+            if (lectura.ph != null) {
+                const prevPh = cache.leerDeCache("ph") || {};
+                cache.guardarEnCache("ph", { ...prevPh, valorActual: lectura.ph });
+            }
+            if (lectura.nivelPct != null) {
+                const prevNivel = cache.leerDeCache("nivel_agua") || {};
+                cache.guardarEnCache("nivel_agua", { ...prevNivel, valorActual: lectura.nivelPct });
+            }
+            if (lectura.tempAguaC != null) {
+                const prevTemp = cache.leerDeCache("temp_agua") || {};
+                cache.guardarEnCache("temp_agua", { ...prevTemp, valorActual: lectura.tempAguaC });
+            }
+            if (lectura.tempAmbC != null) {
+                const elT = document.getElementById("val-temp-amb");
+                if (elT) elT.textContent = `${Number(lectura.tempAmbC).toFixed(1)} °C`;
+            }
+            if (lectura.humAmbPct != null) {
+                const elH = document.getElementById("val-hum-amb");
+                if (elH) elH.textContent = `${Number(lectura.humAmbPct).toFixed(1)} %`;
+            }
+        }
+        if (Array.isArray(relesBackend) && relesBackend.length === 6) {
+            const payload = { canales: relesBackend.map((r) => ({ canal: r.canal, nombre: r.nombre, encendido: r.encendido })) };
+            localStorage.setItem(CLAVE_RELES_ESTADO, JSON.stringify(payload));
+            if (cache) cache.guardarEnCache("reles", payload);
+        }
+        if (dispositivoBackend) {
+            const wifiEl = document.getElementById("wifi-esp32");
+            const badgeEsp = document.getElementById("badge-esp32");
+            const txtEsp = document.getElementById("texto-badge-esp32");
+            if (wifiEl && dispositivoBackend.rssi != null) {
+                wifiEl.textContent = `Señal (${dispositivoBackend.rssi} dBm)`;
+            }
+            if (badgeEsp && txtEsp) {
+                badgeEsp.className = `badge-conexion ${dispositivoBackend.conectado ? "conectado" : "error"}`;
+                txtEsp.textContent = dispositivoBackend.conectado ? "Conectado" : "Desconectado";
+            }
+        }
+        renderizarEquiposDashboard();
+        renderizarTodo();
+    }
+
+    async function cargarResumenBackend() {
+        if (!window.AxionApi) return;
+        try {
+            const res = await window.AxionApi.get("/dashboard/resumen");
+            aplicarLecturaDesdeBackend(res.ultimaLectura, res.sensores, res.reles, res.dispositivo);
+        } catch {
+            // Fallback silencioso a caché local si el backend no está levantado
+        }
+    }
+
+    document.addEventListener("dashboard:actualizarLecturas", (e) => {
+        if (e && e.detail) {
+            aplicarLecturaDesdeBackend(e.detail, null, null, null);
+        }
+    });
+
     renderizarEquiposDashboard();
     renderizarTodo();
+    cargarResumenBackend();
 
         })();
     } finally {

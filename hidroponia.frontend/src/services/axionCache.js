@@ -171,6 +171,21 @@ const API_BASE_URL =
         return JSON.parse(JSON.stringify(obj));
     }
 
+    const MODULOS_SENSORES_API = new Set(["ec", "ph", "nivel_agua", "temp_agua", "dht22"]);
+
+    function sincronizarSensorConBackend(modulo, combinado) {
+        if (!MODULOS_SENSORES_API.has(modulo)) return;
+        if (!global.AxionApi || !global.AxionAuth || !global.AxionAuth.esAdministrador()) return;
+        const controlPayload = {
+            activo: combinado.activo !== false,
+            frecuenciaSeg: Number(combinado.frecuenciaSeg ?? 10),
+            minNormal: Number(combinado.minNormal ?? combinado.tempMin ?? 0),
+            maxNormal: Number(combinado.maxNormal ?? combinado.tempMax ?? 100)
+        };
+        global.AxionApi.put(`/sensores/${modulo}/control`, controlPayload).catch(() => {});
+        global.AxionApi.put(`/sensores/${modulo}/tecnico`, combinado).catch(() => {});
+    }
+
     function guardarEnCache(clave, datos) {
         try {
             const previo = leerDeCache(clave, VALORES_DEFECTO[clave] || {});
@@ -178,6 +193,7 @@ const API_BASE_URL =
                 ? datos
                 : { ...previo, ...(datos && typeof datos === "object" ? datos : {}) };
             localStorage.setItem(`${PREFIJO}${clave}`, JSON.stringify(combinado));
+            sincronizarSensorConBackend(clave, combinado);
             return combinado;
         } catch (err) {
             console.warn(`No se pudo guardar en caché (${clave}):`, err);

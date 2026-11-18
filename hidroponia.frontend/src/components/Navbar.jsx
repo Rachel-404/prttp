@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { normalizarRutaSpa, useAxion } from "../context/AxionContext";
+import { apiGet, apiPatch } from "../services/apiClient";
 
 const ALERTAS_DEFAULT = [
   {
@@ -66,11 +67,33 @@ export default function Navbar() {
   const refAlertas = useRef(null);
   const refPerfil = useRef(null);
 
-  const refrescarAlertas = useCallback(() => {
+  const refrescarAlertas = useCallback(async () => {
+    try {
+      const remotas = await apiGet("/alertas");
+      if (Array.isArray(remotas) && remotas.length) {
+        const normalizadas = remotas.map((a) => ({
+          id: String(a.id),
+          nivel: a.nivel || "normal",
+          titulo: a.titulo,
+          detalle: a.detalle,
+          tiempo: a.creadaEn ? new Date(a.creadaEn).toLocaleString("es-PE") : "Reciente",
+          leida: Boolean(a.leida),
+          urlDestino: normalizarRutaSpa(a.urlDestino || "/")
+        }));
+        setAlertas(normalizadas);
+        if (window.AxionCache) {
+          window.AxionCache.guardarEnCache("alertas", normalizadas);
+        }
+        return;
+      }
+    } catch {
+      // Fallback silencioso a caché local si el backend no está activo
+    }
     setAlertas(cargarAlertasActuales());
   }, []);
 
   useEffect(() => {
+    refrescarAlertas();
     window.addEventListener("axion:alertasActualizadas", refrescarAlertas);
     window.addEventListener("storage", refrescarAlertas);
     return () => {
@@ -113,13 +136,21 @@ export default function Navbar() {
     const nuevas = alertas.map((a) => (a.id === alerta.id ? { ...a, leida: true } : a));
     persistirAlertas(nuevas);
     setAlertasAbiertas(false);
-    if (esAdministrador && alerta.urlDestino) {
-      navigate(normalizarRutaSpa(alerta.urlDestino));
+    if (esAdministrador) {
+      if (/^\d+$/.test(String(alerta.id))) {
+        apiPatch(`/alertas/${alerta.id}/leer`).catch(() => {});
+      }
+      if (alerta.urlDestino) {
+        navigate(normalizarRutaSpa(alerta.urlDestino));
+      }
     }
   };
 
   const marcarTodasLeidas = () => {
     persistirAlertas(alertas.map((a) => ({ ...a, leida: true })));
+    if (esAdministrador) {
+      apiPatch("/alertas/leer-todas").catch(() => {});
+    }
   };
 
   const noLeidas = alertas.filter((a) => !a.leida).length;

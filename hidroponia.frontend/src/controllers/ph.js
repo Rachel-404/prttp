@@ -366,7 +366,9 @@ export default function initController() {
         };
 
         document.dispatchEvent(new CustomEvent("ph:calibracionEjecutada", { detail: comando }));
-        console.info("Comando de calibración enviado (SEN0708):", comando);
+        if (window.AxionApi) {
+            window.AxionApi.post("/sensores/ph/calibrar", comando).catch(() => {});
+        }
         mostrarToast(`Calibración completada: ${etiquetaBuffer}.`);
     }
 

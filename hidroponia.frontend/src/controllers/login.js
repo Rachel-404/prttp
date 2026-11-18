@@ -165,11 +165,38 @@ export default function initController() {
     }
 
     if (formRecuperar) {
-        formRecuperar.addEventListener("submit", (e) => {
+        formRecuperar.addEventListener("submit", async (e) => {
             e.preventDefault();
+            const tokenRecuperacion = document.getElementById("rec-token")?.value?.trim() || "";
+            const nuevaPassword = document.getElementById("rec-password-nueva")?.value?.trim() || "";
+            const confirmar = document.getElementById("rec-password-confirmar")?.value?.trim() || "";
+
+            if (nuevaPassword && confirmar && nuevaPassword !== confirmar) {
+                mostrarToastLogin("Las contraseñas nuevas no coinciden.");
+                return;
+            }
+
+            if (window.AxionApi && tokenRecuperacion && nuevaPassword) {
+                try {
+                    const res = await window.AxionApi.post("/auth/recuperar", {
+                        tokenRecuperacion,
+                        nuevaPassword
+                    });
+                    formRecuperar.reset();
+                    cerrarModalRecuperar();
+                    mostrarToastLogin(res.mensaje || "Contraseña restablecida correctamente.");
+                    return;
+                } catch (err) {
+                    if (!err.isNetworkError) {
+                        mostrarToastLogin(err.message || "Token de recuperación inválido.");
+                        return;
+                    }
+                }
+            }
+
             formRecuperar.reset();
             cerrarModalRecuperar();
-            mostrarToastLogin("Contraseña restablecida (simulación). Ya puedes iniciar sesión con tu nueva clave.");
+            mostrarToastLogin("Contraseña restablecida (modo local). Ya puedes iniciar sesión.");
         });
     }
 
@@ -180,7 +207,7 @@ export default function initController() {
     });
 
     if (formLogin) {
-        formLogin.addEventListener("submit", (e) => {
+        formLogin.addEventListener("submit", async (e) => {
             e.preventDefault();
             ocultarFeedback();
 
@@ -205,31 +232,53 @@ export default function initController() {
                 return;
             }
 
-            const correoAutorizado = obtenerCorreoAutorizado();
-            let passwordAutorizada = CREDENCIAL_ADMIN.passwordDemo;
-            try {
-                const rawCuenta = localStorage.getItem(CLAVE_CUENTA_ADMIN);
-                if (rawCuenta) {
-                    const cuenta = JSON.parse(rawCuenta);
-                    if (cuenta && typeof cuenta.passwordAdmin === "string" && cuenta.passwordAdmin.length > 0) {
-                        passwordAutorizada = cuenta.passwordAdmin;
+            let jwtToken = null;
+            let autenticadoPorBackend = false;
+
+            if (window.AxionApi) {
+                try {
+                    const res = await window.AxionApi.post("/auth/login", { correo, password });
+                    jwtToken = res.token;
+                    autenticadoPorBackend = true;
+                } catch (err) {
+                    if (!err.isNetworkError) {
+                        mostrarFeedback(
+                            "error",
+                            err.message || "Credenciales incorrectas. Verifica tu correo institucional y contraseña."
+                        );
+                        if (inputPassword) inputPassword.focus();
+                        return;
                     }
                 }
-            } catch (err) {
-                console.warn("No se pudo leer la contraseña administrativa:", err);
             }
 
-            const esCorreoValido =
-                correo === CREDENCIAL_ADMIN.correoDefecto || correo === correoAutorizado;
-            const esPasswordValida = password === passwordAutorizada;
+            if (!autenticadoPorBackend) {
+                const correoAutorizado = obtenerCorreoAutorizado();
+                let passwordAutorizada = CREDENCIAL_ADMIN.passwordDemo;
+                try {
+                    const rawCuenta = localStorage.getItem(CLAVE_CUENTA_ADMIN);
+                    if (rawCuenta) {
+                        const cuenta = JSON.parse(rawCuenta);
+                        if (cuenta && typeof cuenta.passwordAdmin === "string" && cuenta.passwordAdmin.length > 0) {
+                            passwordAutorizada = cuenta.passwordAdmin;
+                        }
+                    }
+                } catch (err) {
+                    console.warn("No se pudo leer la contraseña administrativa:", err);
+                }
 
-            if (!esCorreoValido || !esPasswordValida) {
-                mostrarFeedback(
-                    "error",
-                    "Credenciales incorrectas. Verifica tu correo institucional y contraseña."
-                );
-                if (inputPassword) inputPassword.focus();
-                return;
+                const esCorreoValido =
+                    correo === CREDENCIAL_ADMIN.correoDefecto || correo === correoAutorizado;
+                const esPasswordValida = password === passwordAutorizada;
+
+                if (!esCorreoValido || !esPasswordValida) {
+                    mostrarFeedback(
+                        "error",
+                        "Credenciales incorrectas. Verifica tu correo institucional y contraseña."
+                    );
+                    if (inputPassword) inputPassword.focus();
+                    return;
+                }
             }
 
             const mantenerSesion = Boolean(checkRecordar && checkRecordar.checked);
@@ -237,6 +286,7 @@ export default function initController() {
                 autenticado: true,
                 rol: "Administrador Único",
                 correo,
+                token: jwtToken,
                 persistente: mantenerSesion,
                 inicioIso: new Date().toISOString()
             });

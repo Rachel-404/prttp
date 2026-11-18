@@ -523,7 +523,21 @@ export default function initController() {
                     textoAceptar: "Generar y Descargar",
                     claseBoton: "btn-modal-activar",
                     mostrarCancelar: true,
-                    onAceptar: () => {
+                    onAceptar: async () => {
+                        if (window.AxionApi) {
+                            try {
+                                const inicioIso = new Date(estadoHistorial.fechaInicio).toISOString();
+                                const finIso = new Date(estadoHistorial.fechaFin).toISOString();
+                                await window.AxionApi.download(
+                                    `/reportes/exportar?formato=${encodeURIComponent(ext)}&inicio=${encodeURIComponent(inicioIso)}&fin=${encodeURIComponent(finIso)}`,
+                                    nombreArchivo
+                                );
+                                mostrarToast(`Reporte ${formato} generado desde el servidor: ${nombreArchivo}`);
+                                return;
+                            } catch {
+                                // Fallback local si el backend no está activo
+                            }
+                        }
                         if (formato === "CSV") {
                             descargarArchivoCsv(nombreArchivo);
                         }
@@ -724,12 +738,29 @@ export default function initController() {
                         `${dias} días / ${payload.frecuenciaProgramada}`
                     );
                 }
+                if (window.AxionApi) {
+                    window.AxionApi.put("/respaldos/politica", {
+                        backupFrecuencia: payload.frecuenciaProgramada,
+                        backupFormato: payload.formatoEmpaquetado,
+                        diasRetencion: payload.diasRetencion,
+                        accionVencimiento: payload.accionVencimiento
+                    }).catch(() => {});
+                }
                 mostrarToast("Política de retención y respaldos programados guardada.");
             });
         }
 
         if (btnDepurarManual) {
-            btnDepurarManual.addEventListener("click", () => {
+            btnDepurarManual.addEventListener("click", async () => {
+                if (window.AxionApi) {
+                    try {
+                        const res = await window.AxionApi.post("/respaldos/depurar");
+                        mostrarToast(`Depuración completada: ${res.eliminados ?? 0} registros vencidos eliminados.`);
+                        return;
+                    } catch {
+                        // Fallback
+                    }
+                }
                 mostrarToast("Depuración completada: 0 registros vencidos encontrados bajo la política actual");
             });
         }

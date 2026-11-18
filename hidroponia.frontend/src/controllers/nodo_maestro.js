@@ -154,7 +154,7 @@ export default function initController() {
                 const prev = window.AxionCache.leerDeCache(CLAVE_CACHE);
                 const nuevoProto = (selectProtocolo?.value || "mqtt").toUpperCase();
                 const nuevoSsid = (inputSsid?.value || "").trim() || "AXION_LAB_HIDROPONIA";
-                window.AxionCache.guardarEnCache(CLAVE_CACHE, {
+                const payloadConectividad = {
                     ssid: nuevoSsid,
                     asignacionIp: selectIp?.value || "dhcp",
                     ipLocal: inputIpLocal?.value || "192.168.1.120",
@@ -167,7 +167,11 @@ export default function initController() {
                     endpoint: inputEndpoint?.value || "",
                     usuario: inputUsuario?.value || "",
                     habilitarTls: Boolean(chkTls?.checked)
-                });
+                };
+                window.AxionCache.guardarEnCache(CLAVE_CACHE, payloadConectividad);
+                if (window.AxionApi) {
+                    window.AxionApi.put("/nodo-maestro/ESP32_HIDRO_01/conectividad", payloadConectividad).catch(() => {});
+                }
                 window.AxionCache.registrarAuditoria(
                     "Nodo ESP32-S3",
                     "Conectividad / Protocolo",
@@ -183,14 +187,18 @@ export default function initController() {
         formBuffer.addEventListener("submit", (e) => {
             e.preventDefault();
             if (window.AxionCache) {
-                window.AxionCache.guardarEnCache(CLAVE_CACHE, {
+                const payloadBuffer = {
                     muestreoSeg: Number(inputMuestreo?.value || 2),
                     envioSeg: Number(inputEnvio?.value || 10),
                     particionMb: Number(inputParticion?.value || 10),
                     formatoBuffer: selectFormato?.value || "cbor",
                     loteTramas: Number(inputLote?.value || 50),
                     politicaDesbordamiento: selectDesbordamiento?.value || "fifo"
-                });
+                };
+                window.AxionCache.guardarEnCache(CLAVE_CACHE, payloadBuffer);
+                if (window.AxionApi) {
+                    window.AxionApi.put("/nodo-maestro/ESP32_HIDRO_01/buffer", payloadBuffer).catch(() => {});
+                }
                 window.AxionCache.registrarAuditoria(
                     "Controlador ESP32-S3",
                     "Temporización / Buffer",
@@ -203,7 +211,16 @@ export default function initController() {
     }
 
     if (btnForzarSync) {
-        btnForzarSync.addEventListener("click", () => {
+        btnForzarSync.addEventListener("click", async () => {
+            if (window.AxionApi) {
+                try {
+                    const res = await window.AxionApi.post("/nodo-maestro/ESP32_HIDRO_01/sincronizar");
+                    mostrarToast(res.mensaje || "Sincronización manual ejecutada.");
+                    return;
+                } catch {
+                    // Fallback
+                }
+            }
             mostrarToast("Sincronización manual ejecutada. Buffer en 0 tramas pendientes.");
         });
     }
@@ -215,8 +232,21 @@ export default function initController() {
     }
 
     if (formPinout) {
-        formPinout.addEventListener("submit", (e) => {
+        formPinout.addEventListener("submit", async (e) => {
             e.preventDefault();
+            const filas = Array.from(formPinout.querySelectorAll("tbody tr")).map((tr) => {
+                const celdas = tr.querySelectorAll("td");
+                const select = tr.querySelector("select");
+                return {
+                    gpio: celdas[0]?.textContent?.trim() || "",
+                    interfaz: celdas[1]?.textContent?.trim() || "",
+                    modulo: select ? select.value : (celdas[2]?.textContent?.trim() || ""),
+                    estado: celdas[3]?.textContent?.trim() || "Normal"
+                };
+            });
+            if (window.AxionApi && filas.length) {
+                window.AxionApi.put("/nodo-maestro/ESP32_HIDRO_01/pinout", filas).catch(() => {});
+            }
             mostrarToast("Mapa de pines guardado y sincronizado con el nodo ESP32-S3.");
         });
     }

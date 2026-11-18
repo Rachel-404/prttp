@@ -409,7 +409,9 @@ export default function initController() {
         };
 
         document.dispatchEvent(new CustomEvent("nivelAgua:ceroFijado", { detail: comando }));
-        console.info("Comando de ajuste cero enviado (LMP633-NCN):", comando);
+        if (window.AxionApi) {
+            window.AxionApi.post("/sensores/nivel_agua/cero", comando).catch(() => {});
+        }
         mostrarToast("Punto cero fijado correctamente (0 cm).");
     }
 

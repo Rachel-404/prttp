@@ -1,5 +1,6 @@
 package com.axion.hidroponia.controller;
 
+import com.axion.hidroponia.config.JwtService;
 import com.axion.hidroponia.model.AdminCuenta;
 import com.axion.hidroponia.model.AuditoriaCambio;
 import com.axion.hidroponia.model.SistemaPreferencias;
@@ -27,18 +28,21 @@ public class ConfiguracionController {
     private final AuditoriaCambioRepository auditoriaRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
+    private final JwtService jwtService;
 
     public ConfiguracionController(
             AdminCuentaRepository adminRepo,
             SistemaPreferenciasRepository prefsRepo,
             AuditoriaCambioRepository auditoriaRepo,
             PasswordEncoder passwordEncoder,
-            AuditService auditService) {
+            AuditService auditService,
+            JwtService jwtService) {
         this.adminRepo = adminRepo;
         this.prefsRepo = prefsRepo;
         this.auditoriaRepo = auditoriaRepo;
         this.passwordEncoder = passwordEncoder;
         this.auditService = auditService;
+        this.jwtService = jwtService;
     }
 
     public record CuentaRequest(
@@ -94,7 +98,8 @@ public class ConfiguracionController {
 
         auditService.registrar("Cuenta Administrativa", cambioPass ? "Perfil y Contraseña" : "Perfil y Sesión",
                 "Anterior", admin.getExpiracionMinutos() + " min");
-        return Map.of("mensaje", "Cuenta administrativa actualizada correctamente.");
+        String nuevoJwt = jwtService.generarToken(admin.getCorreo(), admin.getTokenVersion());
+        return Map.of("mensaje", "Cuenta administrativa actualizada correctamente.", "token", nuevoJwt);
     }
 
     @PostMapping("/configuracion/regenerar-token")
@@ -108,7 +113,8 @@ public class ConfiguracionController {
         adminRepo.save(admin);
 
         auditService.registrar("Cuenta Administrativa", "Token de Emergencia", "Anterior", "Regenerado");
-        return Map.of("tokenRecuperacion", nuevoToken);
+        String nuevoJwt = jwtService.generarToken(admin.getCorreo(), admin.getTokenVersion());
+        return Map.of("tokenRecuperacion", nuevoToken, "token", nuevoJwt);
     }
 
     @GetMapping("/configuracion/apariencia")

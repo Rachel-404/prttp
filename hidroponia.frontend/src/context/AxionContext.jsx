@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../services/axionCache.js";
+import { apiPost, conectarWebSocket } from "../services/apiClient.js";
 
 const CLAVE_TEMA = "axion_tema";
 const CLAVE_TIPOGRAFIA = "axion_tipografia";
@@ -152,7 +153,21 @@ export function AxionProvider({ children }) {
     setSesion(payload);
   };
 
+  useEffect(() => {
+    const desconectarWs = conectarWebSocket({
+      onTelemetria: (lectura) => {
+        window.dispatchEvent(new CustomEvent("axion:telemetria", { detail: lectura }));
+        document.dispatchEvent(new CustomEvent("dashboard:actualizarLecturas", { detail: lectura }));
+      },
+      onAlerta: () => {
+        window.dispatchEvent(new CustomEvent("axion:alertasActualizadas"));
+      }
+    });
+    return () => desconectarWs();
+  }, []);
+
   const cerrarSesionAdmin = () => {
+    apiPost("/auth/logout").catch(() => {});
     localStorage.removeItem(CLAVE_SESION_ADMIN);
     sessionStorage.removeItem(CLAVE_SESION_ADMIN);
     setSesion(null);

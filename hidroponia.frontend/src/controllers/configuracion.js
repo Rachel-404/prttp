@@ -260,6 +260,14 @@ export default function initController() {
                 `${prefsTipografia.titlePx}/${prefsTipografia.subtitlePx}/${prefsTipografia.basePx} px`
             );
         }
+        if (window.AxionApi) {
+            window.AxionApi.put("/configuracion/apariencia", {
+                tema: modoTema,
+                titlePx: prefsTipografia.titlePx,
+                subtitlePx: prefsTipografia.subtitlePx,
+                basePx: prefsTipografia.basePx
+            }).catch(() => {});
+        }
 
         mostrarToast("Apariencia y tipografía aplicadas.");
     });
@@ -275,14 +283,40 @@ export default function initController() {
     });
     observadorTemaNavbar.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
+    function actualizarJwtSesion(nuevoToken) {
+        if (!nuevoToken) return;
+        ["localStorage", "sessionStorage"].forEach((storeName) => {
+            const store = window[storeName];
+            const raw = store.getItem("axion_sesion_activa");
+            if (raw) {
+                try {
+                    const obj = JSON.parse(raw);
+                    obj.token = nuevoToken;
+                    store.setItem("axion_sesion_activa", JSON.stringify(obj));
+                } catch {
+                    // Ignorar
+                }
+            }
+        });
+    }
+
     // Bloque 2 - Regenerar Token / Cambiar Contraseña
     if (enlaceRegenerar) {
-        enlaceRegenerar.addEventListener("click", (e) => {
+        enlaceRegenerar.addEventListener("click", async (e) => {
             e.preventDefault();
-            const nuevoToken = `axn_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
+            let nuevoToken = `axn_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
+            if (window.AxionApi) {
+                try {
+                    const res = await window.AxionApi.post("/configuracion/regenerar-token");
+                    if (res.tokenRecuperacion) nuevoToken = res.tokenRecuperacion;
+                    if (res.token) actualizarJwtSesion(res.token);
+                } catch {
+                    // Fallback local
+                }
+            }
             abrirModal({
                 titulo: "Token de Acceso Regenerado",
-                mensaje: `Se generó un nuevo token temporal de sesión administrativa (${nuevoToken}). Para cambiar tu contraseña, ingresa primero tu contraseña actual y guarda los cambios.`,
+                mensaje: `Se generó un nuevo token de recuperación administrativa (${nuevoToken}). Guárdalo en un lugar seguro. Para cambiar tu contraseña, ingresa primero tu contraseña actual y guarda los cambios.`,
                 claseBoton: "btn-modal-activar"
             });
         });
@@ -396,6 +430,19 @@ export default function initController() {
             passwordAdmin: passwordFinal,
             ultimaActualizacion: new Date().toISOString()
         };
+
+        if (window.AxionApi) {
+            window.AxionApi.put("/configuracion/cuenta", {
+                nombreVisible,
+                correoAlertas,
+                expiracionMinutos,
+                passwordActual,
+                passwordNueva: cambioPassword ? passwordFinal : null
+            }).then((res) => {
+                if (res && res.token) actualizarJwtSesion(res.token);
+            }).catch(() => {});
+        }
+
         localStorage.setItem(CLAVE_CUENTA_ADMIN, JSON.stringify(datosCuenta));
 
         if (displayCorreo) displayCorreo.textContent = correoAlertas;
@@ -436,10 +483,34 @@ export default function initController() {
     const selectFiltroAuditoria = document.getElementById("filtro-auditoria-modulo");
     const btnExportarAuditoria = document.getElementById("btn-exportar-auditoria-csv");
 
-    function renderizarBitacoraAuditoria() {
-        if (!window.AxionCache) return;
+    async function renderizarBitacoraAuditoria() {
         const filtro = selectFiltroAuditoria ? selectFiltroAuditoria.value : "todos";
-        window.AxionCache.renderizarTablaAuditoria("tbody-auditoria-sistema", filtro);
+        if (window.AxionApi) {
+            try {
+                const page = await window.AxionApi.get(`/auditoria?modulo=${encodeURIComponent(filtro)}&page=0&size=50`);
+                const tbody = document.getElementById("tbody-auditoria-sistema");
+                if (tbody && page && Array.isArray(page.content)) {
+                    tbody.innerHTML = "";
+                    if (page.content.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5">No hay registros para el módulo seleccionado.</td></tr>';
+                        return;
+                    }
+                    page.content.forEach((item) => {
+                        const tr = document.createElement("tr");
+                        const fecha = item.fechaHora ? new Date(item.fechaHora).toLocaleString("es-PE") : "";
+                        const detalle = item.valorAnterior ? `${item.valorAnterior} → ${item.valorNuevo}` : (item.valorNuevo || "");
+                        tr.innerHTML = `<td>${fecha}</td><td>${item.modulo}</td><td>${item.parametro}</td><td>${detalle}</td><td>${item.usuario}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                    return;
+                }
+            } catch {
+                // Fallback a caché local si el backend no está activo
+            }
+        }
+        if (window.AxionCache) {
+            window.AxionCache.renderizarTablaAuditoria("tbody-auditoria-sistema", filtro);
+        }
     }
 
     if (selectFiltroAuditoria) {

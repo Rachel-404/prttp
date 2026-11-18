@@ -263,8 +263,31 @@ export default function initController() {
         return scales;
     }
 
-    function renderizarGrafica(claveSerie) {
-        const configSerie = SERIES_TENDENCIA[claveSerie] || SERIES_TENDENCIA.ph;
+    async function renderizarGrafica(claveSerie) {
+        const baseConfig = SERIES_TENDENCIA[claveSerie] || SERIES_TENDENCIA.ph;
+        const configSerie = {
+            ...baseConfig,
+            datasets: baseConfig.datasets.map((ds) => ({ ...ds }))
+        };
+        let etiquetas = HORAS_24H;
+
+        if (window.AxionApi) {
+            try {
+                const res = await window.AxionApi.get(`/dashboard/tendencias?variable=${encodeURIComponent(claveSerie)}`);
+                if (res && Array.isArray(res.puntos) && res.puntos.length > 0) {
+                    etiquetas = res.puntos.map((p) => {
+                        const d = new Date(p.ts);
+                        return Number.isNaN(d.getTime())
+                            ? String(p.ts)
+                            : d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
+                    });
+                    configSerie.datasets[0].data = res.puntos.map((p) => Number(p.valor));
+                }
+            } catch {
+                // Fallback silencioso a datos locales de demostración
+            }
+        }
+
         const coloresTema = obtenerColoresTema();
 
         const datasetsChart = configSerie.datasets.map((ds) => ({
@@ -298,7 +321,7 @@ export default function initController() {
         graficaInstancia = new Chart(canvas, {
             type: "line",
             data: {
-                labels: HORAS_24H,
+                labels: etiquetas,
                 datasets: datasetsChart
             },
             options: {

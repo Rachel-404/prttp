@@ -402,7 +402,9 @@ export default function initController() {
         };
 
         document.dispatchEvent(new CustomEvent("ec:calibracionEjecutada", { detail: comando }));
-        console.info("Comando de calibración enviado (EC / TDS V1.0):", comando);
+        if (window.AxionApi) {
+            window.AxionApi.post("/sensores/ec/calibrar", comando).catch(() => {});
+        }
         mostrarToast(`Calibración completada (${estadoCalibracionEc.solucionEstandarMsCm.toFixed(2)} mS/cm).`);
     }
 
