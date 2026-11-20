@@ -1,3 +1,6 @@
 {
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5501,
+    "java.compile.nullAnalysis.mode": "disabled"
 }
+
+ya ahora ya no usare docker para mi base de datos ya tengo postgres instalado pero aun me falta algo?, configura mi back para que solo 

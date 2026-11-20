@@ -2,7 +2,8 @@
 -- AXIÓN - IOT | Esquema inicial PostgreSQL + TimescaleDB (Flyway V1)
 -- ============================================================================
 
-CREATE EXTENSION IF NOT EXISTS timescaledb;
+-- Extensión opcional: si el servidor no tiene TimescaleDB instalado, opera sobre PostgreSQL estándar.
+-- CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 -- 1. Dispositivos (Nodo Maestro ESP32-S3)
 CREATE TABLE dispositivos (

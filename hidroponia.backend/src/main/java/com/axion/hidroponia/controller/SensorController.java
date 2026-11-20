@@ -3,7 +3,7 @@ package com.axion.hidroponia.controller;
 import com.axion.hidroponia.model.SensorConfiguracion;
 import com.axion.hidroponia.repository.SensorConfiguracionRepository;
 import com.axion.hidroponia.service.AuditService;
-import com.axion.hidroponia.service.MqttService;
+import com.axion.hidroponia.service.DeviceCommandService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,15 +18,15 @@ public class SensorController {
 
     private final SensorConfiguracionRepository sensorRepo;
     private final AuditService auditService;
-    private final MqttService mqttService;
+    private final DeviceCommandService commandService;
 
     public SensorController(
             SensorConfiguracionRepository sensorRepo,
             AuditService auditService,
-            MqttService mqttService) {
+            DeviceCommandService commandService) {
         this.sensorRepo = sensorRepo;
         this.auditService = auditService;
-        this.mqttService = mqttService;
+        this.commandService = commandService;
     }
 
     public record ControlSensorRequest(Boolean activo, Integer frecuenciaSeg, Double minNormal, Double maxNormal) {}
@@ -60,7 +60,7 @@ public class SensorController {
         SensorConfiguracion guardado = sensorRepo.save(cfg);
         auditService.registrar(cfg.getNombre(), "Límites y Muestreo", valorPrevio,
                 String.format("%s–%s (%ds)", guardado.getMinNormal(), guardado.getMaxNormal(), guardado.getFrecuenciaSeg()));
-        mqttService.publicarComando("CONFIG_SENSOR", Map.of("modulo", modulo, "config", guardado));
+        commandService.encolarComando("CONFIG_SENSOR", Map.of("modulo", modulo, "config", guardado));
         return guardado;
     }
 
@@ -76,7 +76,7 @@ public class SensorController {
 
         SensorConfiguracion guardado = sensorRepo.save(cfg);
         auditService.registrar(cfg.getNombre(), "Parámetros Técnicos", "Anterior", "Actualizado");
-        mqttService.publicarComando("CONFIG_TECNICA_SENSOR", Map.of("modulo", modulo, "parametros", merged));
+        commandService.encolarComando("CONFIG_TECNICA_SENSOR", Map.of("modulo", modulo, "parametros", merged));
         return guardado;
     }
 
@@ -91,7 +91,7 @@ public class SensorController {
         sensorRepo.save(cfg);
 
         auditService.registrar("pH RS485", "Calibración NIST", "Anterior", String.valueOf(body));
-        mqttService.publicarComando("CALIBRAR_PH", body);
+        commandService.encolarComando("CALIBRAR_PH", body);
         return Map.of("mensaje", "Calibración de pH enviada al controlador ESP32-S3.");
     }
 
@@ -105,7 +105,7 @@ public class SensorController {
         sensorRepo.save(cfg);
 
         auditService.registrar("Conductividad / TDS", "Calibración EC", "Anterior", String.valueOf(body));
-        mqttService.publicarComando("CALIBRAR_EC", body);
+        commandService.encolarComando("CALIBRAR_EC", body);
         return Map.of("mensaje", "Calibración de conductividad enviada al controlador ESP32-S3.");
     }
 
@@ -119,7 +119,7 @@ public class SensorController {
         sensorRepo.save(cfg);
 
         auditService.registrar("Nivel y Temperatura", "Calibración Cero LMP633", "Anterior", String.valueOf(body));
-        mqttService.publicarComando("CALIBRAR_CERO_NIVEL", body);
+        commandService.encolarComando("CALIBRAR_CERO_NIVEL", body);
         return Map.of("mensaje", "Calibración de punto cero registrada.");
     }
 }

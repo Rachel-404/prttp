@@ -44,7 +44,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/dashboard/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/alertas").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/reportes/historial", "/api/v1/reportes/exportar").permitAll()
-                .requestMatchers("/ws/**").permitAll()
+                // Rutas IoT HTTP para el ESP32-S3 (validadas mediante header X-Device-Key)
+                .requestMatchers("/api/v1/iot/**").permitAll()
                 // Rutas exclusivas del Administrador Único
                 .requestMatchers("/api/v1/**").hasRole("ADMIN")
                 .anyRequest().permitAll()

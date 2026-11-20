@@ -3,7 +3,7 @@ package com.axion.hidroponia.controller;
 import com.axion.hidroponia.model.ReleCanal;
 import com.axion.hidroponia.repository.ReleCanalRepository;
 import com.axion.hidroponia.service.AuditService;
-import com.axion.hidroponia.service.MqttService;
+import com.axion.hidroponia.service.DeviceCommandService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,12 +18,12 @@ public class ReleController {
 
     private final ReleCanalRepository releRepo;
     private final AuditService auditService;
-    private final MqttService mqttService;
+    private final DeviceCommandService commandService;
 
-    public ReleController(ReleCanalRepository releRepo, AuditService auditService, MqttService mqttService) {
+    public ReleController(ReleCanalRepository releRepo, AuditService auditService, DeviceCommandService commandService) {
         this.releRepo = releRepo;
         this.auditService = auditService;
-        this.mqttService = mqttService;
+        this.commandService = commandService;
     }
 
     public record EstadoReleRequest(boolean encendido) {}
@@ -51,7 +51,7 @@ public class ReleController {
 
         auditService.registrar("Control de Equipos", "Relé " + canal + " (" + rele.getNombre() + ")",
                 previo ? "Encendido" : "Apagado", req.encendido() ? "Encendido" : "Apagado");
-        mqttService.publicarComando("SET_RELE", Map.of("canal", canal, "encendido", req.encendido()));
+        commandService.encolarComando("SET_RELE", Map.of("canal", canal, "encendido", req.encendido()));
         return guardado;
     }
 
@@ -66,7 +66,7 @@ public class ReleController {
         List<ReleCanal> guardados = releRepo.saveAll(todos);
 
         auditService.registrar("Control de Equipos", "Modo de Operación", "Anterior", modo);
-        mqttService.publicarComando("SET_MODO_RELES", Map.of("modo", modo));
+        commandService.encolarComando("SET_MODO_RELES", Map.of("modo", modo));
         return guardados;
     }
 
@@ -85,7 +85,7 @@ public class ReleController {
         List<ReleCanal> guardados = releRepo.saveAll(todos);
 
         auditService.registrar("Control de Equipos", "Configuración de Pines", "Anterior", "Actualizado");
-        mqttService.publicarComando("CONFIG_RELES_TECNICO", Map.of("logica", req.logicaDisparo(), "pines", req.pines()));
+        commandService.encolarComando("CONFIG_RELES_TECNICO", Map.of("logica", req.logicaDisparo(), "pines", req.pines()));
         return guardados;
     }
 }

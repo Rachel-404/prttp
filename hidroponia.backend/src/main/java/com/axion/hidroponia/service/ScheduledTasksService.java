@@ -9,7 +9,6 @@ import com.axion.hidroponia.repository.SistemaPreferenciasRepository;
 import com.axion.hidroponia.repository.TelemetriaLecturaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -25,19 +24,16 @@ public class ScheduledTasksService {
     private final AlertaRepository alertaRepo;
     private final TelemetriaLecturaRepository telemetriaRepo;
     private final SistemaPreferenciasRepository prefsRepo;
-    private final SimpMessagingTemplate messagingTemplate;
 
     public ScheduledTasksService(
             DispositivoRepository dispositivoRepo,
             AlertaRepository alertaRepo,
             TelemetriaLecturaRepository telemetriaRepo,
-            SistemaPreferenciasRepository prefsRepo,
-            SimpMessagingTemplate messagingTemplate) {
+            SistemaPreferenciasRepository prefsRepo) {
         this.dispositivoRepo = dispositivoRepo;
         this.alertaRepo = alertaRepo;
         this.telemetriaRepo = telemetriaRepo;
         this.prefsRepo = prefsRepo;
-        this.messagingTemplate = messagingTemplate;
     }
 
     /**
@@ -68,8 +64,7 @@ public class ScheduledTasksService {
                     alerta.setUrlDestino("/nodo-maestro");
                     alerta.setLeida(false);
                     alerta.setCreadaEn(ahora);
-                    Alerta guardada = alertaRepo.save(alerta);
-                    messagingTemplate.convertAndSend("/topic/alertas", guardada);
+                    alertaRepo.save(alerta);
                 }
             }
         }

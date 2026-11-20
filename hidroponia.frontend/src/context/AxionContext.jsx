@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../services/axionCache.js";
-import { apiPost, conectarWebSocket } from "../services/apiClient.js";
+import { apiGet, apiPost } from "../services/apiClient.js";
 
 const CLAVE_TEMA = "axion_tema";
 const CLAVE_TIPOGRAFIA = "axion_tipografia";
@@ -154,16 +154,39 @@ export function AxionProvider({ children }) {
   };
 
   useEffect(() => {
-    const desconectarWs = conectarWebSocket({
-      onTelemetria: (lectura) => {
-        window.dispatchEvent(new CustomEvent("axion:telemetria", { detail: lectura }));
-        document.dispatchEvent(new CustomEvent("dashboard:actualizarLecturas", { detail: lectura }));
-      },
-      onAlerta: () => {
+    const intervaloMs = Number(
+      (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_POLLING_MS) || 5000
+    );
+    const deviceId =
+      (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_DEVICE_ID) ||
+      "ESP32_HIDRO_01";
+    let activo = true;
+    let ultimaLecturaId = null;
+
+    const consultarEstadoHttp = async () => {
+      try {
+        const resumen = await apiGet(`/dashboard/resumen?dispositivoId=${encodeURIComponent(deviceId)}`);
+        if (!activo || !resumen) return;
+        if (resumen.ultimaLectura) {
+          const idActual = resumen.ultimaLectura.id ?? resumen.ultimaLectura.ts;
+          if (idActual !== ultimaLecturaId) {
+            ultimaLecturaId = idActual;
+            window.dispatchEvent(new CustomEvent("axion:telemetria", { detail: resumen.ultimaLectura }));
+            document.dispatchEvent(new CustomEvent("dashboard:actualizarLecturas", { detail: resumen.ultimaLectura }));
+          }
+        }
         window.dispatchEvent(new CustomEvent("axion:alertasActualizadas"));
+      } catch {
+        // Reintentar en el siguiente ciclo de polling HTTP
       }
-    });
-    return () => desconectarWs();
+    };
+
+    consultarEstadoHttp();
+    const timer = setInterval(consultarEstadoHttp, Math.max(2000, intervaloMs));
+    return () => {
+      activo = false;
+      clearInterval(timer);
+    };
   }, []);
 
   const cerrarSesionAdmin = () => {

@@ -1,5 +1,6 @@
 package com.axion.hidroponia;
 
+import com.axion.hidroponia.config.DatabaseBootstrapListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -9,6 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class HidroponiaApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(HidroponiaApplication.class, args);
+        SpringApplication app = new SpringApplication(HidroponiaApplication.class);
+        app.addListeners(new DatabaseBootstrapListener());
+        app.run(args);
     }
 }

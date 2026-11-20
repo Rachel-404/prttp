@@ -5,7 +5,6 @@ import com.axion.hidroponia.model.SensorConfiguracion;
 import com.axion.hidroponia.model.TelemetriaLectura;
 import com.axion.hidroponia.repository.AlertaRepository;
 import com.axion.hidroponia.repository.SensorConfiguracionRepository;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -16,15 +15,12 @@ public class AlertEvaluationService {
 
     private final SensorConfiguracionRepository sensorRepo;
     private final AlertaRepository alertaRepo;
-    private final SimpMessagingTemplate messagingTemplate;
 
     public AlertEvaluationService(
             SensorConfiguracionRepository sensorRepo,
-            AlertaRepository alertaRepo,
-            SimpMessagingTemplate messagingTemplate) {
+            AlertaRepository alertaRepo) {
         this.sensorRepo = sensorRepo;
         this.alertaRepo = alertaRepo;
-        this.messagingTemplate = messagingTemplate;
     }
 
     public void evaluarYNotificar(TelemetriaLectura lectura) {
@@ -74,7 +70,6 @@ public class AlertEvaluationService {
         alerta.setLeida(false);
         alerta.setCreadaEn(OffsetDateTime.now());
 
-        Alerta guardada = alertaRepo.save(alerta);
-        messagingTemplate.convertAndSend("/topic/alertas", guardada);
+        alertaRepo.save(alerta);
     }
 }
