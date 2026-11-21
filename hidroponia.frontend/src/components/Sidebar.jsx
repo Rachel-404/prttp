@@ -7,7 +7,7 @@ const SUBMENU_CONFIG = [
     ruta: "/sensores/ph",
     alias: "/views/sensores/ph",
     icono: "water_ph",
-    texto: "Sensor de pH (RS485)"
+    texto: "Sensor de pH"
   },
   {
     ruta: "/sensores/ec",

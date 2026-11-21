@@ -27,6 +27,7 @@ public class ReleController {
     }
 
     public record EstadoReleRequest(boolean encendido) {}
+    public record NombreReleRequest(String nombre) {}
     public record ModoReleRequest(String modoOperacion) {}
     public record TecnicoRelesRequest(String logicaDisparo, Map<Integer, String> pines) {}
 
@@ -52,6 +53,23 @@ public class ReleController {
         auditService.registrar("Control de Equipos", "Relé " + canal + " (" + rele.getNombre() + ")",
                 previo ? "Encendido" : "Apagado", req.encendido() ? "Encendido" : "Apagado");
         commandService.encolarComando("SET_RELE", Map.of("canal", canal, "encendido", req.encendido()));
+        return guardado;
+    }
+
+    @PatchMapping("/{canal}/nombre")
+    public ReleCanal cambiarNombre(@PathVariable Integer canal, @RequestBody NombreReleRequest req) {
+        ReleCanal rele = releRepo.findById(canal)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Canal de relé no encontrado"));
+        String nuevoNombre = req.nombre() != null ? req.nombre().trim() : "";
+        if (nuevoNombre.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del equipo no puede estar vacío");
+        }
+        String previo = rele.getNombre();
+        rele.setNombre(nuevoNombre);
+        rele.setActualizadoEn(OffsetDateTime.now());
+        ReleCanal guardado = releRepo.save(rele);
+
+        auditService.registrar("Control de Equipos", "Nombre Relé " + canal, previo, nuevoNombre);
         return guardado;
     }
 

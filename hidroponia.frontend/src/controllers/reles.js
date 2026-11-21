@@ -27,383 +27,324 @@ export default function initController() {
 
     try {
         (function () {
+            const DEFAULTS_TECNICOS_RELES = {
+                pines: {
+                    1: "GPIO 5",
+                    2: "GPIO 6",
+                    3: "GPIO 7",
+                    4: "GPIO 15",
+                    5: "GPIO 16",
+                    6: "GPIO 47"
+                },
+                logicaDisparo: "low"
+            };
 
-    const CLAVE_RELES_ESTADO = "axion_reles_estado";
-    const CLAVE_RELES_TECNICO = "axion_reles_tecnico";
+            let estadoOperacionReles = {
+                modo: "manual",
+                canales: []
+            };
 
-    const DEFAULTS_CANALES = [
-        { canal: 1, nombre: "Electrobomba 1 (Recirculación Principal)", encendido: true },
-        { canal: 2, nombre: "Electrobomba 2 (Dosificación / Oxigenación)", encendido: false },
-        { canal: 3, nombre: "Electrobomba 3 (Llenado / Auxiliar)", encendido: false },
-        { canal: 4, nombre: "Reflector (Iluminación del Cultivo)", encendido: true },
-        { canal: 5, nombre: "Canal Reserva 1 (Disponible)", encendido: false },
-        { canal: 6, nombre: "Canal Reserva 2 (Disponible)", encendido: false }
-    ];
+            let estadoTecnicoReles = {
+                pines: { ...DEFAULTS_TECNICOS_RELES.pines },
+                logicaDisparo: DEFAULTS_TECNICOS_RELES.logicaDisparo
+            };
 
-    const DEFAULTS_TECNICOS_RELES = {
-        pines: {
-            1: "GPIO 4",
-            2: "GPIO 5",
-            3: "GPIO 6",
-            4: "GPIO 7",
-            5: "GPIO 15",
-            6: "GPIO 16"
-        },
-        logicaDisparo: "low"
-    };
+            const selectModo = document.getElementById("modo-operacion-reles");
+            const avisoModoAuto = document.getElementById("aviso-modo-automatico");
+            const gridCanales = document.getElementById("grid-reles-canales");
 
-    let estadoOperacionReles = {
-        modo: "manual",
-        canales: DEFAULTS_CANALES.map((c) => ({ ...c }))
-    };
+            const bloqueTecnico = document.getElementById("bloque-tecnico-reles");
+            const btnAcordeonTecnico = document.getElementById("btn-acordeon-tecnico-reles");
+            const formTecnico = document.getElementById("form-tecnico-reles");
+            const selectLogica = document.getElementById("tec-rele-logica");
+            const errorTecnico = document.getElementById("error-tecnico-reles");
+            const btnRestaurarFabrica = document.getElementById("btn-restaurar-fabrica-reles");
 
-    let estadoTecnicoReles = {
-        pines: { ...DEFAULTS_TECNICOS_RELES.pines },
-        logicaDisparo: DEFAULTS_TECNICOS_RELES.logicaDisparo
-    };
+            const modal = document.getElementById("modal-confirmacion-reles");
+            const modalTitulo = document.getElementById("modal-reles-titulo");
+            const modalMensaje = document.getElementById("modal-reles-mensaje");
+            const btnCancelar = document.getElementById("btn-modal-cancelar-reles");
+            const btnAceptar = document.getElementById("btn-modal-aceptar-reles");
+            const toast = document.getElementById("toast-reles");
 
-    // Referencias DOM - Bloque 1
-    const selectModo = document.getElementById("modo-operacion-reles");
-    const avisoModoAuto = document.getElementById("aviso-modo-automatico");
-    const gridCanales = document.getElementById("grid-reles-canales");
+            if (!selectModo || !gridCanales || !modal) return;
 
-    // Referencias DOM - Bloque 2
-    const bloqueTecnico = document.getElementById("bloque-tecnico-reles");
-    const btnAcordeonTecnico = document.getElementById("btn-acordeon-tecnico-reles");
-    const formTecnico = document.getElementById("form-tecnico-reles");
-    const selectLogica = document.getElementById("tec-rele-logica");
-    const errorTecnico = document.getElementById("error-tecnico-reles");
-    const btnRestaurarFabrica = document.getElementById("btn-restaurar-fabrica-reles");
+            let accionConfirmarPendiente = null;
+            let accionCancelarPendiente = null;
+            let toastTimer = null;
 
-    // Referencias DOM - Modal y Toast
-    const modal = document.getElementById("modal-confirmacion-reles");
-    const modalTitulo = document.getElementById("modal-reles-titulo");
-    const modalMensaje = document.getElementById("modal-reles-mensaje");
-    const btnCancelar = document.getElementById("btn-modal-cancelar-reles");
-    const btnAceptar = document.getElementById("btn-modal-aceptar-reles");
-    const toast = document.getElementById("toast-reles");
+            function mostrarToast(texto) {
+                if (!toast) return;
+                toast.textContent = texto;
+                toast.hidden = false;
+                if (toastTimer) clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.hidden = true;
+                }, 3000);
+            }
 
-    if (!selectModo || !gridCanales || !modal) return;
+            function mostrarErrorTecnico(msg) {
+                if (!errorTecnico) return;
+                errorTecnico.textContent = msg;
+                errorTecnico.hidden = false;
+            }
 
-    let accionConfirmarPendiente = null;
-    let accionCancelarPendiente = null;
-    let toastTimer = null;
+            function limpiarErrorTecnico() {
+                if (!errorTecnico) return;
+                errorTecnico.textContent = "";
+                errorTecnico.hidden = true;
+            }
 
-    function cargarEstadoInicial() {
-        try {
-            const rawOp = localStorage.getItem(CLAVE_RELES_ESTADO);
-            if (rawOp) {
-                const datos = JSON.parse(rawOp);
-                if (datos.modo === "manual" || datos.modo === "automatico") {
-                    estadoOperacionReles.modo = datos.modo;
+            function abrirModalConfirmacion({ titulo, mensaje, claseBoton, onAceptar, onCancelar }) {
+                accionConfirmarPendiente = onAceptar || null;
+                accionCancelarPendiente = onCancelar || null;
+                modalTitulo.textContent = titulo;
+                modalMensaje.textContent = mensaje;
+                btnAceptar.className = `btn-modal ${claseBoton || "btn-modal-activar"}`;
+                modal.hidden = false;
+                btnCancelar.focus();
+            }
+
+            function cerrarModal(ejecutadoAceptar = false) {
+                modal.hidden = true;
+                if (!ejecutadoAceptar && typeof accionCancelarPendiente === "function") {
+                    accionCancelarPendiente();
                 }
-                if (Array.isArray(datos.canales) && datos.canales.length === 6) {
-                    estadoOperacionReles.canales = datos.canales.map((c, idx) => ({
-                        canal: idx + 1,
-                        nombre: String(c.nombre || DEFAULTS_CANALES[idx].nombre),
-                        encendido: Boolean(c.encendido)
-                    }));
+                accionConfirmarPendiente = null;
+                accionCancelarPendiente = null;
+            }
+
+            function aplicarListaDesdeBackend(lista) {
+                if (!Array.isArray(lista) || lista.length === 0) return;
+                estadoOperacionReles.modo = lista[0].modoOperacion === "automatico" ? "automatico" : "manual";
+                estadoOperacionReles.canales = lista.map((r) => ({
+                    canal: r.canal,
+                    nombre: String(r.nombre || `Canal ${r.canal}`).replace(/\s*\([^()]+\)/g, ""),
+                    encendido: Boolean(r.encendido)
+                }));
+                estadoTecnicoReles.logicaDisparo = lista[0].logicaDisparo === "high" ? "high" : "low";
+                lista.forEach((r) => {
+                    if (r.pinGpio) estadoTecnicoReles.pines[r.canal] = r.pinGpio;
+                });
+                renderizarTarjetasCanales();
+                sincronizarCamposTecnicos();
+            }
+
+            async function cargarDesdeBackend() {
+                if (!window.AxionApi) return;
+                try {
+                    const lista = await window.AxionApi.get("/reles");
+                    aplicarListaDesdeBackend(lista);
+                } catch (err) {
+                    mostrarToast(err.message || "No se pudo cargar el estado de los relés desde el servidor.");
                 }
             }
 
-            const rawTec = localStorage.getItem(CLAVE_RELES_TECNICO);
-            if (rawTec) {
-                const tec = JSON.parse(rawTec);
-                if (tec.pines && typeof tec.pines === "object") {
-                    estadoTecnicoReles.pines = { ...DEFAULTS_TECNICOS_RELES.pines, ...tec.pines };
-                }
-                if (tec.logicaDisparo === "low" || tec.logicaDisparo === "high") {
-                    estadoTecnicoReles.logicaDisparo = tec.logicaDisparo;
-                }
-            }
-        } catch (err) {
-            console.warn("No se pudo restaurar la configuración de relés:", err);
-        }
-    }
+            function renderizarTarjetasCanales() {
+                const esAutomatico = estadoOperacionReles.modo === "automatico";
+                selectModo.value = estadoOperacionReles.modo;
+                if (avisoModoAuto) avisoModoAuto.hidden = !esAutomatico;
 
-    function persistirOperacion() {
-        localStorage.setItem(CLAVE_RELES_ESTADO, JSON.stringify(estadoOperacionReles));
-        if (window.AxionCache) {
-            window.AxionCache.guardarEnCache("reles", {
-                canales: estadoOperacionReles.canales
-            });
-        }
-    }
+                gridCanales.innerHTML = "";
 
-    function persistirTecnico() {
-        localStorage.setItem(CLAVE_RELES_TECNICO, JSON.stringify(estadoTecnicoReles));
-    }
+                estadoOperacionReles.canales.forEach((canalObj) => {
+                    const card = document.createElement("article");
+                    card.className = "tarjeta-canal-rele";
+                    card.dataset.canal = String(canalObj.canal);
 
-    function mostrarToast(texto) {
-        if (!toast) return;
-        toast.textContent = texto;
-        toast.hidden = false;
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => {
-            toast.hidden = true;
-        }, 3000);
-    }
+                    const claseEstado = canalObj.encendido ? "encendido" : "apagado";
+                    const textoEstado = canalObj.encendido ? "Encendido" : "Apagado";
 
-    function mostrarErrorTecnico(msg) {
-        if (!errorTecnico) return;
-        errorTecnico.textContent = msg;
-        errorTecnico.hidden = false;
-    }
+                    card.innerHTML = `
+                        <div class="cabecera-canal">
+                            <span class="etiqueta-canal-num">Canal ${canalObj.canal}</span>
+                            <span class="estado-rele-badge ${claseEstado}" id="badge-rele-${canalObj.canal}">
+                                <span class="punto-estado-rele" aria-hidden="true"></span>
+                                <span class="texto-estado-rele">${textoEstado}</span>
+                            </span>
+                        </div>
+                        <div class="cuerpo-canal">
+                            <label for="nombre-rele-${canalObj.canal}" class="etiqueta-campo">Equipo asignado</label>
+                            <input
+                                type="text"
+                                id="nombre-rele-${canalObj.canal}"
+                                class="campo-control input-nombre-rele"
+                                value="${canalObj.nombre.replace(/"/g, "&quot;")}"
+                            />
+                        </div>
+                        <div class="pie-canal">
+                            <span class="texto-accion-rele">Control manual</span>
+                            <label class="switch-rele" aria-label="Encender o apagar Canal ${canalObj.canal}">
+                                <input
+                                    type="checkbox"
+                                    id="switch-rele-${canalObj.canal}"
+                                    ${canalObj.encendido ? "checked" : ""}
+                                    ${esAutomatico ? "disabled" : ""}
+                                />
+                                <span class="slider-rele"></span>
+                            </label>
+                        </div>
+                    `;
 
-    function limpiarErrorTecnico() {
-        if (!errorTecnico) return;
-        errorTecnico.textContent = "";
-        errorTecnico.hidden = true;
-    }
-
-    function abrirModalConfirmacion({ titulo, mensaje, claseBoton, onAceptar, onCancelar }) {
-        accionConfirmarPendiente = onAceptar || null;
-        accionCancelarPendiente = onCancelar || null;
-        modalTitulo.textContent = titulo;
-        modalMensaje.textContent = mensaje;
-        btnAceptar.className = `btn-modal ${claseBoton || "btn-modal-activar"}`;
-        modal.hidden = false;
-        btnCancelar.focus();
-    }
-
-    function cerrarModal(ejecutadoAceptar = false) {
-        modal.hidden = true;
-        if (!ejecutadoAceptar && typeof accionCancelarPendiente === "function") {
-            accionCancelarPendiente();
-        }
-        accionConfirmarPendiente = null;
-        accionCancelarPendiente = null;
-    }
-
-    function enviarOrdenReleEsp32(canalObj) {
-        const comando = {
-            microcontrolador: "ESP32-S3",
-            canal: canalObj.canal,
-            nombre: canalObj.nombre,
-            gpio: estadoTecnicoReles.pines[canalObj.canal],
-            estado: canalObj.encendido ? "ENCENDIDO" : "APAGADO",
-            logicaDisparo: estadoTecnicoReles.logicaDisparo,
-            timestamp: new Date().toISOString()
-        };
-
-        document.dispatchEvent(new CustomEvent("reles:comandoEnviado", { detail: comando }));
-        console.info("Orden enviada al ESP32-S3:", comando);
-        mostrarToast(
-            `Canal ${canalObj.canal} ${canalObj.encendido ? "encendido" : "apagado"} (orden enviada al ESP32-S3).`
-        );
-    }
-
-    function renderizarTarjetasCanales() {
-        const esAutomatico = estadoOperacionReles.modo === "automatico";
-        selectModo.value = estadoOperacionReles.modo;
-        if (avisoModoAuto) avisoModoAuto.hidden = !esAutomatico;
-
-        gridCanales.innerHTML = "";
-
-        estadoOperacionReles.canales.forEach((canalObj) => {
-            const card = document.createElement("article");
-            card.className = "tarjeta-canal-rele";
-            card.dataset.canal = String(canalObj.canal);
-
-            const claseEstado = canalObj.encendido ? "encendido" : "apagado";
-            const textoEstado = canalObj.encendido ? "Encendido" : "Apagado";
-
-            card.innerHTML = `
-                <div class="cabecera-canal">
-                    <span class="etiqueta-canal-num">Canal ${canalObj.canal}</span>
-                    <span class="estado-rele-badge ${claseEstado}" id="badge-rele-${canalObj.canal}">
-                        <span class="punto-estado-rele" aria-hidden="true"></span>
-                        <span class="texto-estado-rele">${textoEstado}</span>
-                    </span>
-                </div>
-                <div class="cuerpo-canal">
-                    <label for="nombre-rele-${canalObj.canal}" class="etiqueta-campo">Equipo asignado</label>
-                    <input
-                        type="text"
-                        id="nombre-rele-${canalObj.canal}"
-                        class="campo-control input-nombre-rele"
-                        value="${canalObj.nombre.replace(/"/g, "&quot;")}"
-                    />
-                </div>
-                <div class="pie-canal">
-                    <span class="texto-accion-rele">Control manual</span>
-                    <label class="switch-rele" aria-label="Encender o apagar Canal ${canalObj.canal}">
-                        <input
-                            type="checkbox"
-                            id="switch-rele-${canalObj.canal}"
-                            ${canalObj.encendido ? "checked" : ""}
-                            ${esAutomatico ? "disabled" : ""}
-                        />
-                        <span class="slider-rele"></span>
-                    </label>
-                </div>
-            `;
-
-            const inputNombre = card.querySelector(`#nombre-rele-${canalObj.canal}`);
-            inputNombre.addEventListener("change", () => {
-                const limpio = inputNombre.value.trim() || DEFAULTS_CANALES[canalObj.canal - 1].nombre;
-                inputNombre.value = limpio;
-                canalObj.nombre = limpio;
-                persistirOperacion();
-                mostrarToast(`Nombre del Canal ${canalObj.canal} actualizado.`);
-            });
-
-            const toggle = card.querySelector(`#switch-rele-${canalObj.canal}`);
-            toggle.addEventListener("change", () => {
-                const nuevoEstado = toggle.checked;
-                abrirModalConfirmacion({
-                    titulo: nuevoEstado
-                        ? `¿Encender Canal ${canalObj.canal}?`
-                        : `¿Apagar Canal ${canalObj.canal}?`,
-                    mensaje: `Se enviará la orden al microcontrolador ESP32-S3 para ${
-                        nuevoEstado ? "encender" : "apagar"
-                    } "${canalObj.nombre}".`,
-                    claseBoton: nuevoEstado ? "btn-modal-activar" : "btn-modal-pausar",
-                    onAceptar: () => {
-                        canalObj.encendido = nuevoEstado;
-                        persistirOperacion();
-                        renderizarTarjetasCanales();
-                        enviarOrdenReleEsp32(canalObj);
-                        if (window.AxionApi) {
-                            window.AxionApi.patch(`/reles/${canalObj.canal}/estado`, {
-                                encendido: nuevoEstado
-                            }).catch(() => {});
+                    const inputNombre = card.querySelector(`#nombre-rele-${canalObj.canal}`);
+                    inputNombre.addEventListener("change", async () => {
+                        const limpio = inputNombre.value.trim();
+                        if (!limpio) {
+                            inputNombre.value = canalObj.nombre;
+                            return;
                         }
-                    },
-                    onCancelar: () => {
-                        toggle.checked = !nuevoEstado;
+                        try {
+                            const actualizado = await window.AxionApi.patch(`/reles/${canalObj.canal}/nombre`, {
+                                nombre: limpio
+                            });
+                            canalObj.nombre = actualizado.nombre || limpio;
+                            inputNombre.value = canalObj.nombre;
+                            mostrarToast(`Nombre del Canal ${canalObj.canal} actualizado.`);
+                        } catch (err) {
+                            inputNombre.value = canalObj.nombre;
+                            mostrarToast(err.message || "Error al actualizar el nombre del canal.");
+                        }
+                    });
+
+                    const toggle = card.querySelector(`#switch-rele-${canalObj.canal}`);
+                    toggle.addEventListener("change", () => {
+                        const nuevoEstado = toggle.checked;
+                        abrirModalConfirmacion({
+                            titulo: nuevoEstado
+                                ? `¿Encender Canal ${canalObj.canal}?`
+                                : `¿Apagar Canal ${canalObj.canal}?`,
+                            mensaje: `Se enviará la orden al microcontrolador ESP32-S3 para ${
+                                nuevoEstado ? "encender" : "apagar"
+                            } "${canalObj.nombre}".`,
+                            claseBoton: nuevoEstado ? "btn-modal-activar" : "btn-modal-pausar",
+                            onAceptar: async () => {
+                                try {
+                                    const resp = await window.AxionApi.patch(`/reles/${canalObj.canal}/estado`, {
+                                        encendido: nuevoEstado
+                                    });
+                                    canalObj.encendido = Boolean(resp.encendido);
+                                    renderizarTarjetasCanales();
+                                    mostrarToast(`Canal ${canalObj.canal} ${canalObj.encendido ? "encendido" : "apagado"}.`);
+                                } catch (err) {
+                                    toggle.checked = !nuevoEstado;
+                                    mostrarToast(err.message || "No se pudo cambiar el estado del canal.");
+                                }
+                            },
+                            onCancelar: () => {
+                                toggle.checked = !nuevoEstado;
+                            }
+                        });
+                    });
+
+                    gridCanales.appendChild(card);
+                });
+            }
+
+            function sincronizarCamposTecnicos() {
+                for (let i = 1; i <= 6; i++) {
+                    const inputPin = document.getElementById(`pin-rele-${i}`);
+                    if (inputPin) inputPin.value = estadoTecnicoReles.pines[i] || "";
+                }
+                if (selectLogica) selectLogica.value = estadoTecnicoReles.logicaDisparo;
+            }
+
+            selectModo.addEventListener("change", async () => {
+                const modoPrevio = estadoOperacionReles.modo;
+                const nuevoModo = selectModo.value;
+                try {
+                    const lista = await window.AxionApi.put("/reles/modo", { modoOperacion: nuevoModo });
+                    aplicarListaDesdeBackend(lista);
+                    mostrarToast(nuevoModo === "manual" ? "Modo Manual activado." : "Modo Automático activado.");
+                } catch (err) {
+                    estadoOperacionReles.modo = modoPrevio;
+                    selectModo.value = modoPrevio;
+                    mostrarToast(err.message || "No se pudo cambiar el modo de operación.");
+                }
+            });
+
+            if (btnAcordeonTecnico && bloqueTecnico) {
+                btnAcordeonTecnico.addEventListener("click", () => {
+                    const abierto = bloqueTecnico.classList.toggle("abierto");
+                    btnAcordeonTecnico.setAttribute("aria-expanded", abierto ? "true" : "false");
+                });
+            }
+
+            if (formTecnico) {
+                formTecnico.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    limpiarErrorTecnico();
+
+                    const nuevosPines = {};
+                    const usados = new Set();
+
+                    for (let i = 1; i <= 6; i++) {
+                        const val = (document.getElementById(`pin-rele-${i}`)?.value || "").trim();
+                        if (!val) {
+                            mostrarErrorTecnico(`Indica el pin GPIO para el Relé ${i}.`);
+                            return;
+                        }
+                        const clave = val.toUpperCase();
+                        if (usados.has(clave)) {
+                            mostrarErrorTecnico(`El pin "${val}" está duplicado. Cada relé requiere un GPIO único.`);
+                            return;
+                        }
+                        usados.add(clave);
+                        nuevosPines[i] = val;
+                    }
+
+                    const payloadTecnico = {
+                        pines: nuevosPines,
+                        logicaDisparo: selectLogica.value === "high" ? "high" : "low"
+                    };
+
+                    try {
+                        const lista = await window.AxionApi.put("/reles/tecnico", payloadTecnico);
+                        aplicarListaDesdeBackend(lista);
+                        mostrarToast("Configuración técnica de pines guardada.");
+                    } catch (err) {
+                        mostrarErrorTecnico(err.message || "Error al guardar la configuración técnica.");
                     }
                 });
+
+                for (let i = 1; i <= 6; i++) {
+                    const inputPin = document.getElementById(`pin-rele-${i}`);
+                    if (inputPin) inputPin.addEventListener("input", limpiarErrorTecnico);
+                }
+            }
+
+            if (btnRestaurarFabrica) {
+                btnRestaurarFabrica.addEventListener("click", () => {
+                    abrirModalConfirmacion({
+                        titulo: "¿Restaurar valores de fábrica?",
+                        mensaje: "Se restablecerán los pines GPIO por defecto y la lógica de disparo Activo en Bajo.",
+                        claseBoton: "btn-modal-pausar",
+                        onAceptar: async () => {
+                            try {
+                                const lista = await window.AxionApi.put("/reles/tecnico", DEFAULTS_TECNICOS_RELES);
+                                aplicarListaDesdeBackend(lista);
+                                limpiarErrorTecnico();
+                                mostrarToast("Pines y lógica restaurados a valores de fábrica.");
+                            } catch (err) {
+                                mostrarToast(err.message || "Error al restaurar valores de fábrica.");
+                            }
+                        }
+                    });
+                });
+            }
+
+            btnAceptar.addEventListener("click", () => {
+                if (typeof accionConfirmarPendiente === "function") accionConfirmarPendiente();
+                cerrarModal(true);
+            });
+            btnCancelar.addEventListener("click", () => cerrarModal(false));
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) cerrarModal(false);
+            });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape" && !modal.hidden) cerrarModal(false);
             });
 
-            gridCanales.appendChild(card);
-        });
-    }
-
-    function sincronizarCamposTecnicos() {
-        for (let i = 1; i <= 6; i++) {
-            const inputPin = document.getElementById(`pin-rele-${i}`);
-            if (inputPin) inputPin.value = estadoTecnicoReles.pines[i];
-        }
-        if (selectLogica) selectLogica.value = estadoTecnicoReles.logicaDisparo;
-    }
-
-    // Cambio de modo global
-    selectModo.addEventListener("change", () => {
-        estadoOperacionReles.modo = selectModo.value;
-        persistirOperacion();
-        renderizarTarjetasCanales();
-        if (window.AxionApi) {
-            window.AxionApi.put("/reles/modo", {
-                modoOperacion: estadoOperacionReles.modo
-            }).catch(() => {});
-        }
-        document.dispatchEvent(
-            new CustomEvent("reles:modoCambiado", { detail: { modo: estadoOperacionReles.modo } })
-        );
-        mostrarToast(
-            estadoOperacionReles.modo === "manual"
-                ? "Modo Manual activado."
-                : "Modo Automático (Temporizador) activado."
-        );
-    });
-
-    // Acordeón Técnico (Bloque 2)
-    if (btnAcordeonTecnico && bloqueTecnico) {
-        btnAcordeonTecnico.addEventListener("click", () => {
-            const abierto = bloqueTecnico.classList.toggle("abierto");
-            btnAcordeonTecnico.setAttribute("aria-expanded", abierto ? "true" : "false");
-        });
-    }
-
-    if (formTecnico) {
-        formTecnico.addEventListener("submit", (e) => {
-            e.preventDefault();
-            limpiarErrorTecnico();
-
-            const nuevosPines = {};
-            const usados = new Set();
-
-            for (let i = 1; i <= 6; i++) {
-                const val = (document.getElementById(`pin-rele-${i}`)?.value || "").trim();
-                if (!val) {
-                    mostrarErrorTecnico(`Indica el pin GPIO para el Relé ${i}.`);
-                    return;
-                }
-                const clave = val.toUpperCase();
-                if (usados.has(clave)) {
-                    mostrarErrorTecnico(`El pin "${val}" está duplicado. Cada relé requiere un GPIO único.`);
-                    return;
-                }
-                usados.add(clave);
-                nuevosPines[i] = val;
-            }
-
-            estadoTecnicoReles.pines = nuevosPines;
-            estadoTecnicoReles.logicaDisparo = selectLogica.value === "high" ? "high" : "low";
-            persistirTecnico();
-            if (window.AxionApi) {
-                window.AxionApi.put("/reles/tecnico", estadoTecnicoReles).catch(() => {});
-            }
-
-            document.dispatchEvent(
-                new CustomEvent("reles:configTecnicaGuardada", { detail: { ...estadoTecnicoReles } })
-            );
-            if (window.registrarAuditoria) {
-                window.registrarAuditoria("Control de Equipos", "Configuración de Pines", "Anterior", "Actualizado");
-            }
-            mostrarToast("Configuración técnica de pines guardada.");
-        });
-
-        for (let i = 1; i <= 6; i++) {
-            const inputPin = document.getElementById(`pin-rele-${i}`);
-            if (inputPin) inputPin.addEventListener("input", limpiarErrorTecnico);
-        }
-    }
-
-    if (btnRestaurarFabrica) {
-        btnRestaurarFabrica.addEventListener("click", () => {
-            abrirModalConfirmacion({
-                titulo: "¿Restaurar valores de fábrica?",
-                mensaje:
-                    "Se restablecerán los pines GPIO por defecto (GPIO 4, 5, 6, 7, 15, 16) y la lógica de disparo Activo en Bajo (Low-Level Trigger).",
-                claseBoton: "btn-modal-pausar",
-                onAceptar: () => {
-                    estadoTecnicoReles = {
-                        pines: { ...DEFAULTS_TECNICOS_RELES.pines },
-                        logicaDisparo: DEFAULTS_TECNICOS_RELES.logicaDisparo
-                    };
-                    persistirTecnico();
-                    sincronizarCamposTecnicos();
-                    limpiarErrorTecnico();
-                    mostrarToast("Pines y lógica restaurados a valores de fábrica.");
-                }
-            });
-        });
-    }
-
-    // Modal compartido
-    btnAceptar.addEventListener("click", () => {
-        if (typeof accionConfirmarPendiente === "function") {
-            accionConfirmarPendiente();
-        }
-        cerrarModal(true);
-    });
-
-    btnCancelar.addEventListener("click", () => cerrarModal(false));
-
-    modal.addEventListener("click", (e) => {
-        if (e.target === modal) cerrarModal(false);
-    });
-
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !modal.hidden) cerrarModal(false);
-    });
-
-    cargarEstadoInicial();
-    renderizarTarjetasCanales();
-    sincronizarCamposTecnicos();
-
+            cargarDesdeBackend();
         })();
     } finally {
         document.addEventListener = __origDocAdd;

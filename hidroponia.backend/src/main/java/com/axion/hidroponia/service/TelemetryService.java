@@ -5,9 +5,12 @@ import com.axion.hidroponia.model.TelemetriaLectura;
 import com.axion.hidroponia.repository.DispositivoRepository;
 import com.axion.hidroponia.repository.SensorConfiguracionRepository;
 import com.axion.hidroponia.repository.TelemetriaLecturaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 @Service
@@ -31,12 +34,14 @@ public class TelemetryService {
 
     @SuppressWarnings("unchecked")
     public TelemetriaLectura procesarTrama(Map<String, Object> trama) {
+        OffsetDateTime fechaRecoleccion = parsearTimestampObligatorio(trama.get("ts"));
+
         String dispositivoId = String.valueOf(trama.getOrDefault("dispositivo_id", "ESP32_HIDRO_01"));
         Map<String, Object> datos = (Map<String, Object>) trama.getOrDefault("datos", Map.of());
         Map<String, Object> estado = (Map<String, Object>) trama.getOrDefault("estado", Map.of());
 
         TelemetriaLectura lectura = new TelemetriaLectura();
-        lectura.setTs(OffsetDateTime.now());
+        lectura.setTs(fechaRecoleccion);
         lectura.setDispositivoId(dispositivoId);
         lectura.setPh(toDouble(datos.get("nivel_ph")));
         lectura.setEcUsCm(toDouble(datos.get("ec_us_cm")));
@@ -77,6 +82,27 @@ public class TelemetryService {
                 .map(p -> toDouble(p.get("kValue")))
                 .filter(v -> v != null && v > 0)
                 .orElse(0.5);
+    }
+
+    private OffsetDateTime parsearTimestampObligatorio(Object rawTs) {
+        if (rawTs == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El campo 'ts' (fecha/hora ISO-8601 de recolección) es obligatorio");
+        }
+        String texto = String.valueOf(rawTs).trim();
+        if (texto.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El campo 'ts' no puede estar vacío");
+        }
+        try {
+            return OffsetDateTime.parse(texto);
+        } catch (DateTimeParseException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Formato inválido en 'ts'. Usa ISO-8601 (ej. 2026-11-20T17:10:00Z)");
+        }
     }
 
     private Double toDouble(Object obj) {

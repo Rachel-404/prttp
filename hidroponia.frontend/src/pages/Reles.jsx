@@ -33,15 +33,15 @@ export default function Reles() {
                             <label htmlFor="modo-operacion-reles" className="etiqueta-campo">Modo:</label>
                             <select id="modo-operacion-reles" className="campo-control selector-modo-reles" defaultValue="manual">
                                 <option value="manual">Modo Manual</option>
-                                <option value="automatico">Modo Automático (Temporizador)</option>
+                                <option value="automatico">Modo Automático</option>
                             </select>
                         </div>
                     </header>
 
                     <div className="cuerpo-card">
                         <p id="aviso-modo-automatico" className="aviso-modo-auto" role="status" aria-live="polite" hidden>
-                            Modo Automático (Temporizador) activo: el control manual de los relés está bloqueado temporalmente para evitar conflictos con la programación del ESP32-S3.
-                        </p>
+ Modo Automático activo: el control manual de los relés está bloqueado temporalmente para evitar conflictos con la programación del ESP32-S3.
+ </p>
 
                         
                         <div className="grid-reles-canales" id="grid-reles-canales" aria-live="polite"></div>
@@ -51,42 +51,42 @@ export default function Reles() {
                 
                 <section className="card card-tecnica-abierta" id="bloque-tecnico-reles" aria-label="Configuración técnica de pines">
                     <header className="titulo-card">
-                        <h3>Configuración Técnica de Pines (Solo Técnicos)</h3>
+                        <h3>Configuración Técnica de Pines</h3>
                     </header>
 
                     <form id="form-tecnico-reles" className="cuerpo-card" noValidate>
 
                                 <fieldset className="subseccion-tecnica">
-                                    <legend className="subtitulo-tecnico">Asignación de Pines GPIO (ESP32-S3) y Lógica de Disparo</legend>
+                                    <legend className="subtitulo-tecnico">Asignación de Pines GPIO y Lógica de Disparo</legend>
 
                                     <div className="grid-pines-reles">
                                         <div className="grupo-campo">
-                                            <label htmlFor="pin-rele-1" className="etiqueta-campo">Relé 1 (Electrobomba 1)</label>
+                                            <label htmlFor="pin-rele-1" className="etiqueta-campo">Relé 1</label>
                                             <input type="text" id="pin-rele-1" name="pinRele1" className="campo-control" defaultValue="GPIO 4" required />
                                         </div>
 
                                         <div className="grupo-campo">
-                                            <label htmlFor="pin-rele-2" className="etiqueta-campo">Relé 2 (Electrobomba 2)</label>
+                                            <label htmlFor="pin-rele-2" className="etiqueta-campo">Relé 2</label>
                                             <input type="text" id="pin-rele-2" name="pinRele2" className="campo-control" defaultValue="GPIO 5" required />
                                         </div>
 
                                         <div className="grupo-campo">
-                                            <label htmlFor="pin-rele-3" className="etiqueta-campo">Relé 3 (Electrobomba 3)</label>
+                                            <label htmlFor="pin-rele-3" className="etiqueta-campo">Relé 3</label>
                                             <input type="text" id="pin-rele-3" name="pinRele3" className="campo-control" defaultValue="GPIO 6" required />
                                         </div>
 
                                         <div className="grupo-campo">
-                                            <label htmlFor="pin-rele-4" className="etiqueta-campo">Relé 4 (Reflector)</label>
+                                            <label htmlFor="pin-rele-4" className="etiqueta-campo">Relé 4</label>
                                             <input type="text" id="pin-rele-4" name="pinRele4" className="campo-control" defaultValue="GPIO 7" required />
                                         </div>
 
                                         <div className="grupo-campo">
-                                            <label htmlFor="pin-rele-5" className="etiqueta-campo">Relé 5 (Reserva 1)</label>
+                                            <label htmlFor="pin-rele-5" className="etiqueta-campo">Relé 5</label>
                                             <input type="text" id="pin-rele-5" name="pinRele5" className="campo-control" defaultValue="GPIO 15" required />
                                         </div>
 
                                         <div className="grupo-campo">
-                                            <label htmlFor="pin-rele-6" className="etiqueta-campo">Relé 6 (Reserva 2)</label>
+                                            <label htmlFor="pin-rele-6" className="etiqueta-campo">Relé 6</label>
                                             <input type="text" id="pin-rele-6" name="pinRele6" className="campo-control" defaultValue="GPIO 16" required />
                                         </div>
                                     </div>

@@ -3,52 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { normalizarRutaSpa, useAxion } from "../context/AxionContext";
 import { apiGet, apiPatch } from "../services/apiClient";
 
-const ALERTAS_DEFAULT = [
-  {
-    id: "alerta-1",
-    nivel: "critico",
-    titulo: "pH RS485 fuera de umbral",
-    detalle: "Lectura: 6.85 pH (Máx: 6.50 pH)",
-    tiempo: "Hace 14 min",
-    leida: false,
-    urlDestino: "/sensores/ph"
-  },
-  {
-    id: "alerta-2",
-    nivel: "advertencia",
-    titulo: "Desconexión temporal PT100",
-    detalle: "Resistencia fuera de rango (Circuito abierto)",
-    tiempo: "Hace 2 h",
-    leida: false,
-    urlDestino: "/sensores/nivel-temperatura?tab=temperatura"
-  },
-  {
-    id: "alerta-3",
-    nivel: "normal",
-    titulo: "Sincronización Buffer Offline",
-    detalle: "142 tramas enviadas tras reconexión Wi-Fi",
-    tiempo: "Ayer, 18:30",
-    leida: true,
-    urlDestino: "/nodo-maestro"
-  }
-];
-
-function cargarAlertasActuales() {
-  if (window.AxionCache) {
-    const guardadas = window.AxionCache.leerDeCache("alertas", ALERTAS_DEFAULT);
-    if (Array.isArray(guardadas) && guardadas.length) {
-      return guardadas.map((a, idx) => ({
-        ...ALERTAS_DEFAULT[idx],
-        ...a,
-        urlDestino: normalizarRutaSpa(
-          a.urlDestino || a.ruta || ALERTAS_DEFAULT[idx]?.urlDestino || "/"
-        )
-      }));
-    }
-  }
-  return ALERTAS_DEFAULT;
-}
-
 export default function Navbar() {
   const {
     esAdministrador,
@@ -60,7 +14,7 @@ export default function Navbar() {
   } = useAxion();
   const navigate = useNavigate();
 
-  const [alertas, setAlertas] = useState(() => cargarAlertasActuales());
+  const [alertas, setAlertas] = useState([]);
   const [alertasAbiertas, setAlertasAbiertas] = useState(false);
   const [perfilAbierto, setPerfilAbierto] = useState(false);
 
@@ -70,7 +24,7 @@ export default function Navbar() {
   const refrescarAlertas = useCallback(async () => {
     try {
       const remotas = await apiGet("/alertas");
-      if (Array.isArray(remotas) && remotas.length) {
+      if (Array.isArray(remotas)) {
         const normalizadas = remotas.map((a) => ({
           id: String(a.id),
           nivel: a.nivel || "normal",
@@ -81,24 +35,17 @@ export default function Navbar() {
           urlDestino: normalizarRutaSpa(a.urlDestino || "/")
         }));
         setAlertas(normalizadas);
-        if (window.AxionCache) {
-          window.AxionCache.guardarEnCache("alertas", normalizadas);
-        }
-        return;
       }
     } catch {
-      // Fallback silencioso a caché local si el backend no está activo
+      // Mantener el estado actual si el servidor no responde momentáneamente
     }
-    setAlertas(cargarAlertasActuales());
   }, []);
 
   useEffect(() => {
     refrescarAlertas();
     window.addEventListener("axion:alertasActualizadas", refrescarAlertas);
-    window.addEventListener("storage", refrescarAlertas);
     return () => {
       window.removeEventListener("axion:alertasActualizadas", refrescarAlertas);
-      window.removeEventListener("storage", refrescarAlertas);
     };
   }, [refrescarAlertas]);
 
@@ -125,16 +72,8 @@ export default function Navbar() {
     };
   }, []);
 
-  const persistirAlertas = (nuevas) => {
-    setAlertas(nuevas);
-    if (window.AxionCache) {
-      window.AxionCache.guardarEnCache("alertas", nuevas);
-    }
-  };
-
-  const marcarAlerta = (alerta) => {
-    const nuevas = alertas.map((a) => (a.id === alerta.id ? { ...a, leida: true } : a));
-    persistirAlertas(nuevas);
+  const marcarAlerta = async (alerta) => {
+    setAlertas((prev) => prev.map((a) => (a.id === alerta.id ? { ...a, leida: true } : a)));
     setAlertasAbiertas(false);
     if (esAdministrador) {
       if (/^\d+$/.test(String(alerta.id))) {
@@ -147,10 +86,9 @@ export default function Navbar() {
   };
 
   const marcarTodasLeidas = () => {
-    persistirAlertas(alertas.map((a) => ({ ...a, leida: true })));
-    if (esAdministrador) {
-      apiPatch("/alertas/leer-todas").catch(() => {});
-    }
+    if (!esAdministrador) return;
+    setAlertas((prev) => prev.map((a) => ({ ...a, leida: true })));
+    apiPatch("/alertas/leer-todas").catch(() => {});
   };
 
   const noLeidas = alertas.filter((a) => !a.leida).length;
@@ -248,34 +186,40 @@ export default function Navbar() {
                 </button>
               </div>
               <ul id="lista-alertas-header" className="lista-alertas-header" aria-live="polite">
-                {alertas.map((alerta) => (
-                  <li
-                    key={alerta.id}
-                    className={`item-alerta-header alerta-${alerta.nivel}${
-                      alerta.leida ? " alerta-leida" : ""
-                    }`}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => marcarAlerta(alerta)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        marcarAlerta(alerta);
-                      }
-                    }}
-                  >
-                    <div className="cabecera-item-alerta">
-                      <span className="titulo-item-alerta">{alerta.titulo}</span>
-                      {!alerta.leida && (
-                        <span className="punto-alerta-no-leida" aria-hidden="true"></span>
-                      )}
-                    </div>
-                    <span className="detalle-item-alerta">{alerta.detalle}</span>
-                    <div className="pie-item-alerta">
-                      <span>{alerta.tiempo}</span>
-                    </div>
+                {alertas.length === 0 ? (
+                  <li className="item-alerta-header alerta-leida">
+                    <span className="detalle-item-alerta">No hay alertas registradas.</span>
                   </li>
-                ))}
+                ) : (
+                  alertas.map((alerta) => (
+                    <li
+                      key={alerta.id}
+                      className={`item-alerta-header alerta-${alerta.nivel}${
+                        alerta.leida ? " alerta-leida" : ""
+                      }`}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => marcarAlerta(alerta)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          marcarAlerta(alerta);
+                        }
+                      }}
+                    >
+                      <div className="cabecera-item-alerta">
+                        <span className="titulo-item-alerta">{alerta.titulo}</span>
+                        {!alerta.leida && (
+                          <span className="punto-alerta-no-leida" aria-hidden="true"></span>
+                        )}
+                      </div>
+                      <span className="detalle-item-alerta">{alerta.detalle}</span>
+                      <div className="pie-item-alerta">
+                        <span>{alerta.tiempo}</span>
+                      </div>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
           </div>

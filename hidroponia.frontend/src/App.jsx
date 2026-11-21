@@ -5,8 +5,6 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import SensorPh from "./pages/SensorPh";
 import SensorEc from "./pages/SensorEc";
-import SensorNivelAgua from "./pages/SensorNivelAgua";
-import SensorTemperatura from "./pages/SensorTemperatura";
 import SensorNivelTemperatura from "./pages/SensorNivelTemperatura";
 import SensorTemperaturaHumedad from "./pages/SensorTemperaturaHumedad";
 import Reles from "./pages/Reles";
@@ -73,36 +71,20 @@ export default function App() {
 
       <Route
         path="/sensores/nivel-agua"
-        element={
-          <RutaAdmin>
-            <SensorNivelAgua />
-          </RutaAdmin>
-        }
+        element={<Navigate to="/sensores/nivel-temperatura?tab=nivel" replace />}
       />
       <Route
         path="/views/sensores/nivel-agua/index.html"
-        element={
-          <RutaAdmin>
-            <SensorNivelAgua />
-          </RutaAdmin>
-        }
+        element={<Navigate to="/sensores/nivel-temperatura?tab=nivel" replace />}
       />
 
       <Route
         path="/sensores/temperatura"
-        element={
-          <RutaAdmin>
-            <SensorTemperatura />
-          </RutaAdmin>
-        }
+        element={<Navigate to="/sensores/nivel-temperatura?tab=temperatura" replace />}
       />
       <Route
         path="/views/sensores/temperatura/temperatura.html"
-        element={
-          <RutaAdmin>
-            <SensorTemperatura />
-          </RutaAdmin>
-        }
+        element={<Navigate to="/sensores/nivel-temperatura?tab=temperatura" replace />}
       />
 
       <Route

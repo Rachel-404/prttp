@@ -1,7 +1,11 @@
 package com.axion.hidroponia.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "sistema_preferencias")
@@ -34,6 +38,10 @@ public class SistemaPreferencias {
     @Column(name = "accion_vencimiento", nullable = false, length = 20)
     private String accionVencimiento = "archivar";
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "config_respaldos", columnDefinition = "jsonb", nullable = false)
+    private Map<String, Object> configRespaldos = new HashMap<>();
+
     @Column(name = "actualizado_en", nullable = false)
     private OffsetDateTime actualizadoEn = OffsetDateTime.now();
 
@@ -55,6 +63,8 @@ public class SistemaPreferencias {
     public void setDiasRetencion(Integer diasRetencion) { this.diasRetencion = diasRetencion; }
     public String getAccionVencimiento() { return accionVencimiento; }
     public void setAccionVencimiento(String accionVencimiento) { this.accionVencimiento = accionVencimiento; }
+    public Map<String, Object> getConfigRespaldos() { return configRespaldos; }
+    public void setConfigRespaldos(Map<String, Object> configRespaldos) { this.configRespaldos = configRespaldos; }
     public OffsetDateTime getActualizadoEn() { return actualizadoEn; }
     public void setActualizadoEn(OffsetDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
 }

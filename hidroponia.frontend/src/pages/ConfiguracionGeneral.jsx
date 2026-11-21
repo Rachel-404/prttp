@@ -29,7 +29,7 @@ export default function ConfiguracionGeneral() {
                 
                 <article className="card card-config-ancha">
                     <header className="titulo-card">
-                        <h3>Cuenta Administrativa (Admin Único)</h3>
+                        <h3>Cuenta Administrativa</h3>
                     </header>
 
                     <form id="form-cuenta-admin" className="cuerpo-card" noValidate>
@@ -50,12 +50,12 @@ export default function ConfiguracionGeneral() {
                             </div>
 
                             <div className="grupo-campo">
-                                <label htmlFor="correo-alertas" className="etiqueta-campo">Correo de Alertas (Notificaciones del sistema)</label>
+                                <label htmlFor="correo-alertas" className="etiqueta-campo">Correo de Alertas</label>
                                 <input type="email" id="correo-alertas" name="correoAlertas" className="campo-control" defaultValue="admin@universidad.edu" required />
                             </div>
 
                             <div className="grupo-campo">
-                                <label htmlFor="expiracion-sesion" className="etiqueta-campo">Expiración de Sesión (Minutos de inactividad)</label>
+                                <label htmlFor="expiracion-sesion" className="etiqueta-campo">Expiración de Sesión</label>
                                 <input type="number" id="expiracion-sesion" name="expiracionSesion" className="campo-control" min="1" max="1440" step="1" defaultValue="30" required />
                             </div>
 
@@ -103,7 +103,7 @@ export default function ConfiguracionGeneral() {
                         <div className="grupo-campo campo-tema-limitado">
                             <label htmlFor="select-tema-general" className="etiqueta-campo">Tema de la Interfaz</label>
                             <select id="select-tema-general" name="tema" className="campo-control" defaultValue="oscuro">
-                                <option value="oscuro">Modo Oscuro (Actual)</option>
+                                <option value="oscuro">Modo Oscuro</option>
                                 <option value="claro">Modo Claro</option>
                                 <option value="sistema">Sincronizar con el Sistema</option>
                             </select>

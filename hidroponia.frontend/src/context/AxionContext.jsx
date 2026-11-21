@@ -108,18 +108,33 @@ export function AxionProvider({ children }) {
   }, [modoTema]);
 
   useEffect(() => {
+    const aplicarTipografia = (prefs) => {
+      if (!prefs) return;
+      const t = prefs.title || (prefs.titlePx ? `${prefs.titlePx}px` : null);
+      const s = prefs.subtitle || (prefs.subtitlePx ? `${prefs.subtitlePx}px` : null);
+      const b = prefs.base || (prefs.basePx ? `${prefs.basePx}px` : null);
+      if (t) document.documentElement.style.setProperty("--font-size-title", t);
+      if (s) document.documentElement.style.setProperty("--font-size-subtitle", s);
+      if (b) document.documentElement.style.setProperty("--font-size-base", b);
+    };
+
     try {
-      const raw =
-        localStorage.getItem(CLAVE_TIPOGRAFIA) ||
-        localStorage.getItem("axion_proto_tipografia");
-      if (!raw) return;
-      const prefs = JSON.parse(raw);
-      if (prefs.title) document.documentElement.style.setProperty("--font-size-title", prefs.title);
-      if (prefs.subtitle) document.documentElement.style.setProperty("--font-size-subtitle", prefs.subtitle);
-      if (prefs.base) document.documentElement.style.setProperty("--font-size-base", prefs.base);
+      const raw = localStorage.getItem(CLAVE_TIPOGRAFIA);
+      if (raw) aplicarTipografia(JSON.parse(raw));
     } catch {
-      // Ignorar errores de lectura
+      // Ignorar
     }
+
+    apiGet("/configuracion/apariencia")
+      .then((ap) => {
+        if (!ap) return;
+        if (ap.tema && ["oscuro", "claro", "sistema"].includes(ap.tema)) {
+          localStorage.setItem(CLAVE_TEMA, ap.tema);
+          setModoTema(ap.tema);
+        }
+        aplicarTipografia(ap);
+      })
+      .catch(() => {});
   }, []);
 
   const alternarTema = () => {

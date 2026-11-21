@@ -28,8 +28,6 @@ export default function initController() {
     try {
         (function () {
 
-    const CLAVE_BACKUP_CORREO = "axion_reportes_backup_correo";
-    const CLAVE_BACKUP_DRIVE = "axion_reportes_backup_drive";
     const REGISTROS_POR_PAGINA = 8;
 
     const VARIABLES_CONFIG = {
@@ -37,8 +35,6 @@ export default function initController() {
             nombre: "pH del Agua",
             unidad: "pH",
             decimales: 2,
-            base: 6.1,
-            amplitud: 0.35,
             minNormal: 5.8,
             maxNormal: 6.5,
             margenAdv: 0.25,
@@ -48,8 +44,6 @@ export default function initController() {
             nombre: "Conductividad Eléctrica",
             unidad: "µS/cm",
             decimales: 0,
-            base: 1250,
-            amplitud: 240,
             minNormal: 1000,
             maxNormal: 1600,
             margenAdv: 200,
@@ -59,8 +53,6 @@ export default function initController() {
             nombre: "Temperatura del Agua",
             unidad: "°C",
             decimales: 1,
-            base: 21.5,
-            amplitud: 2.2,
             minNormal: 18.0,
             maxNormal: 24.0,
             margenAdv: 1.5,
@@ -70,8 +62,6 @@ export default function initController() {
             nombre: "Temperatura Ambiente",
             unidad: "°C",
             decimales: 1,
-            base: 23.0,
-            amplitud: 4.5,
             minNormal: 16.0,
             maxNormal: 28.0,
             margenAdv: 2.0,
@@ -81,8 +71,6 @@ export default function initController() {
             nombre: "Humedad Relativa",
             unidad: "%",
             decimales: 0,
-            base: 66,
-            amplitud: 14,
             minNormal: 50,
             maxNormal: 80,
             margenAdv: 6,
@@ -92,8 +80,6 @@ export default function initController() {
             nombre: "Nivel de Agua",
             unidad: "%",
             decimales: 0,
-            base: 82,
-            amplitud: 16,
             minNormal: 40,
             maxNormal: 95,
             margenAdv: 15,
@@ -122,28 +108,28 @@ export default function initController() {
     const estadoHistorial = {
         fechaInicio: "",
         fechaFin: "",
-        intervalo: "1h",
-        variables: ["ph", "ec", "tempAgua"],
+        intervalo: "crudo",
+        variables: ["ph", "ec", "tempAgua", "tempAmbiente", "humedad", "nivelAgua"],
         registros: [],
         etiquetasGrafica: [],
         seriesGrafica: [],
         paginaActual: 1
     };
 
-    // Estado persistente de Pestaña 2
+    // Estado de Pestaña 2 (hidratado desde GET /api/v1/respaldos/politica)
     const estadoBackupCorreo = {
-        activo: true,
-        correo: "admin@universidad.edu",
+        activo: false,
+        correo: "",
         frecuencia: "semanal",
         formato: "xlsx"
     };
 
     const estadoBackupDrive = {
-        conectado: true,
-        cuenta: "admin@universidad.edu",
+        conectado: false,
+        cuenta: "",
         ruta: "/AXION-IOT/Respaldos_Hidroponia/",
         frecuencia: "24h",
-        ultimoRespaldo: "Hoy a las 00:00 hrs"
+        ultimoRespaldo: "Sin respaldos registrados"
     };
 
     function formatearDatetimeLocal(fecha) {
@@ -168,17 +154,6 @@ export default function initController() {
         inicio.setHours(0, 0, 0, 0);
         estadoHistorial.fechaInicio = formatearDatetimeLocal(inicio);
         estadoHistorial.fechaFin = formatearDatetimeLocal(fin);
-    }
-
-    function cargarEstadosBackup() {
-        try {
-            const correoRaw = localStorage.getItem(CLAVE_BACKUP_CORREO);
-            if (correoRaw) Object.assign(estadoBackupCorreo, JSON.parse(correoRaw));
-            const driveRaw = localStorage.getItem(CLAVE_BACKUP_DRIVE);
-            if (driveRaw) Object.assign(estadoBackupDrive, JSON.parse(driveRaw));
-        } catch (err) {
-            console.warn("No se pudo restaurar configuración de respaldos:", err);
-        }
     }
 
     function mostrarToast(texto) {
@@ -217,54 +192,143 @@ export default function initController() {
         return { etiqueta: "Crítico", clase: "estado-critico" };
     }
 
-    function generarDatosHistoricos() {
-        const inicio = new Date(estadoHistorial.fechaInicio);
-        const fin = new Date(estadoHistorial.fechaFin);
-        const totalPuntos = 12;
-        const spanMs = Math.max(fin.getTime() - inicio.getTime(), 60 * 60 * 1000);
-        const pasoMs = spanMs / (totalPuntos - 1);
+    const CAMPO_LECTURA_POR_VARIABLE = {
+        ph: "ph",
+        ec: "ecUsCm",
+        tempAgua: "tempAguaC",
+        tempAmbiente: "tempAmbC",
+        humedad: "humAmbPct",
+        nivelAgua: "nivelPct"
+    };
 
-        const etiquetas = [];
+    const BUCKET_MS_POR_INTERVALO = {
+        "5m": 5 * 60 * 1000,
+        "15m": 15 * 60 * 1000,
+        "1h": 60 * 60 * 1000,
+        "1d": 24 * 60 * 60 * 1000
+    };
+
+    function agruparFilasPorIntervalo(filasAsc, intervalo) {
+        const bucketMs = BUCKET_MS_POR_INTERVALO[intervalo] || 0;
+        if (bucketMs <= 0 || filasAsc.length === 0) {
+            return filasAsc;
+        }
+
+        const grupos = new Map();
+        filasAsc.forEach((fila) => {
+            const ms = new Date(fila.ts).getTime();
+            if (!Number.isFinite(ms)) return;
+            const claveBucket = Math.floor(ms / bucketMs) * bucketMs;
+            if (!grupos.has(claveBucket)) {
+                grupos.set(claveBucket, []);
+            }
+            grupos.get(claveBucket).push(fila);
+        });
+
+        const camposNumericos = Object.values(CAMPO_LECTURA_POR_VARIABLE);
+        const resultado = [];
+        grupos.forEach((items, claveBucket) => {
+            const filaProm = { ts: new Date(claveBucket).toISOString() };
+            camposNumericos.forEach((campo) => {
+                let suma = 0;
+                let cuenta = 0;
+                items.forEach((it) => {
+                    const v = it[campo];
+                    if (typeof v === "number" && Number.isFinite(v)) {
+                        suma += v;
+                        cuenta += 1;
+                    }
+                });
+                filaProm[campo] = cuenta > 0 ? suma / cuenta : null;
+            });
+            resultado.push(filaProm);
+        });
+
+        return resultado;
+    }
+
+    async function cargarDatosHistoricosReales() {
+        const inicioIso = new Date(estadoHistorial.fechaInicio).toISOString();
+        const finIso = new Date(estadoHistorial.fechaFin).toISOString();
+
         const series = estadoHistorial.variables.map((clave) => ({
             clave,
             cfg: VARIABLES_CONFIG[clave],
             valores: []
         }));
-        const registros = [];
 
-        for (let i = 0; i < totalPuntos; i++) {
-            const marca = new Date(inicio.getTime() + i * pasoMs);
-            const etiquetaCorta =
-                estadoHistorial.intervalo === "1d"
-                    ? marca.toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit" })
-                    : marca.toLocaleString("es-PE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-            etiquetas.push(etiquetaCorta);
-
-            series.forEach((serie, idx) => {
-                const { cfg } = serie;
-                const onda = Math.sin((i + 1) * 0.65 + idx * 1.1) * cfg.amplitud;
-                const sesgo = i === 8 && idx === 0 ? cfg.amplitud * 1.35 : 0;
-                const valorBruto = cfg.base + onda + sesgo;
-                const valorNum = Number(valorBruto.toFixed(cfg.decimales));
-                serie.valores.push(valorNum);
-
-                const estado = obtenerEstadoLectura(valorNum, cfg);
-                registros.push({
-                    fechaHora: formatearFechaLegible(marca),
-                    variable: cfg.nombre,
-                    valorTexto: `${valorNum.toFixed(cfg.decimales)} ${cfg.unidad}`,
-                    estadoEtiqueta: estado.etiqueta,
-                    estadoClase: estado.clase
-                });
-            });
+        if (!window.AxionApi) {
+            estadoHistorial.etiquetasGrafica = [];
+            estadoHistorial.seriesGrafica = series;
+            estadoHistorial.registros = [];
+            estadoHistorial.paginaActual = 1;
+            return;
         }
 
-        // Orden descendente para mostrar primero los registros más recientes
-        registros.reverse();
-        estadoHistorial.etiquetasGrafica = etiquetas;
-        estadoHistorial.seriesGrafica = series;
-        estadoHistorial.registros = registros;
-        estadoHistorial.paginaActual = 1;
+        try {
+            const resp = await window.AxionApi.get(
+                `/reportes/historial?inicio=${encodeURIComponent(inicioIso)}&fin=${encodeURIComponent(finIso)}&page=0&size=500`
+            );
+            const crudasDesc = Array.isArray(resp?.content) ? resp.content : [];
+            const crudasAsc = [...crudasDesc].reverse();
+            const filasAsc = agruparFilasPorIntervalo(crudasAsc, estadoHistorial.intervalo);
+            const filasDesc = [...filasAsc].reverse();
+
+            const etiquetas = [];
+            filasAsc.forEach((fila) => {
+                const marca = new Date(fila.ts);
+                const etiquetaCorta =
+                    estadoHistorial.intervalo === "1d"
+                        ? marca.toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit" })
+                        : marca.toLocaleString("es-PE", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit"
+                          });
+                etiquetas.push(etiquetaCorta);
+
+                series.forEach((serie) => {
+                    const campo = CAMPO_LECTURA_POR_VARIABLE[serie.clave];
+                    const raw = campo ? fila[campo] : null;
+                    if (typeof raw === "number" && Number.isFinite(raw)) {
+                        serie.valores.push(Number(raw.toFixed(serie.cfg.decimales)));
+                    } else {
+                        serie.valores.push(null);
+                    }
+                });
+            });
+
+            const registros = [];
+            filasDesc.forEach((fila) => {
+                const marca = new Date(fila.ts);
+                series.forEach((serie) => {
+                    const campo = CAMPO_LECTURA_POR_VARIABLE[serie.clave];
+                    const raw = campo ? fila[campo] : null;
+                    if (typeof raw !== "number" || !Number.isFinite(raw)) return;
+                    const valorNum = Number(raw.toFixed(serie.cfg.decimales));
+                    const estado = obtenerEstadoLectura(valorNum, serie.cfg);
+                    registros.push({
+                        fechaHora: formatearFechaLegible(marca),
+                        variable: serie.cfg.nombre,
+                        valorTexto: `${valorNum.toFixed(serie.cfg.decimales)} ${serie.cfg.unidad}`,
+                        estadoEtiqueta: estado.etiqueta,
+                        estadoClase: estado.clase
+                    });
+                });
+            });
+
+            estadoHistorial.etiquetasGrafica = etiquetas;
+            estadoHistorial.seriesGrafica = series;
+            estadoHistorial.registros = registros;
+            estadoHistorial.paginaActual = 1;
+        } catch {
+            estadoHistorial.etiquetasGrafica = [];
+            estadoHistorial.seriesGrafica = series;
+            estadoHistorial.registros = [];
+            estadoHistorial.paginaActual = 1;
+            mostrarToast("No se pudo obtener el historial desde el servidor.");
+        }
     }
 
     function obtenerColoresTemaGrafica() {
@@ -409,23 +473,6 @@ export default function initController() {
         btnSig.disabled = estadoHistorial.paginaActual >= totalPaginas;
     }
 
-    function descargarArchivoCsv(nombreArchivo) {
-        const encabezados = ["Fecha/Hora", "Variable", "Valor", "Estado"];
-        const filas = estadoHistorial.registros.map((r) => [r.fechaHora, r.variable, r.valorTexto, r.estadoEtiqueta]);
-        const contenido = [encabezados, ...filas]
-            .map((fila) => fila.map((celda) => `"${String(celda).replace(/"/g, '""')}"`).join(","))
-            .join("\n");
-
-        const blob = new Blob(["\uFEFF" + contenido], { type: "text/csv;charset=utf-8;" });
-        const enlace = document.createElement("a");
-        enlace.href = URL.createObjectURL(blob);
-        enlace.download = nombreArchivo;
-        document.body.appendChild(enlace);
-        enlace.click();
-        enlace.remove();
-        setTimeout(() => URL.revokeObjectURL(enlace.href), 1000);
-    }
-
     function inicializarEventosHistorial() {
         const formFiltros = document.getElementById("form-filtros-historial");
         const inputInicio = document.getElementById("filtro-fecha-inicio");
@@ -438,22 +485,30 @@ export default function initController() {
         const btnsExportar = Array.from(document.querySelectorAll(".btn-exportar-formato"));
         const btnSuperponer = document.getElementById("btn-superponer-lecturas");
 
-        if (!formFiltros || !inputInicio || !inputFin || !selectIntervalo) return;
+        if (!formFiltros || !inputInicio || !inputFin) return;
 
         inputInicio.value = estadoHistorial.fechaInicio;
         inputFin.value = estadoHistorial.fechaFin;
-        selectIntervalo.value = estadoHistorial.intervalo;
+        if (selectIntervalo) selectIntervalo.value = estadoHistorial.intervalo;
         checkboxes.forEach((chk) => {
             chk.checked = estadoHistorial.variables.includes(chk.value);
         });
 
-        if (estadoHistorial.registros.length === 0) {
-            generarDatosHistoricos();
-        }
-        renderizarGraficaHistorial();
-        renderizarTablaPaginada();
+        cargarDatosHistoricosReales().then(() => {
+            renderizarGraficaHistorial();
+            renderizarTablaPaginada();
+        });
 
-        formFiltros.addEventListener("submit", (event) => {
+        if (selectIntervalo) {
+            selectIntervalo.addEventListener("change", async () => {
+                estadoHistorial.intervalo = selectIntervalo.value;
+                await cargarDatosHistoricosReales();
+                renderizarGraficaHistorial();
+                renderizarTablaPaginada();
+            });
+        }
+
+        formFiltros.addEventListener("submit", async (event) => {
             event.preventDefault();
             if (errorFiltros) {
                 errorFiltros.hidden = true;
@@ -482,13 +537,13 @@ export default function initController() {
 
             estadoHistorial.fechaInicio = inputInicio.value;
             estadoHistorial.fechaFin = inputFin.value;
-            estadoHistorial.intervalo = selectIntervalo.value;
+            if (selectIntervalo) estadoHistorial.intervalo = selectIntervalo.value;
             estadoHistorial.variables = seleccionadas;
 
-            generarDatosHistoricos();
+            await cargarDatosHistoricosReales();
             renderizarGraficaHistorial();
             renderizarTablaPaginada();
-            mostrarToast("Consulta histórica actualizada.");
+            mostrarToast("Consulta histórica actualizada desde PostgreSQL.");
         });
 
         if (btnAnt) {
@@ -512,44 +567,88 @@ export default function initController() {
 
         btnsExportar.forEach((btn) => {
             btn.addEventListener("click", () => {
-                const formato = btn.dataset.formato || "CSV";
                 const fechaSello = new Date().toISOString().slice(0, 10);
-                const ext = formato.toLowerCase();
-                const nombreArchivo = `axion_reporte_${fechaSello}.${ext}`;
+                const nombreArchivo = `axion_reporte_${fechaSello}.xlsx`;
 
                 abrirModal({
-                    titulo: `Generar Reporte ${formato}`,
-                    mensaje: `Se preparará el archivo "${nombreArchivo}" con ${estadoHistorial.registros.length} registros históricos del intervalo seleccionado.`,
+                    titulo: "Generar Reporte Excel",
+                    mensaje: `Se generará el archivo "${nombreArchivo}" con los registros históricos del intervalo seleccionado.`,
                     textoAceptar: "Generar y Descargar",
                     claseBoton: "btn-modal-activar",
                     mostrarCancelar: true,
                     onAceptar: async () => {
-                        if (window.AxionApi) {
-                            try {
-                                const inicioIso = new Date(estadoHistorial.fechaInicio).toISOString();
-                                const finIso = new Date(estadoHistorial.fechaFin).toISOString();
-                                await window.AxionApi.download(
-                                    `/reportes/exportar?formato=${encodeURIComponent(ext)}&inicio=${encodeURIComponent(inicioIso)}&fin=${encodeURIComponent(finIso)}`,
-                                    nombreArchivo
-                                );
-                                mostrarToast(`Reporte ${formato} generado desde el servidor: ${nombreArchivo}`);
-                                return;
-                            } catch {
-                                // Fallback local si el backend no está activo
-                            }
+                        if (!window.AxionApi) {
+                            mostrarToast("Cliente API no disponible.");
+                            return;
                         }
-                        if (formato === "CSV") {
-                            descargarArchivoCsv(nombreArchivo);
+                        try {
+                            const inicioIso = new Date(estadoHistorial.fechaInicio).toISOString();
+                            const finIso = new Date(estadoHistorial.fechaFin).toISOString();
+                            await window.AxionApi.download(
+                                `/reportes/exportar?inicio=${encodeURIComponent(inicioIso)}&fin=${encodeURIComponent(finIso)}`,
+                                nombreArchivo
+                            );
+                            mostrarToast(`Reporte Excel descargado: ${nombreArchivo}`);
+                        } catch {
+                            mostrarToast("No se pudo descargar el reporte Excel desde el servidor.");
                         }
-                        mostrarToast(`Reporte ${formato} generado: ${nombreArchivo}`);
                     }
                 });
             });
         });
 
         if (btnSuperponer) {
-            btnSuperponer.addEventListener("click", () => {
-                mostrarToast("Lecturas de bitácora manual superpuestas para contraste estadístico.");
+            btnSuperponer.addEventListener("click", async () => {
+                const inputCsv = document.getElementById("input-bitacora-csv");
+                const elDiff = document.getElementById("metrica-diff-media");
+                const elRmse = document.getElementById("metrica-rmse");
+                const elBland = document.getElementById("metrica-bland-altman");
+
+                const archivo = inputCsv?.files?.[0];
+                if (!archivo) {
+                    mostrarToast("Selecciona primero un archivo CSV de bitácora manual.");
+                    return;
+                }
+                const seriePh = estadoHistorial.seriesGrafica.find((s) => s.clave === "ph") || estadoHistorial.seriesGrafica[0];
+                const valoresIot = (seriePh?.valores || []).filter((v) => typeof v === "number" && Number.isFinite(v));
+                if (valoresIot.length === 0) {
+                    mostrarToast("No hay lecturas IoT en el rango actual para contrastar.");
+                    return;
+                }
+
+                try {
+                    const texto = await archivo.text();
+                    const lineas = texto.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+                    const manuales = [];
+                    lineas.forEach((linea) => {
+                        const cols = linea.split(/[,;]/).map((c) => c.trim());
+                        const num = Number.parseFloat(cols[cols.length - 1]);
+                        if (Number.isFinite(num)) manuales.push(num);
+                    });
+                    const n = Math.min(manuales.length, valoresIot.length);
+                    if (n === 0) {
+                        mostrarToast("El archivo CSV no contiene valores numéricos válidos.");
+                        return;
+                    }
+                    const diffs = [];
+                    for (let i = 0; i < n; i++) diffs.push(valoresIot[i] - manuales[i]);
+                    const mediaDiff = diffs.reduce((a, b) => a + b, 0) / n;
+                    const rmse = Math.sqrt(diffs.reduce((a, b) => a + b * b, 0) / n);
+                    const varianza = diffs.reduce((a, b) => a + (b - mediaDiff) ** 2, 0) / n;
+                    const sd = Math.sqrt(varianza);
+                    const dentroLimites = diffs.filter((d) => Math.abs(d - mediaDiff) <= 1.96 * sd).length;
+                    const pctBland = (dentroLimites / n) * 100;
+
+                    if (elDiff) elDiff.textContent = `${mediaDiff.toFixed(3)} ${seriePh.cfg.unidad}`;
+                    if (elRmse) elRmse.textContent = rmse.toFixed(3);
+                    if (elBland) {
+                        elBland.textContent = `${pctBland.toFixed(1)} % dentro de límites (${n} muestras)`;
+                        elBland.classList.add("valor-metrica-normal");
+                    }
+                    mostrarToast(`Contraste calculado sobre ${n} pares de lecturas.`);
+                } catch {
+                    mostrarToast("No se pudo procesar el archivo CSV seleccionado.");
+                }
             });
         }
     }
@@ -590,20 +689,70 @@ export default function initController() {
         const btnRespaldarDrive = document.getElementById("btn-respaldar-drive-ahora");
         const errorDrive = document.getElementById("error-backup-drive");
 
+        const formRetencion = document.getElementById("form-politica-retencion");
+        const selectRetFrec = document.getElementById("retencion-frecuencia");
+        const selectRetFmt = document.getElementById("retencion-formato");
+        const inputRetDias = document.getElementById("retencion-dias");
+        const selectRetAccion = document.getElementById("retencion-accion");
+        const btnDepurarManual = document.getElementById("btn-depurar-manual");
+
         if (!formCorreo || !formDrive) return;
 
-        actualizarBadgeCorreo(btnEstadoCorreo, txtEstadoCorreo, estadoBackupCorreo.activo);
-        inputCorreo.value = estadoBackupCorreo.correo;
-        selectFrecCorreo.value = estadoBackupCorreo.frecuencia;
-        selectFmtCorreo.value = estadoBackupCorreo.formato;
+        function sincronizarVistaRespaldos() {
+            actualizarBadgeCorreo(btnEstadoCorreo, txtEstadoCorreo, estadoBackupCorreo.activo);
+            inputCorreo.value = estadoBackupCorreo.correo;
+            selectFrecCorreo.value = estadoBackupCorreo.frecuencia;
+            selectFmtCorreo.value = estadoBackupCorreo.formato;
 
-        actualizarBadgeDrive(btnEstadoDrive, txtEstadoDrive, estadoBackupDrive.conectado);
-        inputCuentaDrive.value = estadoBackupDrive.cuenta;
-        inputRutaDrive.value = estadoBackupDrive.ruta;
-        selectFrecDrive.value = estadoBackupDrive.frecuencia;
-        if (txtUltimoDrive) {
-            txtUltimoDrive.textContent = `Último respaldo exitoso: ${estadoBackupDrive.ultimoRespaldo}`;
+            actualizarBadgeDrive(btnEstadoDrive, txtEstadoDrive, estadoBackupDrive.conectado);
+            inputCuentaDrive.value = estadoBackupDrive.cuenta;
+            inputRutaDrive.value = estadoBackupDrive.ruta;
+            selectFrecDrive.value = estadoBackupDrive.frecuencia;
+            if (txtUltimoDrive) {
+                txtUltimoDrive.textContent = `Último respaldo exitoso: ${estadoBackupDrive.ultimoRespaldo}`;
+            }
         }
+
+        async function guardarPoliticaEnBackend(extraPayload = {}) {
+            return window.AxionApi.put("/respaldos/politica", {
+                backupFrecuencia: selectRetFrec?.value || "diario",
+                backupFormato: selectRetFmt?.value || "zip",
+                diasRetencion: Math.min(1825, Math.max(30, Number.parseInt(inputRetDias?.value || "365", 10) || 365)),
+                accionVencimiento: selectRetAccion?.value || "archivar",
+                configRespaldos: {
+                    correo: estadoBackupCorreo,
+                    drive: estadoBackupDrive
+                },
+                ...extraPayload
+            });
+        }
+
+        async function cargarPoliticaDesdeBackend() {
+            if (!window.AxionApi) return;
+            try {
+                const pol = await window.AxionApi.get("/respaldos/politica");
+                if (!pol) return;
+                if (selectRetFrec && pol.backupFrecuencia) selectRetFrec.value = pol.backupFrecuencia;
+                if (selectRetFmt && pol.backupFormato) selectRetFmt.value = pol.backupFormato;
+                if (inputRetDias && pol.diasRetencion) inputRetDias.value = String(pol.diasRetencion);
+                if (selectRetAccion && pol.accionVencimiento) selectRetAccion.value = pol.accionVencimiento;
+
+                const cfg = pol.configRespaldos || {};
+                if (cfg.correo) Object.assign(estadoBackupCorreo, cfg.correo);
+                if (cfg.drive) {
+                    Object.assign(estadoBackupDrive, cfg.drive);
+                    if (cfg.drive.ultimoRespaldo && !Number.isNaN(Date.parse(cfg.drive.ultimoRespaldo))) {
+                        estadoBackupDrive.ultimoRespaldo = formatearFechaLegible(new Date(cfg.drive.ultimoRespaldo));
+                    }
+                }
+                sincronizarVistaRespaldos();
+            } catch (err) {
+                mostrarToast(err.message || "No se pudo cargar la política de respaldos desde el servidor.");
+            }
+        }
+
+        sincronizarVistaRespaldos();
+        cargarPoliticaDesdeBackend();
 
         btnEstadoCorreo.addEventListener("click", () => {
             const pausar = estadoBackupCorreo.activo;
@@ -613,16 +762,21 @@ export default function initController() {
                     ? "Se suspenderán los envíos programados al correo institucional hasta que vuelvas a activarlos."
                     : "Se reanudará el envío programado de reportes al correo institucional configurado.",
                 claseBoton: pausar ? "btn-modal-pausar" : "btn-modal-activar",
-                onAceptar: () => {
+                onAceptar: async () => {
                     estadoBackupCorreo.activo = !pausar;
-                    localStorage.setItem(CLAVE_BACKUP_CORREO, JSON.stringify(estadoBackupCorreo));
-                    actualizarBadgeCorreo(btnEstadoCorreo, txtEstadoCorreo, estadoBackupCorreo.activo);
-                    mostrarToast(estadoBackupCorreo.activo ? "Envío automático por correo activado." : "Envío automático por correo pausado.");
+                    try {
+                        await guardarPoliticaEnBackend();
+                        actualizarBadgeCorreo(btnEstadoCorreo, txtEstadoCorreo, estadoBackupCorreo.activo);
+                        mostrarToast(estadoBackupCorreo.activo ? "Envío automático por correo activado." : "Envío automático por correo pausado.");
+                    } catch (err) {
+                        estadoBackupCorreo.activo = pausar;
+                        mostrarToast(err.message || "No se pudo actualizar el estado del respaldo por correo.");
+                    }
                 }
             });
         });
 
-        formCorreo.addEventListener("submit", (event) => {
+        formCorreo.addEventListener("submit", async (event) => {
             event.preventDefault();
             errorCorreo.hidden = true;
             const correo = inputCorreo.value.trim();
@@ -634,8 +788,12 @@ export default function initController() {
             estadoBackupCorreo.correo = correo;
             estadoBackupCorreo.frecuencia = selectFrecCorreo.value;
             estadoBackupCorreo.formato = selectFmtCorreo.value;
-            localStorage.setItem(CLAVE_BACKUP_CORREO, JSON.stringify(estadoBackupCorreo));
-            mostrarToast("Programación de envío por correo guardada.");
+            try {
+                await guardarPoliticaEnBackend();
+                mostrarToast("Programación de envío por correo guardada.");
+            } catch (err) {
+                mostrarToast(err.message || "Error al guardar la configuración de correo.");
+            }
         });
 
         btnEnviarAhora.addEventListener("click", () => {
@@ -643,11 +801,20 @@ export default function initController() {
             const formato = selectFmtCorreo.value.toUpperCase();
             abrirModal({
                 titulo: "¿Enviar copia de respaldo ahora?",
-                mensaje: `Se enviará una copia inmediata en formato ${formato} a la dirección ${correo}.`,
+                mensaje: `Se ejecutará una copia inmediata en formato ${formato} hacia ${correo}.`,
                 textoAceptar: "Enviar Copia",
                 claseBoton: "btn-modal-activar",
-                onAceptar: () => {
-                    mostrarToast(`Copia en formato ${formato} enviada a ${correo}.`);
+                onAceptar: async () => {
+                    try {
+                        const res = await window.AxionApi.post("/respaldos/ejecutar", {
+                            canal: "correo",
+                            destino: correo,
+                            formato
+                        });
+                        mostrarToast(res.mensaje || `Respaldo registrado para ${correo}.`);
+                    } catch (err) {
+                        mostrarToast(err.message || "No se pudo ejecutar el respaldo manual.");
+                    }
                 }
             });
         });
@@ -660,16 +827,21 @@ export default function initController() {
                     ? "Se detendrá la sincronización automática hacia la carpeta de Google Drive."
                     : "Se restablecerá la sincronización automática hacia la carpeta de Google Drive configurada.",
                 claseBoton: desconectar ? "btn-modal-pausar" : "btn-modal-activar",
-                onAceptar: () => {
+                onAceptar: async () => {
                     estadoBackupDrive.conectado = !desconectar;
-                    localStorage.setItem(CLAVE_BACKUP_DRIVE, JSON.stringify(estadoBackupDrive));
-                    actualizarBadgeDrive(btnEstadoDrive, txtEstadoDrive, estadoBackupDrive.conectado);
-                    mostrarToast(estadoBackupDrive.conectado ? "Google Drive conectado." : "Google Drive desconectado.");
+                    try {
+                        await guardarPoliticaEnBackend();
+                        actualizarBadgeDrive(btnEstadoDrive, txtEstadoDrive, estadoBackupDrive.conectado);
+                        mostrarToast(estadoBackupDrive.conectado ? "Google Drive conectado." : "Google Drive desconectado.");
+                    } catch (err) {
+                        estadoBackupDrive.conectado = desconectar;
+                        mostrarToast(err.message || "No se pudo actualizar el estado de Google Drive.");
+                    }
                 }
             });
         });
 
-        formDrive.addEventListener("submit", (event) => {
+        formDrive.addEventListener("submit", async (event) => {
             event.preventDefault();
             errorDrive.hidden = true;
             const ruta = inputRutaDrive.value.trim();
@@ -678,90 +850,65 @@ export default function initController() {
                 errorDrive.hidden = false;
                 return;
             }
+            estadoBackupDrive.cuenta = inputCuentaDrive.value.trim();
             estadoBackupDrive.ruta = ruta;
             estadoBackupDrive.frecuencia = selectFrecDrive.value;
-            localStorage.setItem(CLAVE_BACKUP_DRIVE, JSON.stringify(estadoBackupDrive));
-            mostrarToast("Configuración de Google Drive guardada.");
+            try {
+                await guardarPoliticaEnBackend();
+                mostrarToast("Configuración de Google Drive guardada.");
+            } catch (err) {
+                mostrarToast(err.message || "Error al guardar la configuración de Google Drive.");
+            }
         });
 
         btnRespaldarDrive.addEventListener("click", () => {
             const ruta = inputRutaDrive.value.trim() || estadoBackupDrive.ruta;
             abrirModal({
                 titulo: "¿Respaldar en Google Drive ahora?",
-                mensaje: `Se cargará una copia completa de los registros históricos en "${ruta}".`,
+                mensaje: `Se registrará un respaldo completo de los datos históricos en "${ruta}".`,
                 textoAceptar: "Iniciar Respaldo",
                 claseBoton: "btn-modal-activar",
-                onAceptar: () => {
-                    const hora = new Date().toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
-                    estadoBackupDrive.ultimoRespaldo = `Hoy a las ${hora} hrs`;
-                    localStorage.setItem(CLAVE_BACKUP_DRIVE, JSON.stringify(estadoBackupDrive));
-                    if (txtUltimoDrive) {
-                        txtUltimoDrive.textContent = `Último respaldo exitoso: ${estadoBackupDrive.ultimoRespaldo}`;
+                onAceptar: async () => {
+                    try {
+                        const res = await window.AxionApi.post("/respaldos/ejecutar", {
+                            canal: "drive",
+                            destino: ruta
+                        });
+                        const fechaRes = res.ejecutadoEn ? formatearFechaLegible(new Date(res.ejecutadoEn)) : "Reciente";
+                        estadoBackupDrive.ultimoRespaldo = fechaRes;
+                        if (txtUltimoDrive) {
+                            txtUltimoDrive.textContent = `Último respaldo exitoso: ${estadoBackupDrive.ultimoRespaldo}`;
+                        }
+                        mostrarToast(res.mensaje || "Respaldo en Google Drive completado.");
+                    } catch (err) {
+                        mostrarToast(err.message || "No se pudo ejecutar el respaldo en Drive.");
                     }
-                    mostrarToast("Respaldo en Google Drive completado.");
                 }
             });
         });
 
-        const formRetencion = document.getElementById("form-politica-retencion");
-        const selectRetFrec = document.getElementById("retencion-frecuencia");
-        const selectRetFmt = document.getElementById("retencion-formato");
-        const inputRetDias = document.getElementById("retencion-dias");
-        const selectRetAccion = document.getElementById("retencion-accion");
-        const btnDepurarManual = document.getElementById("btn-depurar-manual");
-
-        if (window.AxionCache) {
-            const retGuardada = window.AxionCache.leerDeCache("retencion_backup");
-            if (selectRetFrec && retGuardada.frecuenciaProgramada) selectRetFrec.value = retGuardada.frecuenciaProgramada;
-            if (selectRetFmt && retGuardada.formatoEmpaquetado) selectRetFmt.value = retGuardada.formatoEmpaquetado;
-            if (inputRetDias && retGuardada.diasRetencion) inputRetDias.value = String(retGuardada.diasRetencion);
-            if (selectRetAccion && retGuardada.accionVencimiento) selectRetAccion.value = retGuardada.accionVencimiento;
-        }
-
         if (formRetencion) {
-            formRetencion.addEventListener("submit", (e) => {
+            formRetencion.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 const dias = Math.min(1825, Math.max(30, Number.parseInt(inputRetDias?.value || "365", 10) || 365));
                 if (inputRetDias) inputRetDias.value = String(dias);
-                const payload = {
-                    frecuenciaProgramada: selectRetFrec?.value || "diario",
-                    formatoEmpaquetado: selectRetFmt?.value || "zip",
-                    diasRetencion: dias,
-                    accionVencimiento: selectRetAccion?.value || "archivar"
-                };
-                if (window.AxionCache) {
-                    window.AxionCache.guardarEnCache("retencion_backup", payload);
-                    window.AxionCache.registrarAuditoria(
-                        "Reportes y Respaldos",
-                        "Política de Retención",
-                        "Anterior",
-                        `${dias} días / ${payload.frecuenciaProgramada}`
-                    );
+                try {
+                    await guardarPoliticaEnBackend({ diasRetencion: dias });
+                    mostrarToast("Política de retención y respaldos guardada.");
+                } catch (err) {
+                    mostrarToast(err.message || "Error al guardar la política de retención.");
                 }
-                if (window.AxionApi) {
-                    window.AxionApi.put("/respaldos/politica", {
-                        backupFrecuencia: payload.frecuenciaProgramada,
-                        backupFormato: payload.formatoEmpaquetado,
-                        diasRetencion: payload.diasRetencion,
-                        accionVencimiento: payload.accionVencimiento
-                    }).catch(() => {});
-                }
-                mostrarToast("Política de retención y respaldos programados guardada.");
             });
         }
 
         if (btnDepurarManual) {
             btnDepurarManual.addEventListener("click", async () => {
-                if (window.AxionApi) {
-                    try {
-                        const res = await window.AxionApi.post("/respaldos/depurar");
-                        mostrarToast(`Depuración completada: ${res.eliminados ?? 0} registros vencidos eliminados.`);
-                        return;
-                    } catch {
-                        // Fallback
-                    }
+                try {
+                    const res = await window.AxionApi.post("/respaldos/depurar");
+                    mostrarToast(`Depuración completada: ${res.eliminados ?? 0} registros vencidos eliminados.`);
+                } catch (err) {
+                    mostrarToast(err.message || "Error al ejecutar la depuración manual.");
                 }
-                mostrarToast("Depuración completada: 0 registros vencidos encontrados bajo la política actual");
             });
         }
     }
@@ -815,7 +962,6 @@ export default function initController() {
     }
 
     inicializarFechasPorDefecto();
-    if (esAdmin) cargarEstadosBackup();
 
     botonesPestana.forEach((boton) => {
         boton.addEventListener("click", () => {

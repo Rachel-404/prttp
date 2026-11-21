@@ -24,18 +24,18 @@
             <div class="grupo-campo">
                 <label for="backup-correo-frecuencia" class="etiqueta-campo">Frecuencia de Envío</label>
                 <select id="backup-correo-frecuencia" name="frecuenciaCorreo" class="campo-control">
-                    <option value="diario">Diario (al finalizar el día - 23:59)</option>
-                    <option value="semanal" selected>Semanal (Domingos)</option>
-                    <option value="mensual">Mensual (Día 1)</option>
+                    <option value="diario">Diario</option>
+                    <option value="semanal" selected>Semanal</option>
+                    <option value="mensual">Mensual</option>
                 </select>
             </div>
 
             <div class="grupo-campo">
                 <label for="backup-correo-formato" class="etiqueta-campo">Formato del Archivo Adjunto</label>
                 <select id="backup-correo-formato" name="formatoCorreo" class="campo-control">
-                    <option value="xlsx" selected>Excel (.xlsx)</option>
-                    <option value="csv">CSV (.csv)</option>
-                    <option value="pdf">Reporte Ejecutivo (.pdf)</option>
+                    <option value="xlsx" selected>Excel</option>
+                    <option value="csv">CSV</option>
+                    <option value="pdf">Reporte Ejecutivo</option>
                 </select>
             </div>
 
@@ -135,9 +135,9 @@
                     <div class="grupo-campo">
                         <label for="retencion-frecuencia" class="etiqueta-campo">Frecuencia de Respaldo Automático</label>
                         <select id="retencion-frecuencia" name="frecuenciaProgramada" class="campo-control">
-                            <option value="diario" selected>Diario (00:00 hrs)</option>
-                            <option value="semanal">Semanal (Domingos)</option>
-                            <option value="mensual">Mensual (Día 1)</option>
+                            <option value="diario" selected>Diario</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
                             <option value="desactivado">Desactivado</option>
                         </select>
                     </div>
@@ -145,15 +145,15 @@
                     <div class="grupo-campo">
                         <label for="retencion-formato" class="etiqueta-campo">Formato de Empaquetado</label>
                         <select id="retencion-formato" name="formatoEmpaquetado" class="campo-control">
-                            <option value="zip" selected>Archivo Comprimido (.zip con CSV + JSON)</option>
-                            <option value="json">Volcado Estructurado (.json)</option>
+                            <option value="zip" selected>Archivo Comprimido</option>
+                            <option value="json">Volcado Estructurado</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="registro-mantenimiento">
                     <span class="etiqueta-campo">Destino Local / Descarga</span>
-                    <p class="texto-registro">Almacenamiento Local / Descarga Directa (Último respaldo: Hoy, 00:00 hrs)</p>
+                    <p class="texto-registro">Almacenamiento Local / Descarga Directa</p>
                 </div>
             </div>
         </div>
@@ -167,7 +167,7 @@
 
                 <div class="fila-dos-cols">
                     <div class="grupo-campo">
-                        <label for="retencion-dias" class="etiqueta-campo">Tiempo de Retención en Base Activa (días)</label>
+                        <label for="retencion-dias" class="etiqueta-campo">Tiempo de Retención en Base Activa</label>
                         <input
                             type="number"
                             id="retencion-dias"
@@ -186,7 +186,7 @@
                         <label for="retencion-accion" class="etiqueta-campo">Acción al Vencer Retención</label>
                         <select id="retencion-accion" name="accionVencimiento" class="campo-control">
                             <option value="archivar" selected>Archivar y comprimir antes de purgar</option>
-                            <option value="fifo">Depuración automática (FIFO)</option>
+                            <option value="fifo">Depuración automática</option>
                         </select>
                     </div>
                 </div>
@@ -194,7 +194,7 @@
                 <div class="registro-mantenimiento" aria-label="Uso de almacenamiento histórico">
                     <span class="etiqueta-campo">Indicador de Uso de Almacenamiento Histórico</span>
                     <progress value="9.2" max="100" aria-label="Porcentaje de almacenamiento histórico usado" class="barra-progreso-estado"></progress>
-                    <p class="texto-registro">Espacio utilizado: <strong>184 MB / 2.0 GB (9.2 %)</strong> · Registros activos: <strong>~412,500 lecturas</strong></p>
+                    <p class="texto-registro">Espacio utilizado: <strong>184 MB / 2.0 GB</strong> · Registros activos: <strong>~412,500 lecturas</strong></p>
                 </div>
 
                 <footer class="acciones-card acciones-dobles">

@@ -10,12 +10,17 @@ import com.axion.hidroponia.repository.SistemaPreferenciasRepository;
 import com.axion.hidroponia.service.AuditService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -147,5 +152,34 @@ public class ConfiguracionController {
             return auditoriaRepo.findAllByOrderByFechaHoraDesc(pageable);
         }
         return auditoriaRepo.findByModuloOrderByFechaHoraDesc(modulo, pageable);
+    }
+
+    @GetMapping("/auditoria/exportar")
+    public ResponseEntity<byte[]> exportarAuditoriaCsv(@RequestParam(defaultValue = "todos") String modulo) {
+        List<AuditoriaCambio> registros = "todos".equalsIgnoreCase(modulo)
+                ? auditoriaRepo.findAllByOrderByFechaHoraDesc(PageRequest.of(0, 1000)).getContent()
+                : auditoriaRepo.findByModuloOrderByFechaHoraDesc(modulo, PageRequest.of(0, 1000)).getContent();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("FechaHora,Modulo,Parametro,ValorAnterior,ValorNuevo,Usuario\n");
+        for (AuditoriaCambio item : registros) {
+            sb.append(csvEscape(item.getFechaHora() != null ? item.getFechaHora().toString() : "")).append(',')
+              .append(csvEscape(item.getModulo())).append(',')
+              .append(csvEscape(item.getParametro())).append(',')
+              .append(csvEscape(item.getValorAnterior())).append(',')
+              .append(csvEscape(item.getValorNuevo())).append(',')
+              .append(csvEscape(item.getUsuario())).append('\n');
+        }
+
+        byte[] bytes = ("\uFEFF" + sb).getBytes(StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=axion_auditoria.csv")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .body(bytes);
+    }
+
+    private String csvEscape(String val) {
+        if (val == null) return "\"\"";
+        return "\"" + val.replace("\"", "\"\"") + "\"";
     }
 }

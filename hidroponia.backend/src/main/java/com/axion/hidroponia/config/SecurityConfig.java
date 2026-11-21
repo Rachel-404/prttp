@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/recuperar").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/dashboard/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/alertas").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/configuracion/apariencia").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/reportes/historial", "/api/v1/reportes/exportar").permitAll()
                 // Rutas IoT HTTP para el ESP32-S3 (validadas mediante header X-Device-Key)
                 .requestMatchers("/api/v1/iot/**").permitAll()

@@ -77,7 +77,7 @@ export default function Login() {
                         <line x1="19" y1="12" x2="5" y2="12" />
                         <polyline points="12 19 5 12 12 5" />
                     </svg>
-                    <span>Volver al Panel Público (Solo Lectura)</span>
+                    <span>Volver al Panel Público</span>
                 </Link>
             </footer>
         </section>

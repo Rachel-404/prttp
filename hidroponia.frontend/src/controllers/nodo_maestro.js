@@ -27,230 +27,217 @@ export default function initController() {
 
     try {
         (function () {
+            const DEVICE_ID = "ESP32_HIDRO_01";
 
-    const CLAVE_CACHE = "nodo_maestro";
-    const btnBleSwitch = document.getElementById("btn-ble-switch");
-    const txtBleSwitch = document.getElementById("texto-ble-switch");
-    const inputSsid = document.getElementById("nodo-ssid");
-    const selectIp = document.getElementById("nodo-asignacion-ip");
-    const grupoIpEstatica = document.getElementById("grupo-ip-estatica");
-    const inputIpLocal = document.getElementById("nodo-ip-local");
-    const inputMascara = document.getElementById("nodo-mascara");
-    const inputGateway = document.getElementById("nodo-gateway");
-    const inputDns = document.getElementById("nodo-dns");
-    const selectProtocolo = document.getElementById("nodo-protocolo");
-    const inputPuerto = document.getElementById("nodo-puerto");
-    const inputBroker = document.getElementById("nodo-broker-url");
-    const inputEndpoint = document.getElementById("nodo-endpoint");
-    const inputUsuario = document.getElementById("nodo-usuario");
-    const chkTls = document.getElementById("nodo-tls");
+            const elEstadoRed = document.getElementById("nodo-estado-red");
+            const elAlimentacion = document.getElementById("nodo-alimentacion");
+            const elFirmware = document.getElementById("nodo-firmware");
+            const elPsram = document.getElementById("nodo-psram");
+            const elBufferTramas = document.getElementById("nodo-buffer-tramas");
 
-    const inputMuestreo = document.getElementById("nodo-muestreo");
-    const inputEnvio = document.getElementById("nodo-envio");
-    const inputParticion = document.getElementById("nodo-particion");
-    const selectFormato = document.getElementById("nodo-formato-buffer");
-    const inputLote = document.getElementById("nodo-lote");
-    const selectDesbordamiento = document.getElementById("nodo-desbordamiento");
+            const inputSsid = document.getElementById("nodo-ssid");
+            const selectIp = document.getElementById("nodo-asignacion-ip");
+            const grupoIpEstatica = document.getElementById("grupo-ip-estatica");
+            const inputIpLocal = document.getElementById("nodo-ip-local");
+            const inputMascara = document.getElementById("nodo-mascara");
+            const inputGateway = document.getElementById("nodo-gateway");
+            const inputDns = document.getElementById("nodo-dns");
+            const inputBroker = document.getElementById("nodo-broker-url");
+            const inputEndpoint = document.getElementById("nodo-endpoint");
+            const inputUsuario = document.getElementById("nodo-usuario");
 
-    const formConectividad = document.getElementById("form-conectividad-nodo");
-    const formBuffer = document.getElementById("form-buffer-nodo");
-    const formPinout = document.getElementById("form-pinout-nodo");
-    const btnForzarSync = document.getElementById("btn-forzar-sync");
-    const btnValidarPinout = document.getElementById("btn-validar-pinout");
-    const toast = document.getElementById("toast-nodo-maestro");
+            const inputMuestreo = document.getElementById("nodo-muestreo");
+            const inputParticion = document.getElementById("nodo-particion");
+            const selectFormato = document.getElementById("nodo-formato-buffer");
+            const inputLote = document.getElementById("nodo-lote");
+            const selectDesbordamiento = document.getElementById("nodo-desbordamiento");
 
-    let toastTimer = null;
+            const formConectividad = document.getElementById("form-conectividad-nodo");
+            const formBuffer = document.getElementById("form-buffer-nodo");
+            const formPinout = document.getElementById("form-pinout-nodo");
+            const btnForzarSync = document.getElementById("btn-forzar-sync");
+            const btnValidarPinout = document.getElementById("btn-validar-pinout");
+            const toast = document.getElementById("toast-nodo-maestro");
 
-    function mostrarToast(mensaje) {
-        if (!toast) return;
-        toast.textContent = mensaje;
-        toast.hidden = false;
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => {
-            toast.hidden = true;
-        }, 3500);
-    }
+            let toastTimer = null;
 
-    function aplicarEstadoBle(activo) {
-        if (!btnBleSwitch || !txtBleSwitch) return;
-        btnBleSwitch.classList.toggle("activo", activo);
-        btnBleSwitch.classList.toggle("inactivo", !activo);
-        btnBleSwitch.setAttribute("aria-pressed", activo ? "true" : "false");
-        txtBleSwitch.textContent = activo ? "Activo" : "Inactivo";
-    }
-
-    function cargarDesdeCache() {
-        if (!window.AxionCache) return;
-        const datos = window.AxionCache.leerDeCache(CLAVE_CACHE);
-        if (inputSsid && datos.ssid) inputSsid.value = datos.ssid;
-        aplicarEstadoBle(datos.bleActivo !== false);
-        if (selectIp && datos.asignacionIp) {
-            selectIp.value = datos.asignacionIp;
-            if (grupoIpEstatica) grupoIpEstatica.hidden = datos.asignacionIp !== "estatica";
-        }
-        if (inputIpLocal && datos.ipLocal) inputIpLocal.value = datos.ipLocal;
-        if (inputMascara && datos.mascara) inputMascara.value = datos.mascara;
-        if (inputGateway && datos.gateway) inputGateway.value = datos.gateway;
-        if (inputDns && datos.dns) inputDns.value = datos.dns;
-        if (selectProtocolo && datos.protocolo) selectProtocolo.value = datos.protocolo;
-        if (inputPuerto && datos.puerto) inputPuerto.value = String(datos.puerto);
-        if (inputBroker && datos.brokerUrl) inputBroker.value = datos.brokerUrl;
-        if (inputEndpoint && datos.endpoint) inputEndpoint.value = datos.endpoint;
-        if (inputUsuario && datos.usuario) inputUsuario.value = datos.usuario;
-        if (chkTls) chkTls.checked = datos.habilitarTls !== false;
-
-        if (inputMuestreo && datos.muestreoSeg) inputMuestreo.value = String(datos.muestreoSeg);
-        if (inputEnvio && datos.envioSeg) inputEnvio.value = String(datos.envioSeg);
-        if (inputParticion && datos.particionMb) inputParticion.value = String(datos.particionMb);
-        if (selectFormato && datos.formatoBuffer) selectFormato.value = datos.formatoBuffer;
-        if (inputLote && datos.loteTramas) inputLote.value = String(datos.loteTramas);
-        if (selectDesbordamiento && datos.politicaDesbordamiento) {
-            selectDesbordamiento.value = datos.politicaDesbordamiento;
-        }
-    }
-
-    cargarDesdeCache();
-
-    if (btnBleSwitch && txtBleSwitch) {
-        btnBleSwitch.addEventListener("click", () => {
-            const nuevoActivo = !btnBleSwitch.classList.contains("activo");
-            aplicarEstadoBle(nuevoActivo);
-            if (window.AxionCache) {
-                window.AxionCache.guardarEnCache(CLAVE_CACHE, { bleActivo: nuevoActivo });
+            function mostrarToast(mensaje) {
+                if (!toast) return;
+                toast.textContent = mensaje;
+                toast.hidden = false;
+                if (toastTimer) clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.hidden = true;
+                }, 3500);
             }
-            mostrarToast(nuevoActivo ? "Aprovisionamiento Bluetooth 5 LE activado." : "Aprovisionamiento Bluetooth 5 LE desactivado.");
-        });
-    }
 
-    if (selectIp && grupoIpEstatica) {
-        selectIp.addEventListener("change", () => {
-            grupoIpEstatica.hidden = selectIp.value !== "estatica";
-        });
-    }
-
-    if (selectProtocolo) {
-        selectProtocolo.addEventListener("change", () => {
-            const proto = selectProtocolo.value;
-            if (proto === "mqtt") {
-                if (inputPuerto) inputPuerto.value = "8883";
-                if (inputBroker) inputBroker.value = "mqtts://broker.axion-iot.local";
-                if (inputEndpoint) inputEndpoint.value = "axion/hidroponia/telemetria";
-            } else if (proto === "http") {
-                if (inputPuerto) inputPuerto.value = "443";
-                if (inputBroker) inputBroker.value = "https://api.axion-iot.local";
-                if (inputEndpoint) inputEndpoint.value = "/api/v1/telemetria";
-            } else if (proto === "ws") {
-                if (inputPuerto) inputPuerto.value = "8443";
-                if (inputBroker) inputBroker.value = "wss://ws.axion-iot.local";
-                if (inputEndpoint) inputEndpoint.value = "/stream/telemetria";
-            }
-        });
-    }
-
-    if (formConectividad) {
-        formConectividad.addEventListener("submit", (e) => {
-            e.preventDefault();
-            if (window.AxionCache) {
-                const prev = window.AxionCache.leerDeCache(CLAVE_CACHE);
-                const nuevoProto = (selectProtocolo?.value || "mqtt").toUpperCase();
-                const nuevoSsid = (inputSsid?.value || "").trim() || "AXION_LAB_HIDROPONIA";
-                const payloadConectividad = {
-                    ssid: nuevoSsid,
-                    asignacionIp: selectIp?.value || "dhcp",
-                    ipLocal: inputIpLocal?.value || "192.168.1.120",
-                    mascara: inputMascara?.value || "255.255.255.0",
-                    gateway: inputGateway?.value || "192.168.1.1",
-                    dns: inputDns?.value || "8.8.8.8",
-                    protocolo: selectProtocolo?.value || "mqtt",
-                    puerto: Number(inputPuerto?.value || 8883),
-                    brokerUrl: inputBroker?.value || "",
-                    endpoint: inputEndpoint?.value || "",
-                    usuario: inputUsuario?.value || "",
-                    habilitarTls: Boolean(chkTls?.checked)
-                };
-                window.AxionCache.guardarEnCache(CLAVE_CACHE, payloadConectividad);
-                if (window.AxionApi) {
-                    window.AxionApi.put("/nodo-maestro/ESP32_HIDRO_01/conectividad", payloadConectividad).catch(() => {});
-                }
-                window.AxionCache.registrarAuditoria(
-                    "Nodo ESP32-S3",
-                    "Conectividad / Protocolo",
-                    `${(prev.protocolo || "mqtt").toUpperCase()} (${prev.ssid})`,
-                    `${nuevoProto} (${nuevoSsid})`
-                );
-            }
-            mostrarToast("Configuración de conectividad y transporte guardada.");
-        });
-    }
-
-    if (formBuffer) {
-        formBuffer.addEventListener("submit", (e) => {
-            e.preventDefault();
-            if (window.AxionCache) {
-                const payloadBuffer = {
-                    muestreoSeg: Number(inputMuestreo?.value || 2),
-                    envioSeg: Number(inputEnvio?.value || 10),
-                    particionMb: Number(inputParticion?.value || 10),
-                    formatoBuffer: selectFormato?.value || "cbor",
-                    loteTramas: Number(inputLote?.value || 50),
-                    politicaDesbordamiento: selectDesbordamiento?.value || "fifo"
-                };
-                window.AxionCache.guardarEnCache(CLAVE_CACHE, payloadBuffer);
-                if (window.AxionApi) {
-                    window.AxionApi.put("/nodo-maestro/ESP32_HIDRO_01/buffer", payloadBuffer).catch(() => {});
-                }
-                window.AxionCache.registrarAuditoria(
-                    "Controlador ESP32-S3",
-                    "Temporización / Buffer",
-                    "Anterior",
-                    `${inputMuestreo?.value || 2}s / ${inputEnvio?.value || 10}s`
-                );
-            }
-            mostrarToast("Política de temporización y buffer offline LittleFS guardada.");
-        });
-    }
-
-    if (btnForzarSync) {
-        btnForzarSync.addEventListener("click", async () => {
-            if (window.AxionApi) {
+            async function cargarDesdeBackend() {
+                if (!window.AxionApi) return;
                 try {
-                    const res = await window.AxionApi.post("/nodo-maestro/ESP32_HIDRO_01/sincronizar");
-                    mostrarToast(res.mensaje || "Sincronización manual ejecutada.");
-                    return;
-                } catch {
-                    // Fallback
+                    const disp = await window.AxionApi.get(`/nodo-maestro/${DEVICE_ID}`);
+                    if (!disp) return;
+
+                    if (elEstadoRed) {
+                        elEstadoRed.textContent = disp.conectado
+                            ? `Conectado${disp.rssi != null ? ` (${disp.rssi} dBm)` : ""}`
+                            : "Desconectado";
+                        elEstadoRed.classList.toggle("valor-metrica-normal", Boolean(disp.conectado));
+                    }
+                    if (elAlimentacion) {
+                        const alim = disp.alimentacion || "--";
+                        const mA = disp.consumoMa != null ? ` · ${disp.consumoMa} mA` : "";
+                        elAlimentacion.textContent = `${alim}${mA}`;
+                    }
+                    if (elFirmware) elFirmware.textContent = disp.firmware ? `v${disp.firmware}` : "--";
+                    if (elPsram) elPsram.textContent = disp.psramOcupadaPct != null ? `${disp.psramOcupadaPct}% Ocupado` : "--";
+                    if (elBufferTramas) elBufferTramas.textContent = `${disp.bufferTramas ?? 0} tramas`;
+
+                    const red = disp.configRedMqtt || {};
+                    if (inputSsid && red.ssid) inputSsid.value = red.ssid;
+                    if (selectIp && red.asignacionIp) {
+                        selectIp.value = red.asignacionIp;
+                        if (grupoIpEstatica) grupoIpEstatica.hidden = red.asignacionIp !== "estatica";
+                    }
+                    if (inputIpLocal && red.ipLocal) inputIpLocal.value = red.ipLocal;
+                    if (inputMascara && red.mascara) inputMascara.value = red.mascara;
+                    if (inputGateway && red.gateway) inputGateway.value = red.gateway;
+                    if (inputDns && red.dns) inputDns.value = red.dns;
+                    if (inputBroker && red.brokerUrl) inputBroker.value = red.brokerUrl;
+                    if (inputEndpoint && red.endpoint) inputEndpoint.value = red.endpoint;
+                    if (inputUsuario && red.usuario) inputUsuario.value = red.usuario;
+
+                    const buf = disp.configBuffer || {};
+                    if (inputMuestreo && buf.muestreoSeg) {
+                        const val = Math.min(3600, Math.max(300, Number(buf.muestreoSeg) || 300));
+                        inputMuestreo.value = String(val);
+                    }
+                    if (inputParticion && buf.particionMb) inputParticion.value = String(buf.particionMb);
+                    if (selectFormato && buf.formatoBuffer) selectFormato.value = buf.formatoBuffer;
+                    if (inputLote && buf.loteTramas) inputLote.value = String(buf.loteTramas);
+                    if (selectDesbordamiento && buf.politicaDesbordamiento) {
+                        selectDesbordamiento.value = buf.politicaDesbordamiento;
+                    }
+                } catch (err) {
+                    mostrarToast(err.message || "No se pudo cargar la configuración del controlador desde el backend.");
                 }
             }
-            mostrarToast("Sincronización manual ejecutada. Buffer en 0 tramas pendientes.");
-        });
-    }
 
-    if (btnValidarPinout) {
-        btnValidarPinout.addEventListener("click", () => {
-            mostrarToast("Validación completada: cero colisiones de pines GPIO detectadas.");
-        });
-    }
-
-    if (formPinout) {
-        formPinout.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const filas = Array.from(formPinout.querySelectorAll("tbody tr")).map((tr) => {
-                const celdas = tr.querySelectorAll("td");
-                const select = tr.querySelector("select");
-                return {
-                    gpio: celdas[0]?.textContent?.trim() || "",
-                    interfaz: celdas[1]?.textContent?.trim() || "",
-                    modulo: select ? select.value : (celdas[2]?.textContent?.trim() || ""),
-                    estado: celdas[3]?.textContent?.trim() || "Normal"
-                };
-            });
-            if (window.AxionApi && filas.length) {
-                window.AxionApi.put("/nodo-maestro/ESP32_HIDRO_01/pinout", filas).catch(() => {});
+            if (selectIp && grupoIpEstatica) {
+                selectIp.addEventListener("change", () => {
+                    grupoIpEstatica.hidden = selectIp.value !== "estatica";
+                });
             }
-            mostrarToast("Mapa de pines guardado y sincronizado con el nodo ESP32-S3.");
-        });
-    }
 
+            if (formConectividad) {
+                formConectividad.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const payloadConectividad = {
+                        ssid: (inputSsid?.value || "").trim(),
+                        asignacionIp: selectIp?.value || "dhcp",
+                        ipLocal: (inputIpLocal?.value || "").trim(),
+                        mascara: (inputMascara?.value || "").trim(),
+                        gateway: (inputGateway?.value || "").trim(),
+                        dns: (inputDns?.value || "").trim(),
+                        protocolo: "http",
+                        brokerUrl: (inputBroker?.value || "").trim(),
+                        endpoint: (inputEndpoint?.value || "").trim(),
+                        usuario: (inputUsuario?.value || DEVICE_ID).trim()
+                    };
+
+                    if (!payloadConectividad.ssid || !payloadConectividad.brokerUrl || !payloadConectividad.endpoint) {
+                        mostrarToast("Completa el SSID, URL del backend y endpoint de telemetría.");
+                        return;
+                    }
+
+                    try {
+                        await window.AxionApi.put(`/nodo-maestro/${DEVICE_ID}/conectividad`, payloadConectividad);
+                        mostrarToast("Configuración de conectividad y transporte guardada.");
+                    } catch (err) {
+                        mostrarToast(err.message || "Error al guardar la configuración de conectividad.");
+                    }
+                });
+            }
+
+            if (formBuffer) {
+                formBuffer.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const muestreoSeg = Number(inputMuestreo?.value || 300);
+                    if (!Number.isFinite(muestreoSeg) || muestreoSeg < 300 || muestreoSeg > 3600) {
+                        mostrarToast("La frecuencia de muestreo debe estar entre 300 s y 3600 s.");
+                        return;
+                    }
+                    const payloadBuffer = {
+                        muestreoSeg,
+                        envioSeg: muestreoSeg,
+                        particionMb: Number(inputParticion?.value || 10),
+                        formatoBuffer: selectFormato?.value || "cbor",
+                        loteTramas: Number(inputLote?.value || 50),
+                        politicaDesbordamiento: selectDesbordamiento?.value || "fifo"
+                    };
+
+                    try {
+                        await window.AxionApi.put(`/nodo-maestro/${DEVICE_ID}/buffer`, payloadBuffer);
+                        mostrarToast("Política de temporización y buffer offline guardada.");
+                    } catch (err) {
+                        mostrarToast(err.message || "Error al guardar la política de buffer.");
+                    }
+                });
+            }
+
+            if (btnForzarSync) {
+                btnForzarSync.addEventListener("click", async () => {
+                    try {
+                        const res = await window.AxionApi.post(`/nodo-maestro/${DEVICE_ID}/sincronizar`);
+                        mostrarToast(res.mensaje || "Orden de sincronización encolada para el ESP32-S3.");
+                    } catch (err) {
+                        mostrarToast(err.message || "No se pudo enviar la orden de sincronización.");
+                    }
+                });
+            }
+
+            if (btnValidarPinout && formPinout) {
+                btnValidarPinout.addEventListener("click", () => {
+                    const pinesVistos = new Set();
+                    const colisiones = [];
+                    formPinout.querySelectorAll("tbody tr").forEach((tr) => {
+                        const texto = tr.querySelector("td")?.textContent || "";
+                        const matches = texto.match(/\d+/g) || [];
+                        matches.forEach((num) => {
+                            if (pinesVistos.has(num)) colisiones.push(`GPIO ${num}`);
+                            pinesVistos.add(num);
+                        });
+                    });
+                    if (colisiones.length > 0) {
+                        mostrarToast(`Colisión detectada en: ${[...new Set(colisiones)].join(", ")}.`);
+                    } else {
+                        mostrarToast(`Validación completada: ${pinesVistos.size} pines verificados sin colisiones.`);
+                    }
+                });
+            }
+
+            if (formPinout) {
+                formPinout.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const filas = Array.from(formPinout.querySelectorAll("tbody tr")).map((tr) => {
+                        const celdas = tr.querySelectorAll("td");
+                        const select = tr.querySelector("select");
+                        return {
+                            gpio: celdas[0]?.textContent?.trim() || "",
+                            interfaz: celdas[1]?.textContent?.trim() || "",
+                            modulo: select ? select.value : (celdas[2]?.textContent?.trim() || ""),
+                            estado: celdas[3]?.textContent?.trim() || "Asignado"
+                        };
+                    });
+                    try {
+                        await window.AxionApi.put(`/nodo-maestro/${DEVICE_ID}/pinout`, filas);
+                        mostrarToast("Mapa de pines guardado y sincronizado con el nodo ESP32-S3.");
+                    } catch (err) {
+                        mostrarToast(err.message || "Error al guardar el mapa de pines.");
+                    }
+                });
+            }
+
+            cargarDesdeBackend();
         })();
     } finally {
         document.addEventListener = __origDocAdd;

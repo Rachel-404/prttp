@@ -20,7 +20,7 @@ export default function NodoMaestro() {
       <Layout plana>
 
             <header className="encabezado-modulo">
-                <h1>Controlador Maestro ESP32-S3 (N16R8)</h1>
+                <h1>Controlador Maestro ESP32-S3</h1>
                 <p className="subtitulo-modulo">Gestión de conectividad inalámbrica, transporte de telemetría, buffer offline LittleFS y matriz de pines GPIO.</p>
             </header>
 
@@ -28,22 +28,22 @@ export default function NodoMaestro() {
             <section className="grid-tecnico-cuatro telemetria-nodo-grid" aria-label="Telemetría de salud del controlador">
                 <div className="tarjeta-metrica-contraste">
                     <span className="etiqueta-metrica-contraste">Estado de Red</span>
-                    <strong className="valor-metrica-contraste valor-metrica-normal">Conectado (Wi-Fi -58 dBm)</strong>
+                    <strong id="nodo-estado-red" className="valor-metrica-contraste">--</strong>
                 </div>
 
                 <div className="tarjeta-metrica-contraste">
                     <span className="etiqueta-metrica-contraste">Alimentación y Consumo</span>
-                    <strong className="valor-metrica-contraste">5V USB-C (~160 mA en TX)</strong>
+                    <strong id="nodo-alimentacion" className="valor-metrica-contraste">--</strong>
                 </div>
 
                 <div className="tarjeta-metrica-contraste">
-                    <span className="etiqueta-metrica-contraste">Memoria Flash (LittleFS 16 MB)</span>
-                    <strong className="valor-metrica-contraste">24% Ocupado (10 MB asignados a Buffer)</strong>
+                    <span className="etiqueta-metrica-contraste">Firmware</span>
+                    <strong id="nodo-firmware" className="valor-metrica-contraste">--</strong>
                 </div>
 
                 <div className="tarjeta-metrica-contraste">
-                    <span className="etiqueta-metrica-contraste">Memoria PSRAM (8 MB)</span>
-                    <strong className="valor-metrica-contraste">12% Ocupado (Caché FIFO activa)</strong>
+                    <span className="etiqueta-metrica-contraste">Memoria PSRAM</span>
+                    <strong id="nodo-psram" className="valor-metrica-contraste">--</strong>
                 </div>
             </section>
 
@@ -52,7 +52,7 @@ export default function NodoMaestro() {
                 
                 <div className="card">
                     <header className="titulo-card">
-                        <h3>Conectividad Wi-Fi, BLE y Transporte de Datos</h3>
+                        <h3>Conectividad Wi-Fi y Transporte HTTP</h3>
                     </header>
 
                     <form id="form-conectividad-nodo" className="cuerpo-card" noValidate>
@@ -69,13 +69,6 @@ export default function NodoMaestro() {
                                     <label htmlFor="nodo-wifi-pass" className="etiqueta-campo">Contraseña Wi-Fi</label>
                                     <input type="password" id="nodo-wifi-pass" name="wifiPassword" className="campo-control" defaultValue="********" required />
                                 </div>
-                            </div>
-
-                            <div className="fila-switch">
-                                <label htmlFor="btn-ble-switch" className="etiqueta-campo">Aprovisionamiento Bluetooth 5 LE</label>
-                                <button type="button" id="btn-ble-switch" className="txt-descr activo" aria-pressed="true">
-                                    <span id="texto-ble-switch">Activo</span>
-                                </button>
                             </div>
 
                             <div className="grupo-campo">
@@ -107,50 +100,29 @@ export default function NodoMaestro() {
                         </fieldset>
 
                         <fieldset className="subseccion-tecnica">
-                            <legend className="subtitulo-tecnico">Protocolo de Transporte</legend>
+                            <legend className="subtitulo-tecnico">Conexión HTTP al Backend</legend>
 
-                            <div className="fila-dos-cols">
-                                <div className="grupo-campo">
-                                    <label htmlFor="nodo-protocolo" className="etiqueta-campo">Protocolo</label>
-                                    <select id="nodo-protocolo" name="protocolo" className="campo-control" defaultValue="mqtt">
-                                        <option value="mqtt">MQTT</option>
-                                        <option value="http">HTTP / REST</option>
-                                        <option value="ws">WebSocket</option>
-                                    </select>
-                                </div>
-
-                                <div className="grupo-campo">
-                                    <label htmlFor="nodo-puerto" className="etiqueta-campo">Puerto</label>
-                                    <input type="number" id="nodo-puerto" name="puerto" className="campo-control" min="1" max="65535" defaultValue="8883" required />
-                                </div>
+                            <div className="grupo-campo">
+                                <label htmlFor="nodo-broker-url" className="etiqueta-campo">URL del Servidor Backend</label>
+                                <input type="text" id="nodo-broker-url" name="brokerUrl" className="campo-control" defaultValue="http://localhost:8080" required />
                             </div>
 
                             <div className="grupo-campo">
-                                <label htmlFor="nodo-broker-url" className="etiqueta-campo">Servidor / Broker URL</label>
-                                <input type="text" id="nodo-broker-url" name="brokerUrl" className="campo-control" defaultValue="mqtts://broker.axion-iot.local" required />
-                            </div>
-
-                            <div className="grupo-campo">
-                                <label htmlFor="nodo-endpoint" className="etiqueta-campo">Tópico Principal / Endpoint</label>
-                                <input type="text" id="nodo-endpoint" name="endpoint" className="campo-control" defaultValue="axion/hidroponia/telemetria" required />
+                                <label htmlFor="nodo-endpoint" className="etiqueta-campo">Endpoint de Telemetría</label>
+                                <input type="text" id="nodo-endpoint" name="endpoint" className="campo-control" defaultValue="/api/v1/iot/telemetria" required />
                             </div>
 
                             <div className="fila-dos-cols">
                                 <div className="grupo-campo">
-                                    <label htmlFor="nodo-usuario" className="etiqueta-campo">Usuario</label>
-                                    <input type="text" id="nodo-usuario" name="usuario" className="campo-control" defaultValue="esp32_nodo_01" />
+                                    <label htmlFor="nodo-usuario" className="etiqueta-campo">Dispositivo ID</label>
+                                    <input type="text" id="nodo-usuario" name="usuario" className="campo-control" defaultValue="ESP32_HIDRO_01" />
                                 </div>
 
                                 <div className="grupo-campo">
-                                    <label htmlFor="nodo-pass-transporte" className="etiqueta-campo">Contraseña</label>
+                                    <label htmlFor="nodo-pass-transporte" className="etiqueta-campo">Device Key</label>
                                     <input type="password" id="nodo-pass-transporte" name="passTransporte" className="campo-control" defaultValue="********" />
                                 </div>
                             </div>
-
-                            <label className="item-checkbox-variable" htmlFor="nodo-tls">
-                                <input type="checkbox" id="nodo-tls" name="habilitarTls" defaultChecked />
-                                <span>Habilitar Cifrado TLS / SSL</span>
-                            </label>
                         </fieldset>
 
                         <footer className="acciones-card">
@@ -164,28 +136,21 @@ export default function NodoMaestro() {
                 
                 <div className="card">
                     <header className="titulo-card">
-                        <h3>Temporización y Buffer Offline (LittleFS)</h3>
+                        <h3>Temporización y Buffer Offline</h3>
                     </header>
 
                     <form id="form-buffer-nodo" className="cuerpo-card" noValidate>
-                        <div className="fila-dos-cols">
-                            <div className="grupo-campo">
-                                <label htmlFor="nodo-muestreo" className="etiqueta-campo">Frecuencia Global de Muestreo (segundos)</label>
-                                <input type="number" id="nodo-muestreo" name="muestreoSeg" className="campo-control" min="1" max="3600" defaultValue="2" required />
-                            </div>
-
-                            <div className="grupo-campo">
-                                <label htmlFor="nodo-envio" className="etiqueta-campo">Frecuencia de Envío al Servidor (segundos)</label>
-                                <input type="number" id="nodo-envio" name="envioSeg" className="campo-control" min="1" max="3600" defaultValue="10" required />
-                            </div>
+                        <div className="grupo-campo">
+                            <label htmlFor="nodo-muestreo" className="etiqueta-campo">Frecuencia de Muestreo y Envío Inmediato</label>
+                            <input type="number" id="nodo-muestreo" name="muestreoSeg" className="campo-control" min="300" max="3600" defaultValue="300" required />
                         </div>
 
                         <fieldset className="subseccion-tecnica">
-                            <legend className="subtitulo-tecnico">Cola Circular Offline (Tolerancia a fallos 72 h)</legend>
+                            <legend className="subtitulo-tecnico">Cola Circular Offline</legend>
 
                             <div className="fila-dos-cols">
                                 <div className="grupo-campo">
-                                    <label htmlFor="nodo-particion" className="etiqueta-campo">Tamaño de Partición LittleFS (MB)</label>
+                                    <label htmlFor="nodo-particion" className="etiqueta-campo">Tamaño de Partición LittleFS</label>
                                     <input type="number" id="nodo-particion" name="particionMb" className="campo-control" min="1" max="14" defaultValue="10" required />
                                 </div>
 
@@ -200,14 +165,14 @@ export default function NodoMaestro() {
 
                             <div className="fila-dos-cols">
                                 <div className="grupo-campo">
-                                    <label htmlFor="nodo-lote" className="etiqueta-campo">Tamaño de Lote de Sincronización (tramas)</label>
+                                    <label htmlFor="nodo-lote" className="etiqueta-campo">Tamaño de Lote de Sincronización</label>
                                     <input type="number" id="nodo-lote" name="loteTramas" className="campo-control" min="1" max="500" defaultValue="50" required />
                                 </div>
 
                                 <div className="grupo-campo">
                                     <label htmlFor="nodo-desbordamiento" className="etiqueta-campo">Política de Desbordamiento</label>
                                     <select id="nodo-desbordamiento" name="politicaDesbordamiento" className="campo-control" defaultValue="fifo">
-                                        <option value="fifo">Sobrescribir tramas más antiguas (FIFO) y alertar</option>
+                                        <option value="fifo">Sobrescribir tramas más antiguas y alertar</option>
                                         <option value="detener">Detener captura al llenar partición</option>
                                     </select>
                                 </div>
@@ -216,7 +181,7 @@ export default function NodoMaestro() {
                             <div className="paso-calibracion">
                                 <div className="paso-info">
                                     <span className="etiqueta-campo">Tramas pendientes en buffer</span>
-                                    <p className="texto-registro"><strong>0 tramas (0% de ocupación)</strong></p>
+                                    <p className="texto-registro"><strong id="nodo-buffer-tramas">-- tramas</strong></p>
                                 </div>
                                 <div className="paso-accion">
                                     <button type="button" id="btn-forzar-sync" className="btn-modal btn-modal-cancelar">
@@ -237,7 +202,7 @@ export default function NodoMaestro() {
                 
                 <div className="card">
                     <header className="titulo-card">
-                        <h3>Pinout Manager Interactivo (ESP32-S3-WROOM-1 N16R8)</h3>
+                        <h3>Pinout Manager Interactivo</h3>
                         <span className="texto-guia">Matriz de asignación y reserva de pines GPIO</span>
                     </header>
 
@@ -274,19 +239,19 @@ export default function NodoMaestro() {
                                     <tr>
                                         <td><strong>GPIO 10, 11, 12, 13</strong></td>
                                         <td>Bus SPI</td>
-                                        <td>Sonda PT100 (Digitalizador MAX31865)</td>
+                                        <td>Sonda PT100</td>
                                         <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
                                     </tr>
                                     <tr>
                                         <td><strong>GPIO 17, 18, 21</strong></td>
                                         <td>UART1 / RS485</td>
-                                        <td>Sensor pH RS485 (TX, RX, DE/RE)</td>
+                                        <td>Sensor pH RS485</td>
                                         <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
                                     </tr>
                                     <tr>
                                         <td><strong>GPIO 5, 6, 7, 15, 16, 47</strong></td>
                                         <td>Salida Digital</td>
-                                        <td>Módulo de 6 Relés (Actuadores)</td>
+                                        <td>Módulo de 6 Relés</td>
                                         <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
                                     </tr>
                                     <tr>
@@ -316,7 +281,7 @@ export default function NodoMaestro() {
                                     <tr>
                                         <td><strong>GPIO 35, 36, 37</strong></td>
                                         <td>PSRAM Octal</td>
-                                        <td>Ocupados por PSRAM Octal (8 MB)</td>
+                                        <td>Ocupados por PSRAM Octal</td>
                                         <td><span className="celda-estado estado-critico"><span className="punto-estado" aria-hidden="true"></span><span>Bloqueado de Fábrica</span></span></td>
                                     </tr>
                                 </tbody>

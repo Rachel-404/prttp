@@ -23,7 +23,7 @@ export default function Layout({ children, plana = false }) {
     <div
       className="layout-container"
       style={{
-        gridTemplateColumns: sidebarOculto ? "0px minmax(0, 1fr)" : "250px minmax(0, 1fr)"
+        gridTemplateColumns: sidebarOculto ? "0px minmax" : "250px minmax"
       }}
     >
       <Navbar />

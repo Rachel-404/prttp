@@ -50,27 +50,16 @@ public class ReporteController {
 
     @GetMapping("/reportes/exportar")
     public ResponseEntity<byte[]> exportar(
-            @RequestParam(defaultValue = "csv") String formato,
             @RequestParam(required = false) OffsetDateTime inicio,
             @RequestParam(required = false) OffsetDateTime fin) {
         OffsetDateTime fFin = fin != null ? fin : OffsetDateTime.now();
         OffsetDateTime fIni = inicio != null ? inicio : fFin.minusDays(7);
         List<TelemetriaLectura> lecturas = telemetriaRepo.findByTsBetweenOrderByTsAsc(fIni, fFin);
 
-        return switch (formato.toLowerCase()) {
-            case "xlsx" -> ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=axion_reporte.xlsx")
-                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                    .body(exportService.generarXlsx(lecturas));
-            case "json" -> ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=axion_reporte.json")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(exportService.generarJson(lecturas));
-            default -> ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=axion_reporte.csv")
-                    .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
-                    .body(exportService.generarCsv(lecturas));
-        };
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=axion_reporte.xlsx")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(exportService.generarXlsx(lecturas));
     }
 
     @GetMapping("/respaldos/politica")
@@ -79,30 +68,64 @@ public class ReporteController {
     }
 
     @PutMapping("/respaldos/politica")
-    public SistemaPreferencias actualizarPolitica(@RequestBody Map<String, Object> body) {
+    public SistemaPreferencias actualizarPolitica(@RequestBody SistemaPreferencias req) {
         SistemaPreferencias prefs = prefsRepo.findById(1).orElseGet(SistemaPreferencias::new);
-        if (body.get("backupFrecuencia") != null) prefs.setBackupFrecuencia(String.valueOf(body.get("backupFrecuencia")));
-        if (body.get("backupFormato") != null) prefs.setBackupFormato(String.valueOf(body.get("backupFormato")));
-        if (body.get("diasRetencion") instanceof Number n) prefs.setDiasRetencion(n.intValue());
-        if (body.get("accionVencimiento") != null) prefs.setAccionVencimiento(String.valueOf(body.get("accionVencimiento")));
+        prefs.setId(1);
+        if (req.getBackupFrecuencia() != null) prefs.setBackupFrecuencia(req.getBackupFrecuencia());
+        if (req.getBackupFormato() != null) prefs.setBackupFormato(req.getBackupFormato());
+        if (req.getDiasRetencion() != null) prefs.setDiasRetencion(req.getDiasRetencion());
+        if (req.getAccionVencimiento() != null) prefs.setAccionVencimiento(req.getAccionVencimiento());
+        if (req.getConfigRespaldos() != null) {
+            java.util.Map<String, Object> merged = new java.util.HashMap<>(
+                    prefs.getConfigRespaldos() != null ? prefs.getConfigRespaldos() : java.util.Map.of()
+            );
+            merged.putAll(req.getConfigRespaldos());
+            prefs.setConfigRespaldos(merged);
+        }
         prefs.setActualizadoEn(OffsetDateTime.now());
-
         SistemaPreferencias guardado = prefsRepo.save(prefs);
-        auditService.registrar("Reportes y Respaldos", "Política de Retención", "Anterior",
-                guardado.getDiasRetencion() + " días / " + guardado.getBackupFrecuencia());
+
+        auditService.registrar("Respaldos y Retención", "Política de Respaldo y Retención", "Anterior",
+                guardado.getDiasRetencion() + " días (" + guardado.getBackupFrecuencia() + ")");
         return guardado;
     }
 
     @PostMapping("/respaldos/ejecutar")
-    public Map<String, Object> ejecutarRespaldoManual() {
-        auditService.registrar("Reportes y Respaldos", "Respaldo Manual", "N/A", "Ejecutado");
-        return Map.of("mensaje", "Respaldo generado correctamente.", "ts", OffsetDateTime.now().toString());
+    public Map<String, Object> ejecutarRespaldoManual(@RequestBody(required = false) Map<String, Object> body) {
+        String canal = body != null && body.get("canal") != null ? String.valueOf(body.get("canal")) : "manual";
+        String destino = body != null && body.get("destino") != null ? String.valueOf(body.get("destino")) : "";
+        OffsetDateTime ahora = OffsetDateTime.now();
+
+        if ("drive".equalsIgnoreCase(canal)) {
+            SistemaPreferencias prefs = prefsRepo.findById(1).orElseGet(SistemaPreferencias::new);
+            java.util.Map<String, Object> cfg = new java.util.HashMap<>(
+                    prefs.getConfigRespaldos() != null ? prefs.getConfigRespaldos() : java.util.Map.of()
+            );
+            @SuppressWarnings("unchecked")
+            java.util.Map<String, Object> driveMap = cfg.get("drive") instanceof java.util.Map<?, ?> m
+                    ? new java.util.HashMap<>((java.util.Map<String, Object>) m)
+                    : new java.util.HashMap<>();
+            driveMap.put("ultimoRespaldo", ahora.toString());
+            cfg.put("drive", driveMap);
+            prefs.setConfigRespaldos(cfg);
+            prefs.setActualizadoEn(ahora);
+            prefsRepo.save(prefs);
+        }
+
+        String detalle = destino.isBlank() ? canal : canal + " -> " + destino;
+        auditService.registrar("Respaldos y Retención", "Respaldo Manual", "N/A", detalle);
+        return Map.of(
+                "mensaje", "Respaldo manual ejecutado correctamente.",
+                "canal", canal,
+                "ejecutadoEn", ahora.toString()
+        );
     }
 
     @PostMapping("/respaldos/depurar")
-    public Map<String, Object> depurarManual() {
+    public Map<String, Object> depurarAntiguos() {
         int dias = prefsRepo.findById(1).map(SistemaPreferencias::getDiasRetencion).orElse(365);
         int eliminados = telemetriaRepo.deleteOlderThan(OffsetDateTime.now().minusDays(dias));
-        return Map.of("eliminados", eliminados, "diasRetencion", dias);
+        auditService.registrar("Respaldos y Retención", "Depuración Manual", "Anterior", eliminados + " lecturas depuradas");
+        return Map.of("mensaje", "Depuración completada.", "eliminados", eliminados);
     }
 }
