@@ -1,18 +1,22 @@
 /**
- * AXIÓN - IOT | Firmware HTTP Puro para ESP32-S3-WROOM-1
+ * AXIÓN - IOT | Firmware HTTP Unificado para ESP32-S3-WROOM-1
  * ---------------------------------------------------------------------------
  * Comunicación bidireccional 100% HTTP (sin Mosquitto / MQTT / BLE):
- *   1. POST /api/v1/iot/telemetria  -> Envía lecturas con fecha/hora NTP ("ts")
- *                                      y recibe estado de relés + comandos.
- *   2. GET  /api/v1/iot/comandos    -> Polling ligero cada 3 s para relés/comandos.
+ *   1. POST /api/v1/iot/telemetria        -> Envía lecturas y recibe relés + comandos.
+ *   2. GET  /api/v1/iot/comandos          -> Polling cada 3 s para relés/comandos.
  *   3. POST /api/v1/iot/comandos/{id}/ack -> Confirma ejecución de comando.
- *   4. Portal Cautivo Wi-Fi (SoftAP) -> Si no puede conectarse al Wi-Fi guardado,
- *      crea la red "AXION-ESP32-SETUP" (http://192.168.4.1) para reconfigurar
- *      Wi-Fi y URL del servidor desde cualquier celular o laptop.
+ *   4. Portal Cautivo Wi-Fi ("AXION-ESP32-SETUP" en 192.168.4.1) + Memoria NVS.
+ *
+ * Pinout físico en protoboard:
+ *   - pH DFRobot V2.0 : GPIO 4 (ADC1)
+ *   - TDS V1.0        : GPIO 5 (ADC1)
+ *   - DHT22           : GPIO 6 (1-Wire Digital)
+ *   - PT100 MAX31865  : GPIO 10, 11, 12, 13 (SPI - pendiente módulo)
+ *   - Relay HW-316    : GPIO 14, 15, 16, 17 (Canales 1..4) + 18, 21 (Reserva)
  *
  * Librerías requeridas en Arduino IDE:
- *   - WiFi, HTTPClient, WebServer, DNSServer, Preferences (incluidas en core ESP32)
- *   - ArduinoJson (v7.x, instalar desde Library Manager)
+ *   - ArduinoJson (v7.x)
+ *   - DHT sensor library (Adafruit) + Adafruit Unified Sensor
  */
 
 #include <WiFi.h>
@@ -21,49 +25,81 @@
 #include <DNSServer.h>
 #include <Preferences.h>
 #include <ArduinoJson.h>
+#include <DHT.h>
 #include <time.h>
 
-// ============================================================================
-// VALORES INICIALES POR DEFECTO (SE PUEDEN CAMBIAR LUEGO DESDE EL PORTAL WEB)
-// ============================================================================
-const char* DEFAULT_WIFI_SSID     = "TU_RED_WIFI";
-const char* DEFAULT_WIFI_PASSWORD = "TU_PASSWORD_WIFI";
+#if __has_include("secrets.h")
+  #include "secrets.h"
+#endif
 
-// En local: http://IP_DE_TU_PC:8080/api/v1/iot  (no uses localhost desde el ESP32)
-// En nube:  https://tu-dominio.com/api/v1/iot
-const char* DEFAULT_API_IOT_BASE  = "http://192.168.1.100:8080/api/v1/iot";
+#ifndef SECRET_WIFI_SSID
+  #define SECRET_WIFI_SSID "TU_RED_WIFI"
+#endif
+#ifndef SECRET_WIFI_PASSWORD
+  #define SECRET_WIFI_PASSWORD "TU_PASSWORD_WIFI"
+#endif
+#ifndef SECRET_API_IOT_BASE
+  #define SECRET_API_IOT_BASE "http://192.168.1.100:8080/api/v1/iot"
+#endif
+#ifndef SECRET_DEVICE_KEY
+  #define SECRET_DEVICE_KEY "axion_dev_esp32_key_2026"
+#endif
+
+// ============================================================================
+// 1. CONFIGURACIÓN DE RED Y SERVIDOR BACKEND
+// ============================================================================
+const char* DEFAULT_WIFI_SSID     = SECRET_WIFI_SSID;
+const char* DEFAULT_WIFI_PASSWORD = SECRET_WIFI_PASSWORD;
+const char* DEFAULT_API_IOT_BASE  = SECRET_API_IOT_BASE;
 const char* DEVICE_ID             = "ESP32_HIDRO_01";
-const char* DEFAULT_DEVICE_KEY    = "axion_dev_esp32_key_2026";
+const char* DEFAULT_DEVICE_KEY    = SECRET_DEVICE_KEY;
 
-// Nombre de la red temporal cuando el ESP32 abre el Portal Cautivo (192.168.4.1)
-const char* PORTAL_AP_SSID        = "AXION-ESP32-SETUP";
-const unsigned long PORTAL_TIMEOUT_MS = 180000; // 3 minutos antes de reintentar Wi-Fi guardado
+const char* PORTAL_AP_SSID            = "AXION-ESP32-SETUP";
+const unsigned long PORTAL_TIMEOUT_MS = 180000; // 3 minutos
 
-// Intervalos en milisegundos (mínimo 5 min = 300000 ms, máximo 1 h = 3600000 ms)
-unsigned long intervaloTelemetriaMs = 300000; // Por defecto cada 5 minutos
-const unsigned long INTERVALO_COMANDOS_MS = 3000; // Cada 3 s consulta relés/comandos
+// Cambia a true solo si quieres enviar datos simulados sin sensores conectados
+const bool MODO_SIMULACION = false;
 
-// Cambia a false cuando conectes los sensores físicos reales
-const bool MODO_SIMULACION = true;
-
-// ============================================================================
-// PINOUT DE HARDWARE (6 Canales de Relés)
-// ============================================================================
-int PINES_RELES[6] = { 4, 5, 6, 7, 15, 16 };
-bool RELE_ACTIVO_LOW = true; // true = lógica "low" (activo en LOW), false = "high"
+// 15 s para pruebas en protoboard (ajustable vía CONFIG_BUFFER entre 15 s y 3600 s)
+unsigned long intervaloTelemetriaMs       = 15000;
+const unsigned long INTERVALO_COMANDOS_MS = 3000;
 
 // ============================================================================
-// ESTADO INTERNO Y CONFIGURACIÓN PERSISTENTE (NVS)
+// 2. PINOUT DE HARDWARE EN PROTOBOARD (ESP32-S3-WROOM-1)
+// ============================================================================
+#define PIN_PH   4
+#define PIN_TDS  5
+#define PIN_DHT  6
+#define DHTTYPE  DHT22
+
+// Canales 1..4 = Módulo Relay 4 Canales HW-316 | Canales 5..6 = Reserva
+int PINES_RELES[6] = { 14, 15, 16, 17, 18, 21 };
+bool RELE_ACTIVO_LOW = true; // true = lógica "low" (Active LOW), false = "high"
+
+DHT dht(PIN_DHT, DHTTYPE);
+
+// ============================================================================
+// 3. ESTADO INTERNO Y CONFIGURACIÓN PERSISTENTE (NVS)
 // ============================================================================
 Preferences prefs;
 String cfgSsid;
 String cfgPass;
 String cfgApiBase;
 String cfgDeviceKey;
+const char* NVS_CFG_VERSION = "proto_azang_117";
 
-unsigned long ultimoEnvioTelemetria = 0;
+bool dht22Activo      = true;
+float dht22OffsetTemp = 0.0f;
+float dht22OffsetHum  = 0.0f;
+
+float phVoltajeNeutro = 1500.0f;
+float phVoltajeAcido  = 2032.44f;
+float tdsFactorK      = 1.0f;
+float tdsConvFactor   = 0.5f;
+
+unsigned long ultimoEnvioTelemetria  = 0;
 unsigned long ultimaConsultaComandos = 0;
-unsigned long inicioDesconexionWifi = 0;
+unsigned long inicioDesconexionWifi  = 0;
 
 struct LecturaSensores {
   float ph;
@@ -74,14 +110,32 @@ struct LecturaSensores {
   float humAmbPct;
   float nivelCm;
   float nivelPct;
+  bool dhtOk;
 };
 
 void cargarConfiguracionNvs() {
-  prefs.begin("axion_cfg", true);
-  cfgSsid      = prefs.getString("ssid", DEFAULT_WIFI_SSID);
-  cfgPass      = prefs.getString("pass", DEFAULT_WIFI_PASSWORD);
-  cfgApiBase   = prefs.getString("apiBase", DEFAULT_API_IOT_BASE);
-  cfgDeviceKey = prefs.getString("devKey", DEFAULT_DEVICE_KEY);
+  prefs.begin("axion_cfg", false);
+  String cfgVer = prefs.getString("cfgVer", "");
+  if (cfgVer != NVS_CFG_VERSION) {
+    prefs.putString("ssid", DEFAULT_WIFI_SSID);
+    prefs.putString("pass", DEFAULT_WIFI_PASSWORD);
+    prefs.putString("apiBase", DEFAULT_API_IOT_BASE);
+    prefs.putString("devKey", DEFAULT_DEVICE_KEY);
+    prefs.putString("cfgVer", NVS_CFG_VERSION);
+  }
+  cfgSsid         = prefs.getString("ssid", DEFAULT_WIFI_SSID);
+  cfgPass         = prefs.getString("pass", DEFAULT_WIFI_PASSWORD);
+  cfgApiBase      = prefs.getString("apiBase", DEFAULT_API_IOT_BASE);
+  cfgDeviceKey    = prefs.getString("devKey", DEFAULT_DEVICE_KEY);
+  dht22Activo     = prefs.getBool("dhtActivo", true);
+  dht22OffsetTemp = prefs.getFloat("dhtOffT", 0.0f);
+  dht22OffsetHum  = prefs.getFloat("dhtOffH", 0.0f);
+  tdsConvFactor   = prefs.getFloat("tdsKVal", 0.5f);
+  tdsFactorK      = prefs.getFloat("tdsFacK", 1.0f);
+  long envioSeg   = prefs.getLong("envioSeg", 15L);
+  if (envioSeg >= 15L && envioSeg <= 3600L) {
+    intervaloTelemetriaMs = (unsigned long)envioSeg * 1000UL;
+  }
   prefs.end();
 }
 
@@ -91,11 +145,12 @@ void guardarConfiguracionNvs(const String& ssid, const String& pass, const Strin
   prefs.putString("pass", pass);
   prefs.putString("apiBase", apiBase);
   prefs.putString("devKey", devKey);
+  prefs.putString("cfgVer", NVS_CFG_VERSION);
   prefs.end();
 }
 
 // ============================================================================
-// PORTAL CAUTIVO WI-FI (192.168.4.1)
+// 4. PORTAL CAUTIVO WI-FI (192.168.4.1)
 // ============================================================================
 void iniciarPortalCautivo() {
   Serial.println("\n[PORTAL] Iniciando SoftAP de configuración: " + String(PORTAL_AP_SSID));
@@ -185,7 +240,80 @@ void iniciarPortalCautivo() {
 }
 
 // ============================================================================
-// CONTROL DE RELÉS
+// 5. LECTURA REAL DE SENSORES (DHT22, pH, TDS)
+// ============================================================================
+float leerPHReal() {
+  long suma = 0;
+  for (int i = 0; i < 15; i++) {
+    suma += analogReadMilliVolts(PIN_PH);
+    delay(10);
+  }
+  float mV = suma / 15.0f;
+  float pendiente = (7.0f - 4.0f) / (phVoltajeNeutro - phVoltajeAcido);
+  return 7.0f + pendiente * (mV - phVoltajeNeutro);
+}
+
+float leerTDSReal(float temperaturaAgua) {
+  long suma = 0;
+  for (int i = 0; i < 15; i++) {
+    suma += analogReadMilliVolts(PIN_TDS);
+    delay(10);
+  }
+  float voltaje = (suma / 15.0f) / 1000.0f;
+  float coefComp = 1.0f + 0.02f * (temperaturaAgua - 25.0f);
+  float voltComp = voltaje / coefComp;
+  float tds = (133.42f * pow(voltComp, 3) - 255.86f * pow(voltComp, 2) + 857.39f * voltComp) * tdsConvFactor * tdsFactorK;
+  return (tds < 0.0f) ? 0.0f : tds;
+}
+
+LecturaSensores leerSensores() {
+  LecturaSensores l;
+  if (MODO_SIMULACION) {
+    l.ph        = 6.10f + (random(-15, 16) / 100.0f);
+    l.ecUsCm    = 1220.0f + random(-30, 31);
+    l.tdsPpm    = l.ecUsCm * tdsConvFactor;
+    l.tempAguaC = 21.5f + (random(-5, 6) / 10.0f);
+    l.tempAmbC  = 24.0f + (random(-10, 11) / 10.0f);
+    l.humAmbPct = 63.0f + (random(-20, 21) / 10.0f);
+    l.nivelCm   = 82.0f;
+    l.nivelPct  = 85.0f;
+    l.dhtOk     = true;
+    return l;
+  }
+
+  // Lectura física real del DHT22 en GPIO 6
+  if (!dht22Activo) {
+    l.dhtOk     = false;
+    l.tempAmbC  = 0.0f;
+    l.humAmbPct = 0.0f;
+  } else {
+    float tAmb = dht.readTemperature();
+    float hAmb = dht.readHumidity();
+    l.dhtOk = !isnan(tAmb) && !isnan(hAmb);
+    if (l.dhtOk) {
+      l.tempAmbC = tAmb + dht22OffsetTemp;
+      float humAjustada = hAmb + dht22OffsetHum;
+      if (humAjustada < 0.0f) humAjustada = 0.0f;
+      if (humAjustada > 100.0f) humAjustada = 100.0f;
+      l.humAmbPct = humAjustada;
+    } else {
+      l.tempAmbC  = 0.0f;
+      l.humAmbPct = 0.0f;
+      Serial.println("[DHT22] Lectura NaN en GPIO 6 - revisar conexion 3.3V/GND/DATA");
+    }
+  }
+
+  l.tempAguaC = 25.0f; // Valor base hasta conectar MAX31865 + PT100 (GPIO 10-13)
+  l.ph        = leerPHReal();
+  l.tdsPpm    = leerTDSReal(l.tempAguaC);
+  l.ecUsCm    = (tdsConvFactor > 0.0f) ? (l.tdsPpm / tdsConvFactor) : 0.0f;
+  l.nivelCm   = 0.0f;  // Pendiente transmisor de nivel
+  l.nivelPct  = 0.0f;
+  return l;
+}
+
+// ============================================================================
+// 6. CONTROL DE RELÉS Y COMANDOS DEL BACKEND
 // ============================================================================
 void aplicarEstadoRele(int canal, bool encendido) {
   if (canal < 1 || canal > 6) return;
@@ -234,12 +362,77 @@ void procesarComandosPendientes(JsonArray comandos) {
       RELE_ACTIVO_LOW = (strcmp(logica, "low") == 0);
     } else if (strcmp(tipo, "CONFIG_BUFFER") == 0) {
       long muestreoSeg = params["muestreoSeg"] | (params["envioSeg"] | 300L);
-      if (muestreoSeg < 300L) muestreoSeg = 300L;
+      if (muestreoSeg < 15L) muestreoSeg = 15L;
       if (muestreoSeg > 3600L) muestreoSeg = 3600L;
       intervaloTelemetriaMs = (unsigned long)muestreoSeg * 1000UL;
-      Serial.printf(" -> Nuevo intervalo de muestreo y envío inmediato: %ld s\n", muestreoSeg);
+      prefs.begin("axion_cfg", false);
+      prefs.putLong("envioSeg", muestreoSeg);
+      prefs.end();
+      Serial.printf(" -> Nuevo intervalo de envío: %ld s\n", muestreoSeg);
+    } else if (strcmp(tipo, "CONFIG_SENSOR") == 0) {
+      String modulo = params["modulo"] | "";
+      JsonObject cfg = params["config"];
+      if (modulo == "dht22" && !cfg.isNull()) {
+        if (cfg["activo"].is<bool>()) {
+          dht22Activo = cfg["activo"].as<bool>();
+          prefs.begin("axion_cfg", false);
+          prefs.putBool("dhtActivo", dht22Activo);
+          prefs.end();
+        }
+        Serial.printf(" -> DHT22 %s\n", dht22Activo ? "ACTIVO" : "PAUSADO");
+      } else {
+        Serial.printf(" -> Configuración aplicada para módulo: %s\n", modulo.c_str());
+      }
+    } else if (strcmp(tipo, "CONFIG_TECNICA_SENSOR") == 0) {
+      String modulo = params["modulo"] | "";
+      JsonObject p = params["parametros"];
+      if (modulo == "dht22" && !p.isNull()) {
+        if (p["offsetTemperatura"].is<float>()) dht22OffsetTemp = p["offsetTemperatura"].as<float>();
+        if (p["offsetHumedad"].is<float>()) dht22OffsetHum = p["offsetHumedad"].as<float>();
+        prefs.begin("axion_cfg", false);
+        prefs.putFloat("dhtOffT", dht22OffsetTemp);
+        prefs.putFloat("dhtOffH", dht22OffsetHum);
+        prefs.end();
+        Serial.printf(" -> DHT22 offsets: T=%.1f C, H=%.1f %%\n", dht22OffsetTemp, dht22OffsetHum);
+      } else if (modulo == "ec" && !p.isNull()) {
+        bool actualizado = false;
+        if (p["kValue"].is<float>()) {
+          tdsConvFactor = p["kValue"].as<float>();
+          actualizado = true;
+        } else if (p["k_value"].is<float>()) {
+          tdsConvFactor = p["k_value"].as<float>();
+          actualizado = true;
+        }
+        if (p["factorCalibracionK"].is<float>()) {
+          tdsFactorK = p["factorCalibracionK"].as<float>();
+          actualizado = true;
+        }
+        if (actualizado) {
+          prefs.begin("axion_cfg", false);
+          prefs.putFloat("tdsKVal", tdsConvFactor);
+          prefs.putFloat("tdsFacK", tdsFactorK);
+          prefs.end();
+        }
+        Serial.printf(" -> EC actualizado: kValue=%.2f, factorK=%.2f\n", tdsConvFactor, tdsFactorK);
+      } else {
+        Serial.printf(" -> Configuración técnica aplicada para módulo: %s\n", modulo.c_str());
+      }
+    } else if (strcmp(tipo, "CONFIG_CONECTIVIDAD") == 0) {
+      const char* nuevoSsid = params["ssid"] | "";
+      const char* nuevaUrl  = params["brokerUrl"] | "";
+      if (strlen(nuevoSsid) > 0 && strlen(nuevaUrl) > 0) {
+        cfgSsid = String(nuevoSsid);
+        String base = String(nuevaUrl);
+        while (base.endsWith("/")) base.remove(base.length() - 1);
+        cfgApiBase = base.endsWith("/api/v1/iot") ? base : (base + "/api/v1/iot");
+        prefs.begin("axion_cfg", false);
+        prefs.putString("ssid", cfgSsid);
+        prefs.putString("apiBase", cfgApiBase);
+        prefs.end();
+        Serial.printf(" -> Conectividad actualizada: SSID=%s | API=%s\n", cfgSsid.c_str(), cfgApiBase.c_str());
+      }
     } else if (strcmp(tipo, "CALIBRAR_PH") == 0) {
-      Serial.println(" -> Ejecutando calibración de pH NIST...");
+      Serial.println(" -> Ejecutando calibración de pH...");
     } else if (strcmp(tipo, "CALIBRAR_EC") == 0) {
       Serial.println(" -> Ejecutando calibración de EC...");
     } else if (strcmp(tipo, "CALIBRAR_CERO_NIVEL") == 0) {
@@ -269,36 +462,7 @@ void procesarRespuestaServidor(const String& payload) {
 }
 
 // ============================================================================
-// LECTURA DE SENSORES (REEMPLAZAR CON TUS LIBRERÍAS EN PRODUCCIÓN)
-// ============================================================================
-LecturaSensores leerSensores() {
-  LecturaSensores l;
-  if (MODO_SIMULACION) {
-    l.ph        = 6.10f + (random(-15, 16) / 100.0f);
-    l.ecUsCm    = 1220.0f + random(-30, 31);
-    l.tdsPpm    = l.ecUsCm * 0.5f;
-    l.tempAguaC = 21.5f + (random(-5, 6) / 10.0f);
-    l.tempAmbC  = 24.0f + (random(-10, 11) / 10.0f);
-    l.humAmbPct = 63.0f + (random(-20, 21) / 10.0f);
-    l.nivelCm   = 82.0f;
-    l.nivelPct  = 85.0f;
-    return l;
-  }
-
-  // TODO: Conectar aquí lecturas reales
-  l.ph = 6.0f;
-  l.ecUsCm = 1200.0f;
-  l.tdsPpm = 600.0f;
-  l.tempAguaC = 21.0f;
-  l.tempAmbC = 24.0f;
-  l.humAmbPct = 60.0f;
-  l.nivelCm = 80.0f;
-  l.nivelPct = 80.0f;
-  return l;
-}
-
-// ============================================================================
-// COMUNICACIÓN HTTP CON EL BACKEND
+// 7. COMUNICACIÓN HTTP CON EL BACKEND
 // ============================================================================
 String obtenerTimestampIsoUtc() {
   struct tm timeinfo;
@@ -314,17 +478,14 @@ void enviarTelemetriaHttp() {
   if (WiFi.status() != WL_CONNECTED) return;
 
   String tsIso = obtenerTimestampIsoUtc();
-  if (tsIso.length() == 0) {
-    Serial.println("[NTP] Reloj aún no sincronizado, omitiendo envío hasta obtener hora.");
-    return;
-  }
-
   LecturaSensores s = leerSensores();
 
   JsonDocument doc;
-  doc["ts"]             = tsIso;
+  if (tsIso.length() > 0) {
+    doc["ts"] = tsIso;
+  }
   doc["dispositivo_id"] = DEVICE_ID;
-  doc["fw"]             = "1.0.3-http";
+  doc["fw"]             = "1.1.0-http-real";
   doc["rssi"]           = WiFi.RSSI();
 
   JsonObject datos = doc["datos"].to<JsonObject>();
@@ -338,11 +499,11 @@ void enviarTelemetriaHttp() {
   datos["nivel_tanque_pct"]     = serialized(String(s.nivelPct, 1));
 
   JsonObject estado = doc["estado"].to<JsonObject>();
-  estado["dht22"] = "ok";
-  estado["pt100"] = "ok";
+  estado["dht22"] = !dht22Activo ? "pausado" : (s.dhtOk ? "ok" : "error");
+  estado["pt100"] = MODO_SIMULACION ? "ok" : "pendiente";
   estado["ph"]    = "ok";
   estado["tds"]   = "ok";
-  estado["nivel"] = "ok";
+  estado["nivel"] = MODO_SIMULACION ? "ok" : "pendiente";
 
   String jsonBody;
   serializeJson(doc, jsonBody);
@@ -355,12 +516,17 @@ void enviarTelemetriaHttp() {
   http.addHeader("X-Device-Key", cfgDeviceKey);
 
   int httpCode = http.POST(jsonBody);
-  if (httpCode == 200) {
-    String respuesta = http.getString();
-    Serial.println("[HTTP POST] Telemetría enviada correctamente.");
-    procesarRespuestaServidor(respuesta);
-  } else {
-    Serial.printf("[HTTP POST] Error %d: %s\n", httpCode, http.errorToString(httpCode).c_str());
+  Serial.printf("[POST /telemetria] HTTP %d | DHT22(%s): %.1f C, %.1f %% | pH: %.2f | TDS: %.1f ppm\n",
+                httpCode,
+                !dht22Activo ? "PAUSA" : (s.dhtOk ? "OK" : "ERR"),
+                s.tempAmbC,
+                s.humAmbPct,
+                s.ph,
+                s.tdsPpm);
+  if (httpCode == 200 || httpCode == 201) {
+    procesarRespuestaServidor(http.getString());
+  } else if (httpCode < 0) {
+    Serial.printf("[HTTP POST] Error de conexión a %s: %s\n", url.c_str(), http.errorToString(httpCode).c_str());
   }
   http.end();
 }
@@ -376,10 +542,9 @@ void consultarComandosHttp() {
 
   int httpCode = http.GET();
   if (httpCode == 200) {
-    String respuesta = http.getString();
-    procesarRespuestaServidor(respuesta);
+    procesarRespuestaServidor(http.getString());
   } else {
-    Serial.printf("[HTTP GET] Error %d consultando comandos\n", httpCode);
+    Serial.printf("[HTTP GET] Error %d consultando comandos en %s\n", httpCode, url.c_str());
   }
   http.end();
 }
@@ -416,7 +581,6 @@ void asegurarWifi(bool abrirPortalSiFalla) {
       iniciarPortalCautivo();
     } else {
       if (inicioDesconexionWifi == 0) inicioDesconexionWifi = millis();
-      // Si lleva más de 5 minutos sin poder reconectar, abre el Portal Cautivo
       if (millis() - inicioDesconexionWifi >= 300000UL) {
         iniciarPortalCautivo();
       }
@@ -425,10 +589,12 @@ void asegurarWifi(bool abrirPortalSiFalla) {
 }
 
 // ============================================================================
-// SETUP Y LOOP
+// 8. SETUP Y LOOP
 // ============================================================================
 void setup() {
   Serial.begin(115200);
+  analogReadResolution(12);
+  dht.begin();
   delay(500);
 
   for (int i = 0; i < 6; i++) {
@@ -439,8 +605,8 @@ void setup() {
   cargarConfiguracionNvs();
   asegurarWifi(true);
 
-  // Espera breve para sincronizar NTP en el primer arranque
-  for (int i = 0; i < 10 && obtenerTimestampIsoUtc().length() == 0; i++) {
+  // Espera breve para sincronizar NTP en el primer arranque (el backend respalda si no hay NTP)
+  for (int i = 0; i < 6 && obtenerTimestampIsoUtc().length() == 0; i++) {
     delay(500);
   }
 
