@@ -64,9 +64,15 @@ public class TelemetryService {
 
         TelemetriaLectura guardada = telemetriaRepo.save(lectura);
 
+        Object fwObj = trama.get("fw");
+        String fw = fwObj != null ? String.valueOf(fwObj).trim() : "";
+
         dispositivoRepo.findById(dispositivoId).ifPresent(disp -> {
             disp.setConectado(true);
             disp.setRssi(guardada.getRssi());
+            if (!fw.isBlank() && !"null".equalsIgnoreCase(fw)) {
+                disp.setFirmware(fw);
+            }
             disp.setUltimoHeartbeat(OffsetDateTime.now());
             disp.setActualizadoEn(OffsetDateTime.now());
             dispositivoRepo.save(disp);
@@ -86,22 +92,16 @@ public class TelemetryService {
 
     private OffsetDateTime parsearTimestampObligatorio(Object rawTs) {
         if (rawTs == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El campo 'ts' (fecha/hora ISO-8601 de recolección) es obligatorio");
+            return OffsetDateTime.now();
         }
         String texto = String.valueOf(rawTs).trim();
         if (texto.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El campo 'ts' no puede estar vacío");
+            return OffsetDateTime.now();
         }
         try {
             return OffsetDateTime.parse(texto);
         } catch (DateTimeParseException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Formato inválido en 'ts'. Usa ISO-8601 (ej. 2026-11-20T17:10:00Z)");
+            return OffsetDateTime.now();
         }
     }
 

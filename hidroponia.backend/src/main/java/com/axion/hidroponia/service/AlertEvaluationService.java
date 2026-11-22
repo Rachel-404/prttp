@@ -27,11 +27,47 @@ public class AlertEvaluationService {
         Map<String, SensorConfiguracion> configs = sensorRepo.findAll().stream()
                 .collect(java.util.stream.Collectors.toMap(SensorConfiguracion::getModulo, s -> s));
 
-        evaluarSensor(configs.get("ph"), lectura.getPh(), "pH RS485 fuera de umbral", "pH", "/sensores/ph");
-        evaluarSensor(configs.get("ec"), lectura.getEcUsCm(), "Conductividad EC fuera de umbral", "µS/cm", "/sensores/ec");
-        evaluarSensor(configs.get("temp_agua"), lectura.getTempAguaC(), "Temperatura del Agua fuera de umbral", "°C", "/sensores/nivel-temperatura?tab=temperatura");
-        evaluarSensor(configs.get("nivel_agua"), lectura.getNivelPct(), "Nivel del Tanque fuera de umbral", "%", "/sensores/nivel-temperatura?tab=nivel");
-        evaluarSensor(configs.get("dht22"), lectura.getTempAmbC(), "Temperatura Ambiental fuera de umbral", "°C", "/sensores/temperatura-humedad");
+        Map<String, Object> estados = lectura.getEstadoSensores();
+        if (sensorOperativo(estados, "ph")) {
+            evaluarSensor(configs.get("ph"), lectura.getPh(), "pH fuera de umbral", "pH", "/sensores/ph");
+        }
+        if (sensorOperativo(estados, "tds")) {
+            evaluarSensor(configs.get("ec"), lectura.getEcUsCm(), "Conductividad EC fuera de umbral", "µS/cm", "/sensores/ec");
+        }
+        if (sensorOperativo(estados, "pt100")) {
+            evaluarSensor(configs.get("temp_agua"), lectura.getTempAguaC(), "Temperatura del Agua fuera de umbral", "°C", "/sensores/nivel-temperatura?tab=temperatura");
+        }
+        if (sensorOperativo(estados, "nivel")) {
+            evaluarSensor(configs.get("nivel_agua"), lectura.getNivelPct(), "Nivel del Tanque fuera de umbral", "%", "/sensores/nivel-temperatura?tab=nivel");
+        }
+        if (sensorOperativo(estados, "dht22")) {
+            SensorConfiguracion dhtCfg = configs.get("dht22");
+            evaluarSensor(dhtCfg, lectura.getTempAmbC(), "Temperatura Ambiental fuera de umbral", "°C", "/sensores/temperatura-humedad");
+            evaluarHumedadDht22(dhtCfg, lectura.getHumAmbPct());
+        }
+    }
+
+    private boolean sensorOperativo(Map<String, Object> estados, String clave) {
+        if (estados == null || !estados.containsKey(clave) || estados.get(clave) == null) {
+            return true;
+        }
+        return "ok".equalsIgnoreCase(String.valueOf(estados.get(clave)).trim());
+    }
+
+    private void evaluarHumedadDht22(SensorConfiguracion cfg, Double hum) {
+        if (cfg == null || !cfg.isActivo() || hum == null || cfg.getParametrosTecnicos() == null) {
+            return;
+        }
+        Double humMin = toDouble(cfg.getParametrosTecnicos().get("humMin"));
+        Double humMax = toDouble(cfg.getParametrosTecnicos().get("humMax"));
+        if (humMin == null || humMax == null || humMin >= humMax) {
+            return;
+        }
+        evaluarRango(cfg.getModulo(), hum, humMin, humMax, "Humedad Ambiental fuera de umbral", "%", "/sensores/temperatura-humedad");
+    }
+
+    private Double toDouble(Object obj) {
+        return obj instanceof Number n ? n.doubleValue() : null;
     }
 
     private void evaluarSensor(
@@ -43,8 +79,17 @@ public class AlertEvaluationService {
         if (cfg == null || !cfg.isActivo() || valor == null || cfg.getMinNormal() == null || cfg.getMaxNormal() == null) {
             return;
         }
-        double min = cfg.getMinNormal();
-        double max = cfg.getMaxNormal();
+        evaluarRango(cfg.getModulo(), valor, cfg.getMinNormal(), cfg.getMaxNormal(), tituloBase, unidad, urlDestino);
+    }
+
+    private void evaluarRango(
+            String modulo,
+            double valor,
+            double min,
+            double max,
+            String tituloBase,
+            String unidad,
+            String urlDestino) {
         double margen = Math.max(0.0001, max - min) * 0.05;
 
         String nivel = null;
@@ -57,13 +102,13 @@ public class AlertEvaluationService {
         if (nivel == null) return;
 
         // Evitar duplicados no leídos consecutivos para el mismo módulo y nivel
-        if (alertaRepo.existsByModuloAndNivelAndLeidaFalse(cfg.getModulo(), nivel)) {
+        if (alertaRepo.existsByModuloAndNivelAndLeidaFalse(modulo, nivel)) {
             return;
         }
 
         Alerta alerta = new Alerta();
         alerta.setNivel(nivel);
-        alerta.setModulo(cfg.getModulo());
+        alerta.setModulo(modulo);
         alerta.setTitulo(tituloBase);
         alerta.setDetalle(String.format("Lectura: %.2f %s (Rango: %.2f – %.2f %s)", valor, unidad, min, max, unidad));
         alerta.setUrlDestino(urlDestino);
