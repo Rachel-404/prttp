@@ -62,32 +62,32 @@ export default function Reles() {
                                     <div className="grid-pines-reles">
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-1" className="etiqueta-campo">Relé 1</label>
-                                            <input type="text" id="pin-rele-1" name="pinRele1" className="campo-control" defaultValue="GPIO 4" required />
+                                            <input type="text" id="pin-rele-1" name="pinRele1" className="campo-control" defaultValue="GPIO 14" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-2" className="etiqueta-campo">Relé 2</label>
-                                            <input type="text" id="pin-rele-2" name="pinRele2" className="campo-control" defaultValue="GPIO 5" required />
+                                            <input type="text" id="pin-rele-2" name="pinRele2" className="campo-control" defaultValue="GPIO 15" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-3" className="etiqueta-campo">Relé 3</label>
-                                            <input type="text" id="pin-rele-3" name="pinRele3" className="campo-control" defaultValue="GPIO 6" required />
+                                            <input type="text" id="pin-rele-3" name="pinRele3" className="campo-control" defaultValue="GPIO 16" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-4" className="etiqueta-campo">Relé 4</label>
-                                            <input type="text" id="pin-rele-4" name="pinRele4" className="campo-control" defaultValue="GPIO 7" required />
+                                            <input type="text" id="pin-rele-4" name="pinRele4" className="campo-control" defaultValue="GPIO 17" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-5" className="etiqueta-campo">Relé 5</label>
-                                            <input type="text" id="pin-rele-5" name="pinRele5" className="campo-control" defaultValue="GPIO 15" required />
+                                            <input type="text" id="pin-rele-5" name="pinRele5" className="campo-control" defaultValue="GPIO 18" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-6" className="etiqueta-campo">Relé 6</label>
-                                            <input type="text" id="pin-rele-6" name="pinRele6" className="campo-control" defaultValue="GPIO 16" required />
+                                            <input type="text" id="pin-rele-6" name="pinRele6" className="campo-control" defaultValue="GPIO 21" required />
                                         </div>
                                     </div>
 

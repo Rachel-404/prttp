@@ -126,9 +126,10 @@ export default function SensorTemperaturaHumedad() {
                 <div className="fila-dos-cols">
                   <div className="grupo-campo">
                     <label htmlFor="tec-dht22-gpio" className="etiqueta-campo">Pin Digital de Datos</label>
-                    <select id="tec-dht22-gpio" name="pinGpio" className="campo-control" defaultValue="GPIO 4">
+                    <select id="tec-dht22-gpio" name="pinGpio" className="campo-control" defaultValue="GPIO 6">
                       <option value="GPIO 4">GPIO 4</option>
                       <option value="GPIO 5">GPIO 5</option>
+                      <option value="GPIO 6">GPIO 6</option>
                       <option value="GPIO 15">GPIO 15</option>
                       <option value="GPIO 16">GPIO 16</option>
                       <option value="GPIO 17">GPIO 17</option>

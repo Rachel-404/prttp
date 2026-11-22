@@ -219,19 +219,19 @@ export default function NodoMaestro() {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><strong>GPIO 1</strong></td>
-                                        <td>ADC1</td>
-                                        <td>Sensor EC / TDS</td>
-                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 2</strong></td>
-                                        <td>ADC1</td>
-                                        <td>Transmisor de Nivel de Agua</td>
-                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
-                                    </tr>
-                                    <tr>
                                         <td><strong>GPIO 4</strong></td>
+                                        <td>ADC1</td>
+                                        <td>Sensor pH DFRobot Gravity V2.0</td>
+                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 5</strong></td>
+                                        <td>ADC1</td>
+                                        <td>Sensor EC / TDS V1.0</td>
+                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPIO 6</strong></td>
                                         <td>Digital 1-Wire</td>
                                         <td>Sensor Temperatura y Humedad DHT22</td>
                                         <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
@@ -239,19 +239,13 @@ export default function NodoMaestro() {
                                     <tr>
                                         <td><strong>GPIO 10, 11, 12, 13</strong></td>
                                         <td>Bus SPI</td>
-                                        <td>Sonda PT100</td>
-                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
+                                        <td>Sonda PT100 (Pendiente módulo)</td>
+                                        <td><span className="celda-estado estado-advertencia"><span className="punto-estado" aria-hidden="true"></span><span>Reservado</span></span></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>GPIO 17, 18, 21</strong></td>
-                                        <td>UART1 / RS485</td>
-                                        <td>Sensor pH RS485</td>
-                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 5, 6, 7, 15, 16, 47</strong></td>
+                                        <td><strong>GPIO 14, 15, 16, 17</strong></td>
                                         <td>Salida Digital</td>
-                                        <td>Módulo de 6 Relés</td>
+                                        <td>Módulo Relay 4 Canales HW-316 (5V Active LOW)</td>
                                         <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
                                     </tr>
                                     <tr>

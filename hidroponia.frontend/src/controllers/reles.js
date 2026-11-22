@@ -29,12 +29,12 @@ export default function initController() {
         (function () {
             const DEFAULTS_TECNICOS_RELES = {
                 pines: {
-                    1: "GPIO 5",
-                    2: "GPIO 6",
-                    3: "GPIO 7",
-                    4: "GPIO 15",
-                    5: "GPIO 16",
-                    6: "GPIO 47"
+                    1: "GPIO 14",
+                    2: "GPIO 15",
+                    3: "GPIO 16",
+                    4: "GPIO 17",
+                    5: "GPIO 18",
+                    6: "GPIO 21"
                 },
                 logicaDisparo: "low"
             };

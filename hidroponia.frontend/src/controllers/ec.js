@@ -37,7 +37,7 @@ export default function initController() {
             const ATENUACIONES_VALIDAS = ["11db", "6db", "2.5db", "0db"];
 
             const DEFAULTS_TECNICOS_EC = {
-                gpioAdc: "GPIO1_ADC1",
+                gpioAdc: "GPIO5_ADC1",
                 atenuacionAdc: "11db",
                 factorCalibracionK: 1.0,
                 kValue: 0.5,

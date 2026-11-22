@@ -29,11 +29,11 @@ export default function initController() {
         (function () {
             const MODULO = "dht22";
             const FRECUENCIAS_VALIDAS = [300, 600, 900, 1800, 3600];
-            const GPIOS_VALIDOS = ["GPIO 4", "GPIO 5", "GPIO 15", "GPIO 16", "GPIO 17", "GPIO 18", "GPIO 21"];
+            const GPIOS_VALIDOS = ["GPIO 4", "GPIO 5", "GPIO 6", "GPIO 15", "GPIO 16", "GPIO 17", "GPIO 18", "GPIO 21"];
             const PULLUPS_VALIDOS = ["externa_10k", "interna_esp32"];
 
             const DEFAULTS_TECNICOS_DHT22 = {
-                pinGpio: "GPIO 4",
+                pinGpio: "GPIO 6",
                 resistenciaPullUp: "externa_10k"
             };
 
