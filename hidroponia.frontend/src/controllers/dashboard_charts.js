@@ -80,8 +80,8 @@ export default function initController() {
                 },
                 humedad_ambiente: {
                     tituloEje: "Humedad Relativa (%)",
-                    sugeridoMin: 45,
-                    sugeridoMax: 85,
+                    sugeridoMin: 50,
+                    sugeridoMax: 80,
                     label: "Humedad Relativa",
                     unidad: "%",
                     decimales: 1,
@@ -90,8 +90,8 @@ export default function initController() {
                 },
                 nivel_agua: {
                     tituloEje: "Nivel (%)",
-                    sugeridoMin: 0,
-                    sugeridoMax: 100,
+                    sugeridoMin: 20,
+                    sugeridoMax: 90,
                     label: "Nivel del Tanque",
                     unidad: "%",
                     decimales: 0,
@@ -153,7 +153,42 @@ export default function initController() {
                 contenedorLeyenda.appendChild(item);
             }
 
+            async function sincronizarRangosSensores() {
+                if (!window.AxionApi) return;
+                try {
+                    const resumen = await window.AxionApi.get("/dashboard/resumen");
+                    const sensores = Array.isArray(resumen?.sensores) ? resumen.sensores : [];
+                    sensores.forEach((s) => {
+                        const mod = String(s.modulo || "").toLowerCase();
+                        const minVal = Number(s.minNormal);
+                        const maxVal = Number(s.maxNormal);
+                        const tec = s.parametrosTecnicos && typeof s.parametrosTecnicos === "object" ? s.parametrosTecnicos : {};
+
+                        if (mod === "dht22") {
+                            const tMin = Number.isFinite(Number(tec.tempMin)) ? Number(tec.tempMin) : minVal;
+                            const tMax = Number.isFinite(Number(tec.tempMax)) ? Number(tec.tempMax) : maxVal;
+                            if (Number.isFinite(tMin) && Number.isFinite(tMax)) {
+                                CONFIG_SERIES.temp_ambiente.sugeridoMin = tMin;
+                                CONFIG_SERIES.temp_ambiente.sugeridoMax = tMax;
+                            }
+                            const hMin = Number(tec.humMin);
+                            const hMax = Number(tec.humMax);
+                            if (Number.isFinite(hMin) && Number.isFinite(hMax)) {
+                                CONFIG_SERIES.humedad_ambiente.sugeridoMin = hMin;
+                                CONFIG_SERIES.humedad_ambiente.sugeridoMax = hMax;
+                            }
+                        } else if (CONFIG_SERIES[mod] && Number.isFinite(minVal) && Number.isFinite(maxVal)) {
+                            CONFIG_SERIES[mod].sugeridoMin = minVal;
+                            CONFIG_SERIES[mod].sugeridoMax = maxVal;
+                        }
+                    });
+                } catch (err) {
+                    console.warn("No se pudieron sincronizar los rangos reales para gráficas:", err);
+                }
+            }
+
             async function renderizarGrafica(claveSerie) {
+                await sincronizarRangosSensores();
                 const cfg = CONFIG_SERIES[claveSerie] || CONFIG_SERIES.ph;
                 let etiquetas = [];
                 let valores = [];

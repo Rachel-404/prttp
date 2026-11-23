@@ -35,18 +35,16 @@ export default function initController() {
             nombre: "pH del Agua",
             unidad: "pH",
             decimales: 2,
-            minNormal: 5.8,
+            minNormal: 5.5,
             maxNormal: 6.5,
-            margenAdv: 0.25,
             color: "#16a34a"
         },
         ec: {
             nombre: "Conductividad Eléctrica",
             unidad: "µS/cm",
             decimales: 0,
-            minNormal: 1000,
-            maxNormal: 1600,
-            margenAdv: 200,
+            minNormal: 800,
+            maxNormal: 1800,
             color: "#f59e0b"
         },
         tempAgua: {
@@ -55,16 +53,14 @@ export default function initController() {
             decimales: 1,
             minNormal: 18.0,
             maxNormal: 24.0,
-            margenAdv: 1.5,
             color: "#64748b"
         },
         tempAmbiente: {
             nombre: "Temperatura Ambiente",
             unidad: "°C",
             decimales: 1,
-            minNormal: 16.0,
+            minNormal: 18.0,
             maxNormal: 28.0,
-            margenAdv: 2.0,
             color: "#ef4444"
         },
         humedad: {
@@ -73,16 +69,14 @@ export default function initController() {
             decimales: 0,
             minNormal: 50,
             maxNormal: 80,
-            margenAdv: 6,
             color: "#eab308"
         },
         nivelAgua: {
             nombre: "Nivel de Agua",
             unidad: "%",
             decimales: 0,
-            minNormal: 40,
-            maxNormal: 95,
-            margenAdv: 15,
+            minNormal: 20,
+            maxNormal: 90,
             color: "#15803d"
         }
     };
@@ -183,13 +177,17 @@ export default function initController() {
     }
 
     function obtenerEstadoLectura(valor, cfg) {
-        if (valor >= cfg.minNormal && valor <= cfg.maxNormal) {
-            return { etiqueta: "Normal", clase: "estado-normal" };
+        if (!Number.isFinite(valor) || !cfg) {
+            return { etiqueta: "Crítico", clase: "estado-critico" };
         }
-        if (valor >= cfg.minNormal - cfg.margenAdv && valor <= cfg.maxNormal + cfg.margenAdv) {
+        if (valor < cfg.minNormal || valor > cfg.maxNormal) {
+            return { etiqueta: "Crítico", clase: "estado-critico" };
+        }
+        const margen = Math.max(0.0001, cfg.maxNormal - cfg.minNormal) * 0.05;
+        if (valor <= cfg.minNormal + margen || valor >= cfg.maxNormal - margen) {
             return { etiqueta: "Advertencia", clase: "estado-advertencia" };
         }
-        return { etiqueta: "Crítico", clase: "estado-critico" };
+        return { etiqueta: "Normal", clase: "estado-normal" };
     }
 
     const CAMPO_LECTURA_POR_VARIABLE = {
@@ -247,7 +245,51 @@ export default function initController() {
         return resultado;
     }
 
+    async function sincronizarUmbralesDesdeBackend() {
+        if (!window.AxionApi) return;
+        try {
+            const resumen = await window.AxionApi.get("/dashboard/resumen");
+            const sensores = Array.isArray(resumen?.sensores) ? resumen.sensores : [];
+            sensores.forEach((s) => {
+                const mod = String(s.modulo || "").toLowerCase();
+                const minVal = Number(s.minNormal);
+                const maxVal = Number(s.maxNormal);
+                const tec = s.parametrosTecnicos && typeof s.parametrosTecnicos === "object" ? s.parametrosTecnicos : {};
+
+                if (mod === "ph" && Number.isFinite(minVal) && Number.isFinite(maxVal)) {
+                    VARIABLES_CONFIG.ph.minNormal = minVal;
+                    VARIABLES_CONFIG.ph.maxNormal = maxVal;
+                } else if (mod === "ec" && Number.isFinite(minVal) && Number.isFinite(maxVal)) {
+                    VARIABLES_CONFIG.ec.minNormal = minVal;
+                    VARIABLES_CONFIG.ec.maxNormal = maxVal;
+                } else if (mod === "temp_agua" && Number.isFinite(minVal) && Number.isFinite(maxVal)) {
+                    VARIABLES_CONFIG.tempAgua.minNormal = minVal;
+                    VARIABLES_CONFIG.tempAgua.maxNormal = maxVal;
+                } else if (mod === "nivel_agua" && Number.isFinite(minVal) && Number.isFinite(maxVal)) {
+                    VARIABLES_CONFIG.nivelAgua.minNormal = minVal;
+                    VARIABLES_CONFIG.nivelAgua.maxNormal = maxVal;
+                } else if (mod === "dht22") {
+                    const tMin = Number.isFinite(Number(tec.tempMin)) ? Number(tec.tempMin) : minVal;
+                    const tMax = Number.isFinite(Number(tec.tempMax)) ? Number(tec.tempMax) : maxVal;
+                    if (Number.isFinite(tMin) && Number.isFinite(tMax)) {
+                        VARIABLES_CONFIG.tempAmbiente.minNormal = tMin;
+                        VARIABLES_CONFIG.tempAmbiente.maxNormal = tMax;
+                    }
+                    const hMin = Number(tec.humMin);
+                    const hMax = Number(tec.humMax);
+                    if (Number.isFinite(hMin) && Number.isFinite(hMax)) {
+                        VARIABLES_CONFIG.humedad.minNormal = hMin;
+                        VARIABLES_CONFIG.humedad.maxNormal = hMax;
+                    }
+                }
+            });
+        } catch (err) {
+            console.warn("No se pudieron sincronizar los umbrales reales para reportes:", err);
+        }
+    }
+
     async function cargarDatosHistoricosReales() {
+        await sincronizarUmbralesDesdeBackend();
         const inicioIso = new Date(estadoHistorial.fechaInicio).toISOString();
         const finIso = new Date(estadoHistorial.fechaFin).toISOString();
 

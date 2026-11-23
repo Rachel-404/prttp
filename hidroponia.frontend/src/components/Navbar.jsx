@@ -17,9 +17,25 @@ export default function Navbar() {
   const [alertas, setAlertas] = useState([]);
   const [alertasAbiertas, setAlertasAbiertas] = useState(false);
   const [perfilAbierto, setPerfilAbierto] = useState(false);
+  const [errorAlertas, setErrorAlertas] = useState("");
 
   const refAlertas = useRef(null);
   const refPerfil = useRef(null);
+  const refErrorTimer = useRef(null);
+
+  const mostrarErrorAlertas = useCallback((msg) => {
+    setErrorAlertas(msg || "No se pudo actualizar el estado de las alertas.");
+    if (refErrorTimer.current) clearTimeout(refErrorTimer.current);
+    refErrorTimer.current = setTimeout(() => {
+      setErrorAlertas("");
+    }, 4000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (refErrorTimer.current) clearTimeout(refErrorTimer.current);
+    };
+  }, []);
 
   const refrescarAlertas = useCallback(async () => {
     try {
@@ -73,22 +89,33 @@ export default function Navbar() {
   }, []);
 
   const marcarAlerta = async (alerta) => {
+    const leidaPrevia = Boolean(alerta.leida);
     setAlertas((prev) => prev.map((a) => (a.id === alerta.id ? { ...a, leida: true } : a)));
+    if (esAdministrador && /^\d+$/.test(String(alerta.id))) {
+      try {
+        await apiPatch(`/alertas/${alerta.id}/leer`);
+      } catch (err) {
+        setAlertas((prev) => prev.map((a) => (a.id === alerta.id ? { ...a, leida: leidaPrevia } : a)));
+        mostrarErrorAlertas(err?.message || "No se pudo marcar la alerta como leída.");
+        return;
+      }
+    }
     setAlertasAbiertas(false);
-    if (esAdministrador) {
-      if (/^\d+$/.test(String(alerta.id))) {
-        apiPatch(`/alertas/${alerta.id}/leer`).catch(() => {});
-      }
-      if (alerta.urlDestino) {
-        navigate(normalizarRutaSpa(alerta.urlDestino));
-      }
+    if (esAdministrador && alerta.urlDestino) {
+      navigate(normalizarRutaSpa(alerta.urlDestino));
     }
   };
 
-  const marcarTodasLeidas = () => {
+  const marcarTodasLeidas = async () => {
     if (!esAdministrador) return;
+    const prevAlertas = alertas;
     setAlertas((prev) => prev.map((a) => ({ ...a, leida: true })));
-    apiPatch("/alertas/leer-todas").catch(() => {});
+    try {
+      await apiPatch("/alertas/leer-todas");
+    } catch (err) {
+      setAlertas(prevAlertas);
+      mostrarErrorAlertas(err?.message || "No se pudieron marcar las alertas como leídas.");
+    }
   };
 
   const noLeidas = alertas.filter((a) => !a.leida).length;
@@ -360,6 +387,15 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+      <div
+        id="toast-alertas-navbar"
+        className="toast-notificacion"
+        role="alert"
+        aria-live="assertive"
+        hidden={!errorAlertas}
+      >
+        {errorAlertas}
+      </div>
     </header>
   );
 }

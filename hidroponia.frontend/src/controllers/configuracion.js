@@ -383,22 +383,37 @@ export default function initController() {
                 const filtro = selectFiltroAuditoria ? selectFiltroAuditoria.value : "todos";
                 const tbody = document.getElementById("tbody-auditoria-sistema");
                 if (!tbody || !window.AxionApi) return;
+
+                function agregarFilaMensaje(texto) {
+                    const tr = document.createElement("tr");
+                    const td = document.createElement("td");
+                    td.colSpan = 5;
+                    td.textContent = texto;
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                }
+
                 try {
                     const page = await window.AxionApi.get(`/auditoria?modulo=${encodeURIComponent(filtro)}&page=0&size=50`);
-                    tbody.innerHTML = "";
+                    tbody.textContent = "";
                     if (!page || !Array.isArray(page.content) || page.content.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5">No hay registros para el módulo seleccionado.</td></tr>';
+                        agregarFilaMensaje("No hay registros para el módulo seleccionado.");
                         return;
                     }
                     page.content.forEach((item) => {
                         const tr = document.createElement("tr");
                         const fecha = item.fechaHora ? new Date(item.fechaHora).toLocaleString("es-PE") : "";
                         const detalle = item.valorAnterior ? `${item.valorAnterior} → ${item.valorNuevo}` : (item.valorNuevo || "");
-                        tr.innerHTML = `<td>${fecha}</td><td>${item.modulo}</td><td>${item.parametro}</td><td>${detalle}</td><td>${item.usuario}</td>`;
+                        [fecha, item.modulo || "", item.parametro || "", detalle, item.usuario || ""].forEach((valor) => {
+                            const td = document.createElement("td");
+                            td.textContent = String(valor);
+                            tr.appendChild(td);
+                        });
                         tbody.appendChild(tr);
                     });
                 } catch {
-                    tbody.innerHTML = '<tr><td colspan="5">No se pudo cargar la bitácora desde el servidor.</td></tr>';
+                    tbody.textContent = "";
+                    agregarFilaMensaje("No se pudo cargar la bitácora desde el servidor.");
                 }
             }
 

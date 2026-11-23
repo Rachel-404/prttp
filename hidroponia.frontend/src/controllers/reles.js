@@ -2,6 +2,7 @@ export default function initController() {
     const __docListeners = [];
     const __winListeners = [];
     const __observers = [];
+    let pollingRelesTimer = null;
     const __origDocAdd = document.addEventListener.bind(document);
     const __origWinAdd = window.addEventListener.bind(window);
     const __OrigMO = window.MutationObserver;
@@ -114,8 +115,36 @@ export default function initController() {
                 accionCancelarPendiente = null;
             }
 
-            function aplicarListaDesdeBackend(lista) {
+            function calcularFirmaEstadoActual() {
+                const canalesFirma = estadoOperacionReles.canales
+                    .map((c) => `${c.canal}|${Boolean(c.encendido)}|${c.nombre}|${estadoTecnicoReles.pines[c.canal] || ""}`)
+                    .join(";");
+                return `${estadoOperacionReles.modo}|${estadoTecnicoReles.logicaDisparo}|${canalesFirma}`;
+            }
+
+            function calcularFirmaListaRemota(lista) {
+                const modo = lista[0].modoOperacion === "automatico" ? "automatico" : "manual";
+                const logica = lista[0].logicaDisparo === "high" ? "high" : "low";
+                const canalesFirma = lista
+                    .map((r) => {
+                        const nombre = String(r.nombre || `Canal ${r.canal}`).replace(/\s*\([^()]+\)/g, "");
+                        const pin = r.pinGpio || estadoTecnicoReles.pines[r.canal] || "";
+                        return `${r.canal}|${Boolean(r.encendido)}|${nombre}|${pin}`;
+                    })
+                    .join(";");
+                return `${modo}|${logica}|${canalesFirma}`;
+            }
+
+            function aplicarListaDesdeBackend(lista, silencioso = false) {
                 if (!Array.isArray(lista) || lista.length === 0) return;
+                if (silencioso) {
+                    const activo = document.activeElement;
+                    const editandoUi = !modal.hidden
+                        || (selectModo && activo === selectModo)
+                        || (activo && (activo.classList?.contains("input-nombre-rele") || (formTecnico && formTecnico.contains(activo))));
+                    if (editandoUi) return;
+                    if (calcularFirmaListaRemota(lista) === calcularFirmaEstadoActual()) return;
+                }
                 estadoOperacionReles.modo = lista[0].modoOperacion === "automatico" ? "automatico" : "manual";
                 estadoOperacionReles.canales = lista.map((r) => ({
                     canal: r.canal,
@@ -128,6 +157,16 @@ export default function initController() {
                 });
                 renderizarTarjetasCanales();
                 sincronizarCamposTecnicos();
+            }
+
+            async function refrescarSilenciosoDesdeBackend() {
+                if (!window.AxionApi) return;
+                try {
+                    const lista = await window.AxionApi.get("/reles");
+                    aplicarListaDesdeBackend(lista, true);
+                } catch {
+                    // Mantener estado actual si hay fallo transitorio en polling
+                }
             }
 
             async function cargarDesdeBackend() {
@@ -345,6 +384,9 @@ export default function initController() {
             });
 
             cargarDesdeBackend();
+            pollingRelesTimer = setInterval(refrescarSilenciosoDesdeBackend, 5000);
+            window.addEventListener("focus", refrescarSilenciosoDesdeBackend);
+            document.addEventListener("dashboard:actualizarLecturas", refrescarSilenciosoDesdeBackend);
         })();
     } finally {
         document.addEventListener = __origDocAdd;
@@ -353,6 +395,7 @@ export default function initController() {
     }
 
     return () => {
+        if (pollingRelesTimer) clearInterval(pollingRelesTimer);
         __docListeners.forEach(([t, fn, opts]) => document.removeEventListener(t, fn, opts));
         __winListeners.forEach(([t, fn, opts]) => window.removeEventListener(t, fn, opts));
         __observers.forEach((obs) => obs.disconnect());
