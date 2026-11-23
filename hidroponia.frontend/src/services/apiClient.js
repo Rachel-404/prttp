@@ -39,6 +39,27 @@ async function request(path, options = {}) {
   }
 
   if (!resp.ok) {
+    if ((resp.status === 401 || resp.status === 403) && !String(path).startsWith("/auth/")) {
+      try {
+        localStorage.removeItem(CLAVE_SESION_ADMIN);
+        sessionStorage.removeItem(CLAVE_SESION_ADMIN);
+        if (typeof window.AxionSincronizarSesion === "function") {
+          window.AxionSincronizarSesion();
+        }
+        const rutaActual = window.location.pathname + window.location.search;
+        if (!window.location.pathname.startsWith("/login")) {
+          const destino = `/login?redirect=${encodeURIComponent(rutaActual)}`;
+          if (typeof window.AxionNavigate === "function") {
+            window.AxionNavigate(destino);
+          } else {
+            window.location.href = destino;
+          }
+        }
+      } catch {
+        // Ignorar errores de redirección
+      }
+    }
+
     let msg = `Error HTTP ${resp.status}`;
     try {
       const errBody = await resp.json();

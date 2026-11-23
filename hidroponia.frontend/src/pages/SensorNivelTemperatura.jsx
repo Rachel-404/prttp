@@ -288,7 +288,7 @@ export default function SensorNivelTemperatura() {
 
                       <div className="grupo-campo">
                         <label htmlFor="tec-temp-pin-cs" className="etiqueta-campo">Pin SPI CS</label>
-                        <select id="tec-temp-pin-cs" name="pinCs" className="campo-control" defaultValue="GPIO5">
+                        <select id="tec-temp-pin-cs" name="pinCs" className="campo-control" defaultValue="GPIO10">
                           <option value="GPIO5">GPIO 5</option>
                           <option value="GPIO10">GPIO 10</option>
                           <option value="GPIO15">GPIO 15</option>

@@ -144,7 +144,7 @@ export default function SensorEc() {
                 <div className="grid-tecnico-adc">
                   <div className="grupo-campo">
                     <label htmlFor="tec-ec-gpio" className="etiqueta-campo">Pin GPIO / Canal ADC1</label>
-                    <select id="tec-ec-gpio" name="gpioAdc" className="campo-control" defaultValue="GPIO1_ADC1">
+                    <select id="tec-ec-gpio" name="gpioAdc" className="campo-control" defaultValue="GPIO5_ADC1">
                       <option value="GPIO1_ADC1">GPIO 1</option>
                       <option value="GPIO2_ADC1">GPIO 2</option>
                       <option value="GPIO3_ADC1">GPIO 3</option>

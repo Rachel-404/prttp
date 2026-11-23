@@ -31,18 +31,17 @@ export default function initController() {
             const FRECUENCIAS_VALIDAS = [300, 600, 900, 1800, 3600];
             const BUFFERS_SEGUNDO_PUNTO = {
                 "4.00": "Buffer Ácido pH 4.00",
-                "9.18": "Buffer Alcalino pH 9.18"
+                "10.00": "Buffer Alcalino pH 10.00"
             };
-            const UARTS_VALIDOS = ["UART1", "UART2"];
-            const BAUDS_VALIDOS = [9600, 19200, 115200];
+            const GPIOS_ADC_VALIDOS = [
+                "GPIO1_ADC1", "GPIO2_ADC1", "GPIO3_ADC1", "GPIO4_ADC1",
+                "GPIO5_ADC1", "GPIO6_ADC1", "GPIO7_ADC1"
+            ];
+            const ATENUACIONES_VALIDAS = ["11db", "6db", "2.5db", "0db"];
 
             const DEFAULTS_TECNICOS_PH = {
-                uart: "UART1",
-                pinRx: 18,
-                pinTx: 17,
-                pinDeRe: 21,
-                slaveId: 1,
-                baudRate: 9600
+                gpioAdc: "GPIO4_ADC1",
+                atenuacionAdc: "11db"
             };
 
             const estadoModuloPh = {
@@ -50,9 +49,8 @@ export default function initController() {
                 frecuenciaLecturaSeg: 300,
                 phMinimo: 5.5,
                 phMaximo: 6.5,
-                calPh400: 4.0,
-                calPh686: 6.86,
-                calPh918: 9.18
+                voltajeNeutroMv: 1500.0,
+                voltajeAcidoMv: 2032.44
             };
 
             let estadoTecnicoPh = { ...DEFAULTS_TECNICOS_PH };
@@ -68,18 +66,13 @@ export default function initController() {
             const btnCalibrarNeutro = document.getElementById("btn-calibrar-neutro");
             const selectBufferSegundo = document.getElementById("select-buffer-segundo");
             const btnCalibrarSegundo = document.getElementById("btn-calibrar-segundo");
-            const inputCal400 = document.getElementById("ph-cal-400");
-            const inputCal686 = document.getElementById("ph-cal-686");
-            const inputCal918 = document.getElementById("ph-cal-918");
-            const btnCalibrarTresPuntos = document.getElementById("btn-calibrar-tres-puntos");
+            const inputVoltajeNeutro = document.getElementById("ph-voltaje-neutro");
+            const inputVoltajeAcido = document.getElementById("ph-voltaje-acido");
+            const btnCalibrarVoltajes = document.getElementById("btn-calibrar-tres-puntos");
 
             const formTecnico = document.getElementById("form-tecnico-ph");
-            const selectUart = document.getElementById("tec-uart");
-            const inputPinRx = document.getElementById("tec-pin-rx");
-            const inputPinTx = document.getElementById("tec-pin-tx");
-            const inputPinDeRe = document.getElementById("tec-pin-dere");
-            const inputSlaveId = document.getElementById("tec-slave-id");
-            const selectBaudRate = document.getElementById("tec-baud-rate");
+            const selectGpioAdc = document.getElementById("tec-ph-gpio");
+            const selectAtenuacion = document.getElementById("tec-ph-atenuacion");
             const errorTecnico = document.getElementById("error-tecnico-ph");
             const btnRestaurarFabrica = document.getElementById("btn-restaurar-fabrica");
 
@@ -132,15 +125,10 @@ export default function initController() {
                 if (Number.isFinite(Number(cfg.maxNormal))) estadoModuloPh.phMaximo = Number(cfg.maxNormal);
 
                 const p = cfg.parametrosTecnicos || {};
-                if (Number.isFinite(Number(p.calPh400))) estadoModuloPh.calPh400 = Number(p.calPh400);
-                if (Number.isFinite(Number(p.calPh686))) estadoModuloPh.calPh686 = Number(p.calPh686);
-                if (Number.isFinite(Number(p.calPh918))) estadoModuloPh.calPh918 = Number(p.calPh918);
-                if (UARTS_VALIDOS.includes(p.uart)) estadoTecnicoPh.uart = p.uart;
-                if (Number.isInteger(Number(p.pinRx))) estadoTecnicoPh.pinRx = Number(p.pinRx);
-                if (Number.isInteger(Number(p.pinTx))) estadoTecnicoPh.pinTx = Number(p.pinTx);
-                if (Number.isInteger(Number(p.pinDeRe))) estadoTecnicoPh.pinDeRe = Number(p.pinDeRe);
-                if (Number.isInteger(Number(p.slaveId))) estadoTecnicoPh.slaveId = Number(p.slaveId);
-                if (BAUDS_VALIDOS.includes(Number(p.baudRate))) estadoTecnicoPh.baudRate = Number(p.baudRate);
+                if (Number.isFinite(Number(p.voltajeNeutroMv))) estadoModuloPh.voltajeNeutroMv = Number(p.voltajeNeutroMv);
+                if (Number.isFinite(Number(p.voltajeAcidoMv))) estadoModuloPh.voltajeAcidoMv = Number(p.voltajeAcidoMv);
+                if (GPIOS_ADC_VALIDOS.includes(p.gpioAdc)) estadoTecnicoPh.gpioAdc = p.gpioAdc;
+                if (ATENUACIONES_VALIDAS.includes(p.atenuacionAdc)) estadoTecnicoPh.atenuacionAdc = p.atenuacionAdc;
                 sincronizarFormulario();
             }
 
@@ -167,10 +155,9 @@ export default function initController() {
             async function guardarTecnicoEnBackend() {
                 const cfg = await window.AxionApi.put(`/sensores/${MODULO}/tecnico`, {
                     ...estadoTecnicoPh,
-                    calPh400: estadoModuloPh.calPh400,
-                    calPh686: estadoModuloPh.calPh686,
-                    calPh918: estadoModuloPh.calPh918,
-                    estandar: "NIST"
+                    voltajeNeutroMv: estadoModuloPh.voltajeNeutroMv,
+                    voltajeAcidoMv: estadoModuloPh.voltajeAcidoMv,
+                    tipoSensor: "analogico_dfrobot_v2"
                 });
                 aplicarDesdeBackend(cfg);
             }
@@ -187,15 +174,10 @@ export default function initController() {
                 if (selectFrecuencia) selectFrecuencia.value = String(estadoModuloPh.frecuenciaLecturaSeg);
                 if (inputPhMinimo) inputPhMinimo.value = estadoModuloPh.phMinimo.toFixed(2);
                 if (inputPhMaximo) inputPhMaximo.value = estadoModuloPh.phMaximo.toFixed(2);
-                if (inputCal400) inputCal400.value = estadoModuloPh.calPh400.toFixed(2);
-                if (inputCal686) inputCal686.value = estadoModuloPh.calPh686.toFixed(2);
-                if (inputCal918) inputCal918.value = estadoModuloPh.calPh918.toFixed(2);
-                if (selectUart) selectUart.value = estadoTecnicoPh.uart;
-                if (inputPinRx) inputPinRx.value = String(estadoTecnicoPh.pinRx);
-                if (inputPinTx) inputPinTx.value = String(estadoTecnicoPh.pinTx);
-                if (inputPinDeRe) inputPinDeRe.value = String(estadoTecnicoPh.pinDeRe);
-                if (inputSlaveId) inputSlaveId.value = String(estadoTecnicoPh.slaveId);
-                if (selectBaudRate) selectBaudRate.value = String(estadoTecnicoPh.baudRate);
+                if (inputVoltajeNeutro) inputVoltajeNeutro.value = estadoModuloPh.voltajeNeutroMv.toFixed(1);
+                if (inputVoltajeAcido) inputVoltajeAcido.value = estadoModuloPh.voltajeAcidoMv.toFixed(2);
+                if (selectGpioAdc) selectGpioAdc.value = estadoTecnicoPh.gpioAdc;
+                if (selectAtenuacion) selectAtenuacion.value = estadoTecnicoPh.atenuacionAdc;
             }
 
             function mostrarError(el, msg) {
@@ -225,7 +207,7 @@ export default function initController() {
                 abrirModalConfirmacion({
                     titulo: nuevoEstado ? "¿Reactivar sensor de pH?" : "¿Pausar monitoreo de pH?",
                     mensaje: nuevoEstado
-                        ? "El sistema reanudará la lectura de pH por RS485 y la evaluación de alertas."
+                        ? "El sistema reanudará la lectura analógica de pH (GPIO 4) y la evaluación de alertas."
                         : "Se suspenderán temporalmente las alertas de pH durante limpieza o calibración.",
                     claseBoton: nuevoEstado ? "btn-modal-activar" : "btn-modal-pausar",
                     onAceptar: async () => {
@@ -247,9 +229,9 @@ export default function initController() {
                 btnCalibrarNeutro.addEventListener("click", () => {
                     abrirModalConfirmacion({
                         titulo: "Calibrar Punto Neutro",
-                        mensaje: "¿Confirmas que la sonda está sumergida en la solución buffer pH 6.86?",
+                        mensaje: "¿Confirmas que la sonda está sumergida en la solución buffer pH 7.00?",
                         claseBoton: "btn-modal-activar",
-                        onAceptar: () => ejecutarCalibracion({ paso: "PUNTO_NEUTRO", bufferPh: 6.86, calPh686: 6.86 }, "pH 6.86")
+                        onAceptar: () => ejecutarCalibracion({ paso: "PUNTO_NEUTRO", bufferPh: 7.0 }, "pH 7.00")
                     });
                 });
             }
@@ -267,26 +249,23 @@ export default function initController() {
                 });
             }
 
-            if (btnCalibrarTresPuntos) {
-                btnCalibrarTresPuntos.addEventListener("click", () => {
-                    const c400 = Number.parseFloat(inputCal400?.value || "4.00");
-                    const c686 = Number.parseFloat(inputCal686?.value || "6.86");
-                    const c918 = Number.parseFloat(inputCal918?.value || "9.18");
-                    if (![c400, c686, c918].every((v) => Number.isFinite(v) && v >= 0 && v <= 14) || !(c400 < c686 && c686 < c918)) {
-                        mostrarToast("Los 3 puntos deben ser valores válidos en orden: ácido < neutro < alcalino.");
+            if (btnCalibrarVoltajes) {
+                btnCalibrarVoltajes.addEventListener("click", () => {
+                    const vNeutro = Number.parseFloat(inputVoltajeNeutro?.value || "1500.0");
+                    const vAcido = Number.parseFloat(inputVoltajeAcido?.value || "2032.44");
+                    if (!Number.isFinite(vNeutro) || !Number.isFinite(vAcido) || vNeutro <= 0 || vAcido <= 0 || Math.abs(vNeutro - vAcido) < 10) {
+                        mostrarToast("Ingresa voltajes válidos en mV distintos entre pH 7.0 y pH 4.0.");
                         return;
                     }
-                    estadoModuloPh.calPh400 = Number(c400.toFixed(2));
-                    estadoModuloPh.calPh686 = Number(c686.toFixed(2));
-                    estadoModuloPh.calPh918 = Number(c918.toFixed(2));
+                    estadoModuloPh.voltajeNeutroMv = Number(vNeutro.toFixed(1));
+                    estadoModuloPh.voltajeAcidoMv = Number(vAcido.toFixed(2));
                     ejecutarCalibracion(
                         {
-                            paso: "TRES_PUNTOS",
-                            calPh400: estadoModuloPh.calPh400,
-                            calPh686: estadoModuloPh.calPh686,
-                            calPh918: estadoModuloPh.calPh918
+                            paso: "VOLTAJES_MV",
+                            voltajeNeutroMv: estadoModuloPh.voltajeNeutroMv,
+                            voltajeAcidoMv: estadoModuloPh.voltajeAcidoMv
                         },
-                        `${estadoModuloPh.calPh400} / ${estadoModuloPh.calPh686} / ${estadoModuloPh.calPh918}`
+                        `${estadoModuloPh.voltajeNeutroMv} / ${estadoModuloPh.voltajeAcidoMv} mV`
                     );
                 });
             }
@@ -329,35 +308,22 @@ export default function initController() {
                     e.preventDefault();
                     limpiarError(errorTecnico);
 
-                    const uart = selectUart.value;
-                    const pinRx = Number(inputPinRx.value);
-                    const pinTx = Number(inputPinTx.value);
-                    const pinDeRe = Number(inputPinDeRe.value);
-                    const slaveId = Number(inputSlaveId.value);
-                    const baudRate = Number(selectBaudRate.value);
+                    const gpioAdc = selectGpioAdc ? selectGpioAdc.value : "GPIO4_ADC1";
+                    const atenuacionAdc = selectAtenuacion ? selectAtenuacion.value : "11db";
 
-                    if (!UARTS_VALIDOS.includes(uart)) {
-                        mostrarError(errorTecnico, "Selecciona un puerto UART válido.");
+                    if (!GPIOS_ADC_VALIDOS.includes(gpioAdc)) {
+                        mostrarError(errorTecnico, "Selecciona un canal GPIO / ADC1 válido.");
                         return;
                     }
-                    const pines = [pinRx, pinTx, pinDeRe];
-                    if (pines.some((p) => !Number.isInteger(p) || p < 0 || p > 48) || new Set(pines).size !== 3) {
-                        mostrarError(errorTecnico, "Los pines RX, TX y DE/RE deben ser enteros distintos entre 0 y 48.");
-                        return;
-                    }
-                    if (!Number.isInteger(slaveId) || slaveId < 1 || slaveId > 247) {
-                        mostrarError(errorTecnico, "El Slave ID Modbus debe estar entre 1 y 247.");
-                        return;
-                    }
-                    if (!BAUDS_VALIDOS.includes(baudRate)) {
-                        mostrarError(errorTecnico, "Selecciona una velocidad en baudios válida.");
+                    if (!ATENUACIONES_VALIDAS.includes(atenuacionAdc)) {
+                        mostrarError(errorTecnico, "Selecciona una atenuación ADC válida.");
                         return;
                     }
 
-                    estadoTecnicoPh = { uart, pinRx, pinTx, pinDeRe, slaveId, baudRate };
+                    estadoTecnicoPh = { gpioAdc, atenuacionAdc };
                     try {
                         await guardarTecnicoEnBackend();
-                        mostrarToast("Configuración técnica Modbus RTU guardada.");
+                        mostrarToast("Configuración técnica ADC1 del sensor de pH guardada.");
                     } catch (err) {
                         mostrarError(errorTecnico, err.message || "Error al guardar la configuración técnica.");
                     }
@@ -368,10 +334,12 @@ export default function initController() {
                 btnRestaurarFabrica.addEventListener("click", () => {
                     abrirModalConfirmacion({
                         titulo: "¿Restaurar valores de fábrica?",
-                        mensaje: "Se restablecerán los pines UART1 y parámetros Modbus RTU a sus valores por defecto.",
+                        mensaje: "Se restablecerá la entrada analógica en GPIO 4 y atenuación 11 dB.",
                         claseBoton: "btn-modal-pausar",
                         onAceptar: async () => {
                             estadoTecnicoPh = { ...DEFAULTS_TECNICOS_PH };
+                            estadoModuloPh.voltajeNeutroMv = 1500.0;
+                            estadoModuloPh.voltajeAcidoMv = 2032.44;
                             try {
                                 await guardarTecnicoEnBackend();
                                 limpiarError(errorTecnico);

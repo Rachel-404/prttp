@@ -59,6 +59,26 @@ export default function NodoMaestro() {
                         <fieldset className="subseccion-tecnica">
                             <legend className="subtitulo-tecnico">Red Inalámbrica</legend>
 
+                            <div className="grupo-campo" style={{ marginBottom: "12px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                                    <button type="button" id="btn-escanear-wifi" className="btn-modal btn-modal-cancelar">
+                                        Buscar redes Wi-Fi
+                                    </button>
+                                    <span id="estado-escaneo-wifi" className="texto-guia"></span>
+                                </div>
+                                <div
+                                    id="lista-redes-wifi"
+                                    hidden
+                                    style={{
+                                        marginTop: "10px",
+                                        display: "grid",
+                                        gap: "8px",
+                                        maxHeight: "220px",
+                                        overflowY: "auto"
+                                    }}
+                                ></div>
+                            </div>
+
                             <div className="fila-dos-cols">
                                 <div className="grupo-campo">
                                     <label htmlFor="nodo-ssid" className="etiqueta-campo">SSID de Red Wi-Fi</label>
@@ -67,7 +87,14 @@ export default function NodoMaestro() {
 
                                 <div className="grupo-campo">
                                     <label htmlFor="nodo-wifi-pass" className="etiqueta-campo">Contraseña Wi-Fi</label>
-                                    <input type="password" id="nodo-wifi-pass" name="wifiPassword" className="campo-control" defaultValue="********" required />
+                                    <input
+                                        type="password"
+                                        id="nodo-wifi-pass"
+                                        name="wifiPassword"
+                                        className="campo-control"
+                                        defaultValue=""
+                                        placeholder="Ingresa la contraseña Wi-Fi (dejar vacío para mantener)"
+                                    />
                                 </div>
                             </div>
 
@@ -219,64 +246,9 @@ export default function NodoMaestro() {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><strong>GPIO 4</strong></td>
-                                        <td>ADC1</td>
-                                        <td>Sensor pH DFRobot Gravity V2.0</td>
-                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 5</strong></td>
-                                        <td>ADC1</td>
-                                        <td>Sensor EC / TDS V1.0</td>
-                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 6</strong></td>
-                                        <td>Digital 1-Wire</td>
-                                        <td>Sensor Temperatura y Humedad DHT22</td>
-                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 10, 11, 12, 13</strong></td>
-                                        <td>Bus SPI</td>
-                                        <td>Sonda PT100 (Pendiente módulo)</td>
-                                        <td><span className="celda-estado estado-advertencia"><span className="punto-estado" aria-hidden="true"></span><span>Reservado</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 14, 15, 16, 17</strong></td>
-                                        <td>Salida Digital</td>
-                                        <td>Módulo Relay 4 Canales HW-316 (5V Active LOW)</td>
-                                        <td><span className="celda-estado estado-normal"><span className="punto-estado" aria-hidden="true"></span><span>Asignado</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 0, 45, 46</strong></td>
-                                        <td>Sistema</td>
-                                        <td>Pines Strapping de arranque</td>
-                                        <td><span className="celda-estado estado-advertencia"><span className="punto-estado" aria-hidden="true"></span><span>Advertencia</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 19, 20</strong></td>
-                                        <td>USB OTG</td>
-                                        <td>USB Nativo D- / D+</td>
-                                        <td><span className="celda-estado estado-advertencia"><span className="punto-estado" aria-hidden="true"></span><span>Advertencia</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 43, 44</strong></td>
-                                        <td>UART0</td>
-                                        <td>Consola Serial de Depuración</td>
-                                        <td><span className="celda-estado estado-advertencia"><span className="punto-estado" aria-hidden="true"></span><span>Advertencia</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 26 – 32</strong></td>
-                                        <td>Flash SPI</td>
-                                        <td>Reservados Flash SPI Interna</td>
-                                        <td><span className="celda-estado estado-critico"><span className="punto-estado" aria-hidden="true"></span><span>Bloqueado de Fábrica</span></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>GPIO 35, 36, 37</strong></td>
-                                        <td>PSRAM Octal</td>
-                                        <td>Ocupados por PSRAM Octal</td>
-                                        <td><span className="celda-estado estado-critico"><span className="punto-estado" aria-hidden="true"></span><span>Bloqueado de Fábrica</span></span></td>
+                                        <td colSpan={4} className="texto-guia">
+                                            Cargando matriz de asignación de pines desde el backend...
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>

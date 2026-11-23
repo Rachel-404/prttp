@@ -16,6 +16,20 @@ function resolverTemaClaro(modo) {
   return modo === "claro";
 }
 
+function tokenJwtExpirado(token) {
+  if (!token || typeof token !== "string") return false;
+  try {
+    const partes = token.split(".");
+    if (partes.length !== 3) return false;
+    const base64 = partes[1].replace(/-/g, "+").replace(/_/g, "/");
+    const pad = base64.length % 4 === 0 ? "" : "=".repeat(4 - (base64.length % 4));
+    const payload = JSON.parse(atob(base64 + pad));
+    return typeof payload?.exp === "number" && payload.exp * 1000 <= Date.now();
+  } catch {
+    return false;
+  }
+}
+
 export function leerSesionGuardada() {
   try {
     const raw =
@@ -23,7 +37,13 @@ export function leerSesionGuardada() {
       sessionStorage.getItem(CLAVE_SESION_ADMIN);
     if (!raw) return null;
     const datos = JSON.parse(raw);
-    return datos && datos.autenticado === true ? datos : null;
+    if (!datos || datos.autenticado !== true) return null;
+    if (tokenJwtExpirado(datos.token)) {
+      localStorage.removeItem(CLAVE_SESION_ADMIN);
+      sessionStorage.removeItem(CLAVE_SESION_ADMIN);
+      return null;
+    }
+    return datos;
   } catch {
     return null;
   }
@@ -177,18 +197,24 @@ export function AxionProvider({ children }) {
       "ESP32_HIDRO_01";
     let activo = true;
     let ultimaLecturaId = null;
+    let ultimaFirmaEstado = null;
 
     const consultarEstadoHttp = async () => {
       try {
         const resumen = await apiGet(`/dashboard/resumen?dispositivoId=${encodeURIComponent(deviceId)}`);
         if (!activo || !resumen) return;
-        if (resumen.ultimaLectura) {
-          const idActual = resumen.ultimaLectura.id ?? resumen.ultimaLectura.ts;
-          if (idActual !== ultimaLecturaId) {
-            ultimaLecturaId = idActual;
-            window.dispatchEvent(new CustomEvent("axion:telemetria", { detail: resumen.ultimaLectura }));
-            document.dispatchEvent(new CustomEvent("dashboard:actualizarLecturas", { detail: resumen.ultimaLectura }));
-          }
+        const idActual = resumen.ultimaLectura ? (resumen.ultimaLectura.id ?? resumen.ultimaLectura.ts ?? "") : "";
+        const conectadoActual = resumen.dispositivo ? Boolean(resumen.dispositivo.conectado) : false;
+        const heartbeatActual = resumen.dispositivo?.ultimoHeartbeat ?? "";
+        const firmaActual = `${idActual}|${conectadoActual}|${heartbeatActual}`;
+
+        if (resumen.ultimaLectura && idActual !== ultimaLecturaId) {
+          ultimaLecturaId = idActual;
+          window.dispatchEvent(new CustomEvent("axion:telemetria", { detail: resumen.ultimaLectura }));
+        }
+        if (firmaActual !== ultimaFirmaEstado) {
+          ultimaFirmaEstado = firmaActual;
+          document.dispatchEvent(new CustomEvent("dashboard:actualizarLecturas", { detail: resumen.ultimaLectura }));
         }
         window.dispatchEvent(new CustomEvent("axion:alertasActualizadas"));
       } catch {

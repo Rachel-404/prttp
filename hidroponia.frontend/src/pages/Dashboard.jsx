@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import usePageStyles from "../components/usePageStyles";
 import initCtrl1 from "../controllers/dashboard.js";
@@ -59,11 +60,11 @@ export default function Dashboard() {
                     <div className="cuerpo-sensor" aria-live="polite">
                         <p id="valor-ph" className="valor-principal">-- pH</p>
                         <p id="ref-ph" className="rango-referencia">Rango normal: --</p>
-                        <p id="diag-ph" className="submetricas-tecnicas" aria-label="Métricas de diagnóstico">RS485 Modbus RTU</p>
+                        <p id="diag-ph" className="submetricas-tecnicas" aria-label="Métricas de diagnóstico">Analógico ADC1 · GPIO 4</p>
                     </div>
 
                     <footer className="pie-sensor">
-                        <span id="extra-ph" className="dato-inferior">Sensor RS485 Industrial</span>
+                        <span id="extra-ph" className="dato-inferior">Sonda DFRobot Gravity V2.0</span>
                     </footer>
                 </article>
 
@@ -112,7 +113,7 @@ export default function Dashboard() {
                 
                 <article className="card card-sensor" id="card-dht22">
                     <header className="titulo-card">
-                        <h3><a href="/sensores/temperatura-humedad">Microclima Ambiental</a></h3>
+                        <h3><Link to="/sensores/temperatura-humedad">Microclima Ambiental</Link></h3>
                         <span id="badge-dht22" className="badge-conexion sin-senal" role="status" aria-live="polite">
                             <span className="punto-estado" aria-hidden="true"></span>
                             <span id="texto-badge-dht22">Cargando</span>
@@ -164,9 +165,9 @@ export default function Dashboard() {
             <section className="card card-equipos" aria-label="Estado de equipos y actuadores">
                 <header className="titulo-card encabezado-equipos">
                     <h3>Estado de Equipos y Actuadores</h3>
-                    <a href="/reles" className="enlace-gestionar-equipos">
+                    <Link to="/reles" className="enlace-gestionar-equipos">
                         <span>Gestionar equipos</span>
-                    </a>
+                    </Link>
                 </header>
 
                 <div className="grid-equipos-dashboard" id="grid-equipos-dashboard" aria-live="polite">

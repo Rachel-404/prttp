@@ -28,6 +28,7 @@ export default function initController() {
     try {
         (function () {
             const MODULO = "nivel_agua";
+            const ALTURA_TANQUE_CM = 100;
             const FRECUENCIAS_VALIDAS = [300, 600, 900, 1800, 3600];
             const UNIDADES_VALIDAS = ["pct", "cm", "L", "kPa", "MPa", "mH2O", "m"];
             const RANGOS_VALIDOS = ["C203G", "C403G", "C104G"];
@@ -149,11 +150,13 @@ export default function initController() {
             }
 
             async function guardarControlEnBackend() {
+                const minPct = Math.min(100, Math.max(0, Number(((estadoModuloNa.nivelMinimoCm / ALTURA_TANQUE_CM) * 100).toFixed(1))));
+                const maxPct = Math.min(100, Math.max(0, Number(((estadoModuloNa.nivelMaximoCm / ALTURA_TANQUE_CM) * 100).toFixed(1))));
                 await window.AxionApi.put(`/sensores/${MODULO}/control`, {
                     activo: estadoModuloNa.activo,
                     frecuenciaSeg: estadoModuloNa.frecuenciaLecturaSeg,
-                    minNormal: estadoModuloNa.nivelMinimoCm,
-                    maxNormal: estadoModuloNa.nivelMaximoCm
+                    minNormal: minPct,
+                    maxNormal: maxPct
                 });
                 const cfg = await window.AxionApi.put(`/sensores/${MODULO}/tecnico`, {
                     unidadPrincipal: estadoModuloNa.unidadPrincipal,

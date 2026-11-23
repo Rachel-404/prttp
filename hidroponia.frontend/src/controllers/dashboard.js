@@ -100,14 +100,15 @@ export default function initController() {
             };
 
             const estadoDashboard = {
-                ec: { valor: null, kValue: 0.5, sondaTemp: "pt100", enLinea: true },
-                ph: { valor: null, enLinea: true },
-                nivel: { valor: null, valorPctCrudo: null, litros: null, unidadPrincipal: "pct", enLinea: true },
-                tempAgua: { valor: null, tipoConexion: "3_hilos", compensarOtros: true, enLinea: true },
+                ec: { valor: null, kValue: 0.5, sondaTemp: "pt100", enLinea: true, estadoHw: "ok" },
+                ph: { valor: null, enLinea: true, estadoHw: "ok" },
+                nivel: { valor: null, valorPctCrudo: null, litros: null, capacidadLitros: 350, unidadPrincipal: "pct", enLinea: true, estadoHw: "ok" },
+                tempAgua: { valor: null, tipoConexion: "3_hilos", compensarOtros: true, enLinea: true, estadoHw: "ok" },
                 dht22: {
                     temperatura: null,
                     humedad: null,
                     enLinea: true,
+                    estadoHw: "ok",
                     tempMin: 18.0,
                     tempMax: 28.0,
                     humMin: 50,
@@ -129,11 +130,10 @@ export default function initController() {
 
             function evaluarClaseColor(valor, cfg, enLinea) {
                 if (!enLinea || !Number.isFinite(valor)) return "valor-critico";
-                if (valor >= cfg.minNormal && valor <= cfg.maxNormal) return "valor-normal";
-                const limiteInfCritico = cfg.minNormal - cfg.margenAdvertencia;
-                const limiteSupCritico = cfg.maxNormal + cfg.margenAdvertencia;
-                if (valor >= limiteInfCritico && valor <= limiteSupCritico) return "valor-advertencia";
-                return "valor-critico";
+                if (valor < cfg.minNormal || valor > cfg.maxNormal) return "valor-critico";
+                const margen = Math.max(0.0001, cfg.maxNormal - cfg.minNormal) * 0.05;
+                if (valor <= cfg.minNormal + margen || valor >= cfg.maxNormal - margen) return "valor-advertencia";
+                return "valor-normal";
             }
 
             function actualizarBadgeEstado(elBadge, elTexto, estadoBadge, texto) {
@@ -165,11 +165,19 @@ export default function initController() {
                     elRef.textContent = `${prefijo}: ${minTxt} - ${maxTxt} ${cfg.unidad}`;
                 }
 
-                const tieneValor = Number.isFinite(estado.valor);
+                const hw = estado.estadoHw || "ok";
+                const esPausadoHw = hw === "pausado" || hw === "inactivo";
+                const esPendiente = hw === "pendiente";
+                const esErrorHw = hw === "error";
+                const tieneValor = !esPausadoHw && !esPendiente && !esErrorHw && Number.isFinite(estado.valor);
                 const claseColor = evaluarClaseColor(estado.valor, cfg, estado.enLinea);
 
-                if (!estado.enLinea) {
+                if (!estado.enLinea || esPausadoHw) {
                     actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Pausado");
+                } else if (esPendiente) {
+                    actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Pendiente");
+                } else if (esErrorHw) {
+                    actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Error");
                 } else if (!tieneValor) {
                     actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Sin datos");
                 } else if (claseColor === "valor-normal") {
@@ -203,7 +211,7 @@ export default function initController() {
             function renderizarDiagnosticos() {
                 const diagEc = document.getElementById("diag-ec");
                 if (diagEc) {
-                    const tempRef = Number.isFinite(estadoDashboard.tempAgua.valor)
+                    const tempRef = estadoDashboard.tempAgua.enLinea && estadoDashboard.tempAgua.estadoHw === "ok" && Number.isFinite(estadoDashboard.tempAgua.valor)
                         ? `${estadoDashboard.tempAgua.valor.toFixed(1)} °C`
                         : "-- °C";
                     diagEc.textContent = `ATC ${estadoDashboard.ec.sondaTemp === "fijo25" ? "Fijo" : "PT100"} · ${tempRef}`;
@@ -294,8 +302,19 @@ export default function initController() {
                     elExtra.textContent = `Aire: ${d.tempMin.toFixed(1)} – ${d.tempMax.toFixed(1)} °C · Humedad: ${Math.round(d.humMin)} – ${Math.round(d.humMax)} %`;
                 }
 
-                if (!d.enLinea) {
+                const hw = d.estadoHw || "ok";
+                if (!d.enLinea || hw === "pausado" || hw === "inactivo") {
                     actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Pausado");
+                    if (elTemp) {
+                        elTemp.classList.remove("valor-normal", "valor-advertencia", "valor-critico");
+                        elTemp.textContent = "-- °C";
+                    }
+                    if (elHum) elHum.textContent = "-- %";
+                    return;
+                }
+
+                if (hw === "pendiente" || hw === "error") {
+                    actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", hw === "error" ? "Error" : "Pendiente");
                     if (elTemp) {
                         elTemp.classList.remove("valor-normal", "valor-advertencia", "valor-critico");
                         elTemp.textContent = "-- °C";
@@ -373,6 +392,9 @@ export default function initController() {
                             if (Number.isFinite(Number(s.maxNormal))) CONFIG_SENSORES.ph.maxNormal = Number(s.maxNormal);
                         } else if (s.modulo === "nivel_agua") {
                             estadoDashboard.nivel.enLinea = Boolean(s.activo);
+                            if (Number.isFinite(Number(params.litros))) {
+                                estadoDashboard.nivel.capacidadLitros = Number(params.litros);
+                            }
                             const unidadKey = params.unidadPrincipal && UNIDADES_NIVEL[params.unidadPrincipal] ? params.unidadPrincipal : "pct";
                             estadoDashboard.nivel.unidadPrincipal = unidadKey;
                             const u = UNIDADES_NIVEL[unidadKey];
@@ -397,6 +419,13 @@ export default function initController() {
                 }
 
                 if (ultimaLectura) {
+                    const estHw = ultimaLectura.estadoSensores || {};
+                    estadoDashboard.ec.estadoHw = String(estHw.tds || "ok").toLowerCase();
+                    estadoDashboard.ph.estadoHw = String(estHw.ph || "ok").toLowerCase();
+                    estadoDashboard.nivel.estadoHw = String(estHw.nivel || "ok").toLowerCase();
+                    estadoDashboard.tempAgua.estadoHw = String(estHw.pt100 || "ok").toLowerCase();
+                    estadoDashboard.dht22.estadoHw = String(estHw.dht22 || "ok").toLowerCase();
+
                     if (ultimaLectura.ecUsCm != null) estadoDashboard.ec.valor = Number(ultimaLectura.ecUsCm);
                     if (ultimaLectura.ph != null) estadoDashboard.ph.valor = Number(ultimaLectura.ph);
                     if (ultimaLectura.nivelPct != null) {
@@ -404,7 +433,13 @@ export default function initController() {
                         const u = UNIDADES_NIVEL[estadoDashboard.nivel.unidadPrincipal] || UNIDADES_NIVEL.pct;
                         estadoDashboard.nivel.valor = Number((estadoDashboard.nivel.valorPctCrudo * u.factor).toFixed(u.decimales));
                     }
-                    if (ultimaLectura.volumenL != null) estadoDashboard.nivel.litros = Number(ultimaLectura.volumenL);
+                    if (estadoDashboard.nivel.estadoHw === "ok" && ultimaLectura.nivelPct != null) {
+                        estadoDashboard.nivel.litros = ultimaLectura.volumenL != null
+                            ? Number(ultimaLectura.volumenL)
+                            : (Number(ultimaLectura.nivelPct) / 100) * (estadoDashboard.nivel.capacidadLitros || 350);
+                    } else {
+                        estadoDashboard.nivel.litros = null;
+                    }
                     if (ultimaLectura.tempAguaC != null) {
                         estadoDashboard.tempAgua.valor = Number(ultimaLectura.tempAguaC);
                         if (cache) cache.guardarEnCache("temp_agua", { valorActual: estadoDashboard.tempAgua.valor });

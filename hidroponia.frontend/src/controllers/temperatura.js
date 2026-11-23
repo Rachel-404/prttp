@@ -35,7 +35,7 @@ export default function initController() {
 
             const DEFAULTS_TECNICOS_TEMP = {
                 tipoConexion: "3_hilos",
-                pinCs: "GPIO5",
+                pinCs: "GPIO10",
                 rrefOhmios: 430.0,
                 coeficienteAlpha: 0.00385,
                 filtroRed: "60Hz"
@@ -299,7 +299,7 @@ export default function initController() {
                     limpiarError(errorTecnico);
 
                     const tipoConexion = selectConexion.value;
-                    const pinCs = selectPinCs ? selectPinCs.value : "GPIO5";
+                    const pinCs = selectPinCs ? selectPinCs.value : "GPIO10";
                     const rrefOhmios = Number.parseFloat(inputRref.value);
                     const coeficienteAlpha = Number.parseFloat(inputAlpha.value);
                     const filtroRed = selectFiltro.value;
