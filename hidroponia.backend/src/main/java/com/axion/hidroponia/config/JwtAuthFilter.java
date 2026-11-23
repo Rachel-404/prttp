@@ -43,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 var adminOpt = adminRepo.findById(1);
                 if (adminOpt.isPresent()
                         && adminOpt.get().getCorreo().equalsIgnoreCase(correo)
-                        && (ver == null || ver.equals(adminOpt.get().getTokenVersion()))) {
+                        && ver != null && ver.equals(adminOpt.get().getTokenVersion())) {
                     var auth = new UsernamePasswordAuthenticationToken(
                             correo,
                             null,

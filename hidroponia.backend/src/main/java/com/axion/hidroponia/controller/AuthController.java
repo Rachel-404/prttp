@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -82,10 +84,13 @@ public class AuthController {
 
     @PostMapping("/logout")
     public Map<String, Object> logout() {
-        adminRepo.findById(1).ifPresent(admin -> {
-            admin.setTokenVersion(admin.getTokenVersion() + 1);
-            adminRepo.save(admin);
-        });
-        return Map.of("mensaje", "Sesión cerrada e invalidada correctamente.");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            adminRepo.findById(1).ifPresent(admin -> {
+                admin.setTokenVersion(admin.getTokenVersion() + 1);
+                adminRepo.save(admin);
+            });
+        }
+        return Map.of("mensaje", "Sesión cerrada correctamente.");
     }
 }

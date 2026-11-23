@@ -90,7 +90,7 @@ public class SensorController {
         cfg.setActualizadoEn(OffsetDateTime.now());
         sensorRepo.save(cfg);
 
-        auditService.registrar("pH RS485", "Calibración NIST", "Anterior", String.valueOf(body));
+        auditService.registrar("Sensor pH Analógico", "Calibración Analógica", "Anterior", String.valueOf(body));
         commandService.encolarComando("CALIBRAR_PH", body);
         return Map.of("mensaje", "Calibración de pH enviada al controlador ESP32-S3.");
     }

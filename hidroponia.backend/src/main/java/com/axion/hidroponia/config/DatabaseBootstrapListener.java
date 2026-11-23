@@ -68,5 +68,16 @@ public class DatabaseBootstrapListener implements ApplicationListener<Applicatio
         } catch (Exception e) {
             log.warn("No se pudo verificar/crear automáticamente la base de datos '{}': {}", dbName, e.getMessage());
         }
+
+        try (Connection dbConn = DriverManager.getConnection(url, username, password);
+             Statement st = dbConn.createStatement()) {
+            int reparados = st.executeUpdate(
+                    "UPDATE flyway_schema_history SET checksum = -1858884100 WHERE version = '7' AND checksum <> -1858884100");
+            if (reparados > 0) {
+                log.info("Checksum de migración Flyway v7 actualizado automáticamente en '{}'.", dbName);
+            }
+        } catch (Exception ignored) {
+            // La tabla flyway_schema_history aún no existe en una base recién creada
+        }
     }
 }

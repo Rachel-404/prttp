@@ -37,22 +37,19 @@ public class ScheduledTasksService {
     }
 
     /**
-     * Watchdog de conectividad del ESP32-S3 cada 30 segundos.
+     * Watchdog único de conectividad del ESP32-S3 cada 15 segundos (límite: 60 s sin heartbeat).
      */
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(fixedDelay = 15000)
     public void verificarHeartbeatDispositivos() {
         List<Dispositivo> dispositivos = dispositivoRepo.findAll();
         OffsetDateTime ahora = OffsetDateTime.now();
+        OffsetDateTime limite = ahora.minusSeconds(60);
 
         for (Dispositivo disp : dispositivos) {
-            if (disp.getUltimoHeartbeat() == null) continue;
-            int envioSeg = 10;
-            if (disp.getConfigBuffer() != null && disp.getConfigBuffer().get("envioSeg") instanceof Number n) {
-                envioSeg = n.intValue();
-            }
-            OffsetDateTime limite = ahora.minusSeconds(Math.max(30, envioSeg * 3L));
-            if (disp.isConectado() && disp.getUltimoHeartbeat().isBefore(limite)) {
+            if (disp.isConectado()
+                    && (disp.getUltimoHeartbeat() == null || disp.getUltimoHeartbeat().isBefore(limite))) {
                 disp.setConectado(false);
+                disp.setActualizadoEn(ahora);
                 dispositivoRepo.save(disp);
 
                 if (!alertaRepo.existsByModuloAndNivelAndLeidaFalse("nodo_maestro", "critico")) {
@@ -60,7 +57,7 @@ public class ScheduledTasksService {
                     alerta.setNivel("critico");
                     alerta.setModulo("nodo_maestro");
                     alerta.setTitulo("Pérdida de enlace con " + disp.getId());
-                    alerta.setDetalle("El nodo maestro ESP32-S3 no ha reportado telemetría reciente.");
+                    alerta.setDetalle("El nodo maestro ESP32-S3 no ha reportado actividad en los últimos 60 segundos.");
                     alerta.setUrlDestino("/nodo-maestro");
                     alerta.setLeida(false);
                     alerta.setCreadaEn(ahora);

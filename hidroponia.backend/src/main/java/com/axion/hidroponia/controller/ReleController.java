@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/reles")
@@ -90,20 +93,41 @@ public class ReleController {
 
     @PutMapping("/tecnico")
     public List<ReleCanal> actualizarTecnico(@RequestBody TecnicoRelesRequest req) {
+        if (req == null || req.pines() == null || req.pines().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debe especificar los pines GPIO de los relés.");
+        }
+
+        Map<Integer, String> pinesLimpios = new LinkedHashMap<>();
+        Set<String> pinesUsados = new HashSet<>();
+        for (Map.Entry<Integer, String> entry : req.pines().entrySet()) {
+            Integer canal = entry.getKey();
+            String pin = entry.getValue() != null ? entry.getValue().trim() : "";
+            if (canal == null || canal < 1 || canal > 6 || pin.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin GPIO inválido o vacío para el canal " + canal);
+            }
+            if (!pinesUsados.add(pin.toUpperCase())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El pin GPIO \"" + pin + "\" está duplicado entre canales.");
+            }
+            pinesLimpios.put(canal, pin);
+        }
+
+        String logica = "high".equalsIgnoreCase(req.logicaDisparo()) ? "high" : "low";
         List<ReleCanal> todos = releRepo.findAllByOrderByCanalAsc();
         for (ReleCanal r : todos) {
-            if (req.logicaDisparo() != null) {
-                r.setLogicaDisparo(req.logicaDisparo());
-            }
-            if (req.pines() != null && req.pines().containsKey(r.getCanal())) {
-                r.setPinGpio(req.pines().get(r.getCanal()));
+            r.setLogicaDisparo(logica);
+            if (pinesLimpios.containsKey(r.getCanal())) {
+                r.setPinGpio(pinesLimpios.get(r.getCanal()));
             }
             r.setActualizadoEn(OffsetDateTime.now());
         }
         List<ReleCanal> guardados = releRepo.saveAll(todos);
 
+        Map<String, Object> cmdParams = new LinkedHashMap<>();
+        cmdParams.put("logica", logica);
+        cmdParams.put("pines", pinesLimpios);
+
         auditService.registrar("Control de Equipos", "Configuración de Pines", "Anterior", "Actualizado");
-        commandService.encolarComando("CONFIG_RELES_TECNICO", Map.of("logica", req.logicaDisparo(), "pines", req.pines()));
+        commandService.encolarComando("CONFIG_RELES_TECNICO", cmdParams);
         return guardados;
     }
 }

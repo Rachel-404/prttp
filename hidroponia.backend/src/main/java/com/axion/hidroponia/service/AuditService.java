@@ -18,11 +18,16 @@ public class AuditService {
     public void registrar(String modulo, String parametro, String valorAnterior, String valorNuevo) {
         AuditoriaCambio entry = new AuditoriaCambio();
         entry.setFechaHora(OffsetDateTime.now());
-        entry.setModulo(modulo);
-        entry.setParametro(parametro);
-        entry.setValorAnterior(valorAnterior != null ? valorAnterior : "Anterior");
-        entry.setValorNuevo(valorNuevo);
-        entry.setUsuario("Administrador Único");
+        entry.setModulo(truncar(modulo != null ? modulo : "Sistema", 80));
+        entry.setParametro(truncar(parametro != null ? parametro : "Cambio", 120));
+        entry.setValorAnterior(truncar(valorAnterior != null ? valorAnterior : "Anterior", 200));
+        entry.setValorNuevo(truncar(valorNuevo != null ? valorNuevo : "", 200));
+        entry.setUsuario(truncar("Administrador Único", 80));
         auditoriaRepo.save(entry);
+    }
+
+    private String truncar(String valor, int maxLen) {
+        if (valor == null) return null;
+        return valor.length() > maxLen ? valor.substring(0, maxLen) : valor;
     }
 }

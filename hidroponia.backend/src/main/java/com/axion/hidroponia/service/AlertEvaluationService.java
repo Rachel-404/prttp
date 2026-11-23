@@ -42,7 +42,11 @@ public class AlertEvaluationService {
         }
         if (sensorOperativo(estados, "dht22")) {
             SensorConfiguracion dhtCfg = configs.get("dht22");
-            evaluarSensor(dhtCfg, lectura.getTempAmbC(), "Temperatura Ambiental fuera de umbral", "°C", "/sensores/temperatura-humedad");
+            if (dhtCfg != null && dhtCfg.isActivo() && lectura.getTempAmbC() != null
+                    && dhtCfg.getMinNormal() != null && dhtCfg.getMaxNormal() != null) {
+                evaluarRango("dht22_temp", lectura.getTempAmbC(), dhtCfg.getMinNormal(), dhtCfg.getMaxNormal(),
+                        "Temperatura Ambiental fuera de umbral", "°C", "/sensores/temperatura-humedad");
+            }
             evaluarHumedadDht22(dhtCfg, lectura.getHumAmbPct());
         }
     }
@@ -63,7 +67,7 @@ public class AlertEvaluationService {
         if (humMin == null || humMax == null || humMin >= humMax) {
             return;
         }
-        evaluarRango(cfg.getModulo(), hum, humMin, humMax, "Humedad Ambiental fuera de umbral", "%", "/sensores/temperatura-humedad");
+        evaluarRango("dht22_hum", hum, humMin, humMax, "Humedad Ambiental fuera de umbral", "%", "/sensores/temperatura-humedad");
     }
 
     private Double toDouble(Object obj) {

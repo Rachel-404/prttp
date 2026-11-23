@@ -40,7 +40,7 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // Rutas públicas (Modo Investigación / Consulta)
-                .requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/recuperar").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/recuperar", "/api/v1/auth/logout").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/dashboard/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/alertas").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/configuracion/apariencia").permitAll()

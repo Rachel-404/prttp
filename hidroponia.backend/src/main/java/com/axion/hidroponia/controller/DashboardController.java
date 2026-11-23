@@ -40,8 +40,25 @@ public class DashboardController {
         List<SensorConfiguracion> sensores = sensorRepo.findAll();
         List<ReleCanal> reles = releRepo.findAllByOrderByCanalAsc();
 
+        Map<String, Object> dispositivoResumen = null;
+        if (disp != null) {
+            dispositivoResumen = new LinkedHashMap<>();
+            dispositivoResumen.put("id", disp.getId());
+            dispositivoResumen.put("nombre", disp.getNombre());
+            dispositivoResumen.put("firmware", disp.getFirmware());
+            dispositivoResumen.put("conectado", disp.isConectado());
+            dispositivoResumen.put("rssi", disp.getRssi());
+            dispositivoResumen.put("alimentacion", disp.getAlimentacion());
+            dispositivoResumen.put("consumoMa", disp.getConsumoMa());
+            dispositivoResumen.put("psramOcupadaPct", disp.getPsramOcupadaPct());
+            dispositivoResumen.put("bufferTramas", disp.getBufferTramas());
+            dispositivoResumen.put("ultimoHeartbeat", disp.getUltimoHeartbeat());
+            dispositivoResumen.put("configBuffer", disp.getConfigBuffer());
+            dispositivoResumen.put("actualizadoEn", disp.getActualizadoEn());
+        }
+
         Map<String, Object> resp = new LinkedHashMap<>();
-        resp.put("dispositivo", disp);
+        resp.put("dispositivo", dispositivoResumen);
         resp.put("ultimaLectura", ultima);
         resp.put("sensores", sensores);
         resp.put("reles", reles);

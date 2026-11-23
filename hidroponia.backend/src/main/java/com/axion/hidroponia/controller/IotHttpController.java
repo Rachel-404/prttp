@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,7 @@ public class IotHttpController {
             @RequestHeader(value = "X-Device-Key", required = false) String deviceKey,
             @RequestParam(defaultValue = "ESP32_HIDRO_01") String dispositivoId) {
         validarDeviceKey(deviceKey);
+        telemetryService.registrarHeartbeat(dispositivoId);
 
         List<ComandoPendiente> comandos = commandService.obtenerYEntregarPendientes(dispositivoId);
         List<ReleCanal> reles = releRepo.findAllByOrderByCanalAsc();
@@ -91,5 +93,35 @@ public class IotHttpController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Comando no encontrado");
         }
         return Map.of("ok", true, "id", id, "estado", "EJECUTADO");
+    }
+
+    @PostMapping("/wifi-redes")
+    public Map<String, Object> recibirRedesWifi(
+            @RequestHeader(value = "X-Device-Key", required = false) String deviceKey,
+            @RequestBody Map<String, Object> body) {
+        validarDeviceKey(deviceKey);
+
+        Object rawId = body != null ? body.get("dispositivoId") : null;
+        String dispositivoId = (rawId != null && !String.valueOf(rawId).isBlank())
+                ? String.valueOf(rawId).trim()
+                : "ESP32_HIDRO_01";
+
+        List<Map<String, Object>> redes = new ArrayList<>();
+        if (body != null && body.get("redes") instanceof List<?> rawList) {
+            for (Object item : rawList) {
+                if (item instanceof Map<?, ?> rawMap) {
+                    Map<String, Object> redLimpia = new LinkedHashMap<>();
+                    rawMap.forEach((k, v) -> {
+                        if (k != null) {
+                            redLimpia.put(String.valueOf(k), v);
+                        }
+                    });
+                    redes.add(redLimpia);
+                }
+            }
+        }
+
+        commandService.registrarRedesWifi(dispositivoId, redes);
+        return Map.of("ok", true, "dispositivoId", dispositivoId, "total", redes.size());
     }
 }
