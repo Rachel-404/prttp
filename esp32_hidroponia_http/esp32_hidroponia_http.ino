@@ -5,7 +5,7 @@
  *   1. POST /api/v1/iot/telemetria        -> Envía lecturas y recibe relés + comandos.
  *   2. GET  /api/v1/iot/comandos          -> Polling cada 3 s para relés/comandos.
  *   3. POST /api/v1/iot/comandos/{id}/ack -> Confirma ejecución de comando.
- *   4. Portal Cautivo Wi-Fi ("AXION-ESP32-SETUP" en 192.168.4.1) + Memoria NVS.
+ *   4. Portal Cautivo Wi-Fi ("AXION_HIDRO_SETUP" en 192.168.4.1) + Memoria NVS.
  *
  * Pinout físico en protoboard:
  *   - pH DFRobot V2.0 : GPIO 4 (ADC1)
@@ -54,7 +54,7 @@ const char* DEFAULT_API_IOT_BASE  = SECRET_API_IOT_BASE;
 const char* DEVICE_ID             = "ESP32_HIDRO_01";
 const char* DEFAULT_DEVICE_KEY    = SECRET_DEVICE_KEY;
 
-const char* PORTAL_AP_SSID            = "AXION-ESP32-SETUP";
+const char* PORTAL_AP_SSID            = "AXION_HIDRO_SETUP";
 const unsigned long PORTAL_TIMEOUT_MS = 180000; // 3 minutos
 
 // Cambia a true solo si quieres enviar datos simulados sin sensores conectados
@@ -86,7 +86,6 @@ String cfgSsid;
 String cfgPass;
 String cfgApiBase;
 String cfgDeviceKey;
-const char* NVS_CFG_VERSION = "proto_azang_117";
 
 bool dht22Activo      = true;
 float dht22OffsetTemp = 0.0f;
@@ -113,40 +112,53 @@ struct LecturaSensores {
   bool dhtOk;
 };
 
-void cargarConfiguracionNvs() {
+void guardarConfiguracionNvs(const String& ssid, const String& pass, const String& apiBase, const String& devKey) {
   prefs.begin("axion_cfg", false);
-  String cfgVer = prefs.getString("cfgVer", "");
-  if (cfgVer != NVS_CFG_VERSION) {
-    prefs.putString("ssid", DEFAULT_WIFI_SSID);
-    prefs.putString("pass", DEFAULT_WIFI_PASSWORD);
-    prefs.putString("apiBase", DEFAULT_API_IOT_BASE);
-    prefs.putString("devKey", DEFAULT_DEVICE_KEY);
-    prefs.putString("cfgVer", NVS_CFG_VERSION);
-  }
-  cfgSsid         = prefs.getString("ssid", DEFAULT_WIFI_SSID);
-  cfgPass         = prefs.getString("pass", DEFAULT_WIFI_PASSWORD);
-  cfgApiBase      = prefs.getString("apiBase", DEFAULT_API_IOT_BASE);
-  cfgDeviceKey    = prefs.getString("devKey", DEFAULT_DEVICE_KEY);
+  prefs.putString("wifiSsid", ssid);
+  prefs.putString("wifiPass", pass);
+  prefs.putString("apiBaseUrl", apiBase);
+  prefs.putString("devKey", devKey);
+  prefs.putString("ssid", ssid);
+  prefs.putString("pass", pass);
+  prefs.putString("apiBase", apiBase);
+  prefs.end();
+}
+
+void cargarConfiguracionNvs() {
+  prefs.begin("axion_cfg", true);
+  cfgSsid      = prefs.getString("wifiSsid", prefs.getString("ssid", ""));
+  cfgPass      = prefs.getString("wifiPass", prefs.getString("pass", ""));
+  cfgApiBase   = prefs.getString("apiBaseUrl", prefs.getString("apiBase", ""));
+  cfgDeviceKey = prefs.getString("devKey", "");
   dht22Activo     = prefs.getBool("dhtActivo", true);
   dht22OffsetTemp = prefs.getFloat("dhtOffT", 0.0f);
   dht22OffsetHum  = prefs.getFloat("dhtOffH", 0.0f);
+  phVoltajeNeutro = prefs.getFloat("phVNeutro", 1500.0f);
+  phVoltajeAcido  = prefs.getFloat("phVAcido", 2032.44f);
+  if (fabs(phVoltajeNeutro - phVoltajeAcido) < 10.0f) {
+    phVoltajeNeutro = 1500.0f;
+    phVoltajeAcido  = 2032.44f;
+  }
   tdsConvFactor   = prefs.getFloat("tdsKVal", 0.5f);
   tdsFactorK      = prefs.getFloat("tdsFacK", 1.0f);
+  if (tdsFactorK < 0.1f || tdsFactorK > 5.0f) {
+    tdsFactorK = 1.0f;
+  }
   long envioSeg   = prefs.getLong("envioSeg", 15L);
   if (envioSeg >= 15L && envioSeg <= 3600L) {
     intervaloTelemetriaMs = (unsigned long)envioSeg * 1000UL;
   }
   prefs.end();
-}
 
-void guardarConfiguracionNvs(const String& ssid, const String& pass, const String& apiBase, const String& devKey) {
-  prefs.begin("axion_cfg", false);
-  prefs.putString("ssid", ssid);
-  prefs.putString("pass", pass);
-  prefs.putString("apiBase", apiBase);
-  prefs.putString("devKey", devKey);
-  prefs.putString("cfgVer", NVS_CFG_VERSION);
-  prefs.end();
+  bool faltoInicializar = (cfgSsid.length() == 0 || cfgApiBase.length() == 0);
+  if (cfgSsid.length() == 0) cfgSsid = DEFAULT_WIFI_SSID;
+  if (cfgPass.length() == 0 && String(DEFAULT_WIFI_PASSWORD).length() > 0) cfgPass = DEFAULT_WIFI_PASSWORD;
+  if (cfgApiBase.length() == 0) cfgApiBase = DEFAULT_API_IOT_BASE;
+  if (cfgDeviceKey.length() == 0) cfgDeviceKey = DEFAULT_DEVICE_KEY;
+
+  if (faltoInicializar) {
+    guardarConfiguracionNvs(cfgSsid, cfgPass, cfgApiBase, cfgDeviceKey);
+  }
 }
 
 // ============================================================================
@@ -159,13 +171,21 @@ void iniciarPortalCautivo() {
   WiFi.mode(WIFI_AP_STA);
   int redesEncontradas = WiFi.scanNetworks();
 
-  String opcionesWifi = "";
+  String listaRedesHtml = "";
   for (int i = 0; i < redesEncontradas; i++) {
     String nombre = WiFi.SSID(i);
     if (nombre.length() > 0) {
-      opcionesWifi += "<option value=\"" + nombre + "\">" + nombre + " (" + String(WiFi.RSSI(i)) + " dBm)</option>";
+      String nombreEsc = nombre;
+      nombreEsc.replace("'", "\\'");
+      nombreEsc.replace("<", "&lt;");
+      bool abierta = (WiFi.encryptionType(i) == WIFI_AUTH_OPEN);
+      listaRedesHtml += "<button type='button' class='red-btn' onclick=\"elegirRed('" + nombreEsc + "')\">"
+                        "<span>" + nombreEsc + "</span>"
+                        "<small>" + String(WiFi.RSSI(i)) + " dBm " + (abierta ? "Abierta" : "Segura") + "</small>"
+                        "</button>";
     }
   }
+  WiFi.scanDelete();
 
   WiFi.softAP(PORTAL_AP_SSID);
   IPAddress apIp = WiFi.softAPIP();
@@ -182,21 +202,25 @@ void iniciarPortalCautivo() {
     String html = "<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'>"
       "<meta name='viewport' content='width=device-width,initial-scale=1'>"
       "<title>AXION - Configurar Wi-Fi ESP32</title>"
-      "<style>body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:20px}"
-      ".card{max-width:420px;margin:20px auto;background:#1e293b;padding:24px;border-radius:10px}"
+      "<style>body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:16px}"
+      ".card{max-width:440px;margin:16px auto;background:#1e293b;padding:22px;border-radius:10px}"
       "h2{margin-top:0;color:#38bdf8}label{display:block;margin:12px 0 4px;font-size:14px}"
-      "input,select{width:100%;padding:10px;border-radius:6px;border:1px solid #475569;background:#0f172a;color:#fff;box-sizing:border-box}"
-      "button{width:100%;margin-top:18px;padding:12px;border:0;border-radius:6px;background:#22c55e;color:#052e16;font-weight:bold;font-size:16px;cursor:pointer}"
+      "input{width:100%;padding:10px;border-radius:6px;border:1px solid #475569;background:#0f172a;color:#fff;box-sizing:border-box}"
+      ".redes{display:flex;flex-direction:column;gap:6px;max-height:170px;overflow-y:auto;margin-bottom:8px}"
+      ".red-btn{display:flex;justify-content:space-between;align-items:center;width:100%;padding:9px 10px;border-radius:6px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;cursor:pointer;text-align:left}"
+      ".red-btn:hover{border-color:#38bdf8}"
+      "button[type=submit]{width:100%;margin-top:18px;padding:12px;border:0;border-radius:6px;background:#22c55e;color:#052e16;font-weight:bold;font-size:16px;cursor:pointer}"
       "</style></head><body><div class='card'><h2>AXIÓN - IOT (ESP32-S3)</h2>"
-      "<p>Configura la red Wi-Fi y la URL del servidor backend:</p>"
+      "<p>Selecciona una red Wi-Fi e ingresa la contraseña y URL/IP del backend:</p>"
+      "<div class='redes'>" + (listaRedesHtml.length() > 0 ? listaRedesHtml : "<small>No se detectaron redes cercanas</small>") + "</div>"
       "<form method='POST' action='/guardar'>"
-      "<label>Redes Wi-Fi detectadas</label><select onchange=\"document.getElementById('ssid').value=this.value\">"
-      "<option value=''>-- Seleccionar red --</option>" + opcionesWifi + "</select>"
       "<label>SSID Wi-Fi</label><input id='ssid' name='ssid' value='" + cfgSsid + "' required>"
-      "<label>Contraseña Wi-Fi</label><input type='password' name='pass' value='" + cfgPass + "'>"
-      "<label>URL Backend IoT</label><input name='apiBase' value='" + cfgApiBase + "' required>"
+      "<label>Contraseña Wi-Fi</label><input id='pass' type='password' name='pass' value='" + cfgPass + "'>"
+      "<label>URL/IP Backend IoT (ej. http://192.168.1.50:8080/api/v1/iot)</label><input name='apiBase' value='" + cfgApiBase + "' required>"
       "<label>Device Key (X-Device-Key)</label><input name='devKey' value='" + cfgDeviceKey + "' required>"
-      "<button type='submit'>Guardar y Conectar</button></form></div></body></html>";
+      "<button type='submit'>Guardar y Conectar</button></form>"
+      "<script>function elegirRed(s){document.getElementById('ssid').value=s;document.getElementById('pass').focus();}</script>"
+      "</div></body></html>";
     server.send(200, "text/html", html);
   };
 
@@ -215,6 +239,11 @@ void iniciarPortalCautivo() {
     if (nuevoSsid.length() == 0 || nuevaApi.length() == 0) {
       server.send(400, "text/plain", "SSID y URL Backend son obligatorios.");
       return;
+    }
+
+    while (nuevaApi.endsWith("/")) nuevaApi.remove(nuevaApi.length() - 1);
+    if (!nuevaApi.endsWith("/api/v1/iot")) {
+      nuevaApi += "/api/v1/iot";
     }
 
     guardarConfiguracionNvs(nuevoSsid, nuevoPass, nuevaApi, nuevaKey);
@@ -242,18 +271,24 @@ void iniciarPortalCautivo() {
 // ============================================================================
 // 5. LECTURA REAL DE SENSORES (DHT22, pH, TDS)
 // ============================================================================
-float leerPHReal() {
+float leerVoltajePhMv() {
   long suma = 0;
   for (int i = 0; i < 15; i++) {
     suma += analogReadMilliVolts(PIN_PH);
     delay(10);
   }
-  float mV = suma / 15.0f;
-  float pendiente = (7.0f - 4.0f) / (phVoltajeNeutro - phVoltajeAcido);
+  return suma / 15.0f;
+}
+
+float leerPHReal() {
+  float mV = leerVoltajePhMv();
+  float diff = phVoltajeNeutro - phVoltajeAcido;
+  if (fabs(diff) < 10.0f) diff = -532.44f;
+  float pendiente = (7.0f - 4.0f) / diff;
   return 7.0f + pendiente * (mV - phVoltajeNeutro);
 }
 
-float leerTDSReal(float temperaturaAgua) {
+float leerEcBaseUsCm(float temperaturaAgua) {
   long suma = 0;
   for (int i = 0; i < 15; i++) {
     suma += analogReadMilliVolts(PIN_TDS);
@@ -262,7 +297,13 @@ float leerTDSReal(float temperaturaAgua) {
   float voltaje = (suma / 15.0f) / 1000.0f;
   float coefComp = 1.0f + 0.02f * (temperaturaAgua - 25.0f);
   float voltComp = voltaje / coefComp;
-  float tds = (133.42f * pow(voltComp, 3) - 255.86f * pow(voltComp, 2) + 857.39f * voltComp) * tdsConvFactor * tdsFactorK;
+  float ecBase = 133.42f * pow(voltComp, 3) - 255.86f * pow(voltComp, 2) + 857.39f * voltComp;
+  return (ecBase < 0.0f) ? 0.0f : ecBase;
+}
+
+float leerTDSReal(float temperaturaAgua) {
+  float ecBase = leerEcBaseUsCm(temperaturaAgua);
+  float tds = ecBase * tdsConvFactor * tdsFactorK;
   return (tds < 0.0f) ? 0.0f : tds;
 }
 
@@ -345,6 +386,55 @@ void confirmarComandoAck(long comandoId) {
   http.end();
 }
 
+void escanearYEnviarRedesWifi() {
+  if (WiFi.status() != WL_CONNECTED) return;
+
+  Serial.println("[WIFI] Escaneando redes cercanas...");
+  int n = WiFi.scanNetworks();
+
+  JsonDocument doc;
+  doc["dispositivoId"] = DEVICE_ID;
+  JsonArray redes = doc["redes"].to<JsonArray>();
+
+  for (int i = 0; i < n; i++) {
+    String ssid = WiFi.SSID(i);
+    ssid.trim();
+    if (ssid.length() == 0) continue;
+
+    bool duplicada = false;
+    for (JsonObject existente : redes) {
+      if (String(existente["ssid"] | "") == ssid) {
+        duplicada = true;
+        break;
+      }
+    }
+    if (duplicada) continue;
+
+    bool abierta = (WiFi.encryptionType(i) == WIFI_AUTH_OPEN);
+    JsonObject item = redes.add<JsonObject>();
+    item["ssid"]      = ssid;
+    item["rssi"]      = WiFi.RSSI(i);
+    item["seguridad"] = abierta ? "Abierta" : "WPA/WPA2";
+    item["segura"]    = !abierta;
+  }
+  WiFi.scanDelete();
+
+  String jsonBody;
+  serializeJson(doc, jsonBody);
+
+  HTTPClient http;
+  String url = cfgApiBase + "/wifi-redes";
+  http.begin(url);
+  http.setTimeout(5000);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("X-Device-Key", cfgDeviceKey);
+  int code = http.POST(jsonBody);
+  Serial.printf("[WIFI] %d redes enviadas -> HTTP %d\n", redes.size(), code);
+  http.end();
+}
+
+void enviarTelemetriaHttp();
+
 void procesarComandosPendientes(JsonArray comandos) {
   for (JsonObject cmd : comandos) {
     long id = cmd["id"] | 0L;
@@ -414,31 +504,126 @@ void procesarComandosPendientes(JsonArray comandos) {
           prefs.end();
         }
         Serial.printf(" -> EC actualizado: kValue=%.2f, factorK=%.2f\n", tdsConvFactor, tdsFactorK);
+      } else if (modulo == "ph" && !p.isNull()) {
+        bool actualizadoPh = false;
+        if (p["voltajeNeutroMv"].is<float>()) {
+          float vN = p["voltajeNeutroMv"].as<float>();
+          if (vN > 0.0f) {
+            phVoltajeNeutro = vN;
+            actualizadoPh = true;
+          }
+        }
+        if (p["voltajeAcidoMv"].is<float>()) {
+          float vA = p["voltajeAcidoMv"].as<float>();
+          if (vA > 0.0f) {
+            phVoltajeAcido = vA;
+            actualizadoPh = true;
+          }
+        }
+        if (actualizadoPh && fabs(phVoltajeNeutro - phVoltajeAcido) >= 10.0f) {
+          prefs.begin("axion_cfg", false);
+          prefs.putFloat("phVNeutro", phVoltajeNeutro);
+          prefs.putFloat("phVAcido", phVoltajeAcido);
+          prefs.end();
+        }
+        Serial.printf(" -> pH actualizado: V_neutro=%.2f mV, V_acido=%.2f mV\n", phVoltajeNeutro, phVoltajeAcido);
       } else {
         Serial.printf(" -> Configuración técnica aplicada para módulo: %s\n", modulo.c_str());
       }
+    } else if (strcmp(tipo, "ESCANEAR_WIFI") == 0) {
+      escanearYEnviarRedesWifi();
     } else if (strcmp(tipo, "CONFIG_CONECTIVIDAD") == 0) {
       const char* nuevoSsid = params["ssid"] | "";
+      const char* nuevaPass = params["password"] | (params["wifiPassword"] | "");
       const char* nuevaUrl  = params["brokerUrl"] | "";
-      if (strlen(nuevoSsid) > 0 && strlen(nuevaUrl) > 0) {
+      const char* nuevaKey  = params["passTransporte"] | (params["deviceKey"] | "");
+
+      if (strlen(nuevoSsid) > 0) {
         cfgSsid = String(nuevoSsid);
+      }
+      if (strlen(nuevaPass) > 0 && strcmp(nuevaPass, "********") != 0) {
+        cfgPass = String(nuevaPass);
+      }
+      if (strlen(nuevaKey) > 0 && strcmp(nuevaKey, "********") != 0) {
+        cfgDeviceKey = String(nuevaKey);
+      }
+      if (strlen(nuevaUrl) > 0) {
         String base = String(nuevaUrl);
         while (base.endsWith("/")) base.remove(base.length() - 1);
         cfgApiBase = base.endsWith("/api/v1/iot") ? base : (base + "/api/v1/iot");
-        prefs.begin("axion_cfg", false);
-        prefs.putString("ssid", cfgSsid);
-        prefs.putString("apiBase", cfgApiBase);
-        prefs.end();
-        Serial.printf(" -> Conectividad actualizada: SSID=%s | API=%s\n", cfgSsid.c_str(), cfgApiBase.c_str());
       }
+
+      guardarConfiguracionNvs(cfgSsid, cfgPass, cfgApiBase, cfgDeviceKey);
+      Serial.printf(" -> Conectividad guardada en NVS: SSID=%s | API=%s\n", cfgSsid.c_str(), cfgApiBase.c_str());
+      confirmarComandoAck(id);
+      delay(500);
+      ESP.restart();
+      return;
     } else if (strcmp(tipo, "CALIBRAR_PH") == 0) {
-      Serial.println(" -> Ejecutando calibración de pH...");
+      String paso = params["paso"] | "";
+      float bufferPh = params["bufferPh"] | 0.0f;
+      if (paso == "VOLTAJES_MV" || (params["voltajeNeutroMv"].is<float>() && params["voltajeAcidoMv"].is<float>())) {
+        float vN = params["voltajeNeutroMv"] | phVoltajeNeutro;
+        float vA = params["voltajeAcidoMv"] | phVoltajeAcido;
+        if (vN > 0.0f && vA > 0.0f && fabs(vN - vA) >= 10.0f) {
+          phVoltajeNeutro = vN;
+          phVoltajeAcido  = vA;
+        }
+      } else {
+        float mVActual = leerVoltajePhMv();
+        if (paso == "PUNTO_NEUTRO" || fabs(bufferPh - 7.0f) < 0.2f) {
+          if (mVActual > 10.0f) {
+            phVoltajeNeutro = mVActual;
+          } else {
+            Serial.printf(" -> [pH] Lectura ADC demasiado baja (%.2f mV); revisa GPIO %d.\n", mVActual, PIN_PH);
+          }
+        } else if (paso == "SEGUNDO_PUNTO" || bufferPh > 0.0f) {
+          if (mVActual > 10.0f) {
+            if (bufferPh > 7.5f) {
+              phVoltajeAcido = phVoltajeNeutro - (mVActual - phVoltajeNeutro) * (3.0f / (bufferPh - 7.0f));
+            } else {
+              phVoltajeAcido = mVActual;
+            }
+          } else {
+            Serial.printf(" -> [pH] Lectura ADC demasiado baja (%.2f mV); revisa GPIO %d.\n", mVActual, PIN_PH);
+          }
+        }
+      }
+      if (fabs(phVoltajeNeutro - phVoltajeAcido) < 10.0f) {
+        phVoltajeAcido = phVoltajeNeutro + 532.44f;
+      }
+      prefs.begin("axion_cfg", false);
+      prefs.putFloat("phVNeutro", phVoltajeNeutro);
+      prefs.putFloat("phVAcido", phVoltajeAcido);
+      prefs.end();
+      Serial.printf(" -> pH calibrado y guardado en NVS: V_neutro(7.0)=%.2f mV | V_acido(4.0)=%.2f mV\n",
+                    phVoltajeNeutro, phVoltajeAcido);
     } else if (strcmp(tipo, "CALIBRAR_EC") == 0) {
-      Serial.println(" -> Ejecutando calibración de EC...");
+      float patronMsCm = params["solucionPatronMsCm"] | 0.0f;
+      float patronUsCm = (patronMsCm > 0.0f) ? (patronMsCm * 1000.0f) : (params["solucionPatronUsCm"] | 0.0f);
+      float ecBase = leerEcBaseUsCm(25.0f);
+      if (patronUsCm > 0.0f && ecBase > 1.0f) {
+        float nuevoK = patronUsCm / ecBase;
+        if (nuevoK < 0.1f) nuevoK = 0.1f;
+        if (nuevoK > 5.0f) nuevoK = 5.0f;
+        tdsFactorK = nuevoK;
+      } else if (params["factorCalibracionK"].is<float>()) {
+        float kParam = params["factorCalibracionK"].as<float>();
+        if (kParam >= 0.1f && kParam <= 5.0f) tdsFactorK = kParam;
+      }
+      prefs.begin("axion_cfg", false);
+      prefs.putFloat("tdsFacK", tdsFactorK);
+      prefs.end();
+      Serial.printf(" -> EC/TDS calibrado y guardado en NVS: patron=%.1f uS/cm | ecBase=%.1f uS/cm | tdsFactorK=%.3f\n",
+                    patronUsCm, ecBase, tdsFactorK);
     } else if (strcmp(tipo, "CALIBRAR_CERO_NIVEL") == 0) {
       Serial.println(" -> Registrando punto cero de nivel...");
     } else if (strcmp(tipo, "FORZAR_SYNC_BUFFER") == 0) {
-      Serial.println(" -> Sincronización forzada solicitada por el servidor.");
+      Serial.println(" -> Sincronización forzada solicitada por el servidor. Enviando telemetría ahora...");
+      confirmarComandoAck(id);
+      enviarTelemetriaHttp();
+      ultimoEnvioTelemetria = millis();
+      continue;
     }
 
     confirmarComandoAck(id);
