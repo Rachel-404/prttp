@@ -112,7 +112,7 @@ public class ConfiguracionController {
         AdminCuenta admin = adminRepo.findById(1)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cuenta no encontrada"));
         String nuevoToken = "axn_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
-        admin.setTokenRecuperacion(nuevoToken);
+        admin.setTokenRecuperacion(passwordEncoder.encode(nuevoToken));
         admin.setTokenVersion(admin.getTokenVersion() + 1);
         admin.setActualizadoEn(OffsetDateTime.now());
         adminRepo.save(admin);
@@ -151,14 +151,14 @@ public class ConfiguracionController {
         if ("todos".equalsIgnoreCase(modulo)) {
             return auditoriaRepo.findAllByOrderByFechaHoraDesc(pageable);
         }
-        return auditoriaRepo.findByModuloOrderByFechaHoraDesc(modulo, pageable);
+        return auditoriaRepo.findByModuloContainingIgnoreCaseOrderByFechaHoraDesc(modulo, pageable);
     }
 
     @GetMapping("/auditoria/exportar")
     public ResponseEntity<byte[]> exportarAuditoriaCsv(@RequestParam(defaultValue = "todos") String modulo) {
         List<AuditoriaCambio> registros = "todos".equalsIgnoreCase(modulo)
                 ? auditoriaRepo.findAllByOrderByFechaHoraDesc(PageRequest.of(0, 1000)).getContent()
-                : auditoriaRepo.findByModuloOrderByFechaHoraDesc(modulo, PageRequest.of(0, 1000)).getContent();
+                : auditoriaRepo.findByModuloContainingIgnoreCaseOrderByFechaHoraDesc(modulo, PageRequest.of(0, 1000)).getContent();
 
         StringBuilder sb = new StringBuilder();
         sb.append("FechaHora,Modulo,Parametro,ValorAnterior,ValorNuevo,Usuario\n");

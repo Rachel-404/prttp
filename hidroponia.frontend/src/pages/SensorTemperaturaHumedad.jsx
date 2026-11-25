@@ -33,17 +33,6 @@ export default function SensorTemperaturaHumedad() {
             </header>
 
             <form id="form-control-dht22" className="cuerpo-card" noValidate>
-              <div className="grupo-campo">
-                <label htmlFor="frecuencia-lectura-dht22" className="etiqueta-campo">Frecuencia de Lectura</label>
-                <select id="frecuencia-lectura-dht22" name="frecuenciaLectura" className="campo-control" defaultValue="300">
-                  <option value="300">Cada 5 minutos</option>
-                  <option value="600">Cada 10 minutos</option>
-                  <option value="900">Cada 15 minutos</option>
-                  <option value="1800">Cada 30 minutos</option>
-                  <option value="3600">Cada 1 hora</option>
-                </select>
-              </div>
-
               <div className="fila-dos-cols">
                 <div className="grupo-campo">
                   <label htmlFor="temp-min-aire" className="etiqueta-campo">Temperatura Mínima Aire °C</label>

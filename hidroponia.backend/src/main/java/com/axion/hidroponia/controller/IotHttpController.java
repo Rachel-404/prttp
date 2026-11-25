@@ -1,8 +1,10 @@
 package com.axion.hidroponia.controller;
 
 import com.axion.hidroponia.model.ComandoPendiente;
+import com.axion.hidroponia.model.Dispositivo;
 import com.axion.hidroponia.model.ReleCanal;
 import com.axion.hidroponia.model.TelemetriaLectura;
+import com.axion.hidroponia.repository.DispositivoRepository;
 import com.axion.hidroponia.repository.ReleCanalRepository;
 import com.axion.hidroponia.service.DeviceCommandService;
 import com.axion.hidroponia.service.TelemetryService;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -24,23 +28,47 @@ public class IotHttpController {
     private final TelemetryService telemetryService;
     private final DeviceCommandService commandService;
     private final ReleCanalRepository releRepo;
+    private final DispositivoRepository dispositivoRepo;
     private final String expectedDeviceKey;
 
     public IotHttpController(
             TelemetryService telemetryService,
             DeviceCommandService commandService,
             ReleCanalRepository releRepo,
+            DispositivoRepository dispositivoRepo,
             @Value("${axion.iot.device-key:axion_dev_esp32_key_2026}") String expectedDeviceKey) {
         this.telemetryService = telemetryService;
         this.commandService = commandService;
         this.releRepo = releRepo;
+        this.dispositivoRepo = dispositivoRepo;
         this.expectedDeviceKey = expectedDeviceKey;
     }
 
+    private boolean equalsConstante(String a, String b) {
+        if (a == null || b == null) return false;
+        return MessageDigest.isEqual(
+                a.getBytes(StandardCharsets.UTF_8),
+                b.getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
     private void validarDeviceKey(String deviceKey) {
-        if (deviceKey == null || !deviceKey.equals(expectedDeviceKey)) {
+        if (deviceKey == null || deviceKey.isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "X-Device-Key inválida o ausente");
         }
+        if (equalsConstante(deviceKey, expectedDeviceKey)) {
+            return;
+        }
+        for (Dispositivo disp : dispositivoRepo.findAll()) {
+            Map<String, Object> cfg = disp.getConfigRed();
+            if (cfg != null && cfg.get("deviceKey") != null) {
+                String dbKey = String.valueOf(cfg.get("deviceKey")).trim();
+                if (!dbKey.isEmpty() && equalsConstante(deviceKey, dbKey)) {
+                    return;
+                }
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "X-Device-Key inválida o ausente");
     }
 
     @PostMapping("/telemetria")

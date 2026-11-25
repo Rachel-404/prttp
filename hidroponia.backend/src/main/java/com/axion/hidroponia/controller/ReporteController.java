@@ -64,7 +64,14 @@ public class ReporteController {
 
     @GetMapping("/respaldos/politica")
     public SistemaPreferencias obtenerPolitica() {
-        return prefsRepo.findById(1).orElseGet(SistemaPreferencias::new);
+        SistemaPreferencias prefs = prefsRepo.findById(1).orElseGet(SistemaPreferencias::new);
+        Map<String, Object> cfg = new java.util.HashMap<>(
+                prefs.getConfigRespaldos() != null ? prefs.getConfigRespaldos() : Map.of()
+        );
+        long totalLecturas = telemetriaRepo.count();
+        cfg.put("totalLecturasActivas", totalLecturas);
+        prefs.setConfigRespaldos(cfg);
+        return prefs;
     }
 
     @PutMapping("/respaldos/politica")
@@ -86,7 +93,7 @@ public class ReporteController {
         SistemaPreferencias guardado = prefsRepo.save(prefs);
 
         auditService.registrar("Respaldos y Retención", "Política de Respaldo y Retención", "Anterior",
-                guardado.getDiasRetencion() + " días (" + guardado.getBackupFrecuencia() + ")");
+                guardado.getDiasRetencion() + " días · " + guardado.getBackupFrecuencia());
         return guardado;
     }
 
@@ -94,7 +101,25 @@ public class ReporteController {
     public Map<String, Object> ejecutarRespaldoManual(@RequestBody(required = false) Map<String, Object> body) {
         String canal = body != null && body.get("canal") != null ? String.valueOf(body.get("canal")) : "manual";
         String destino = body != null && body.get("destino") != null ? String.valueOf(body.get("destino")) : "";
+        String formato = body != null && body.get("formato") != null ? String.valueOf(body.get("formato")).toLowerCase() : "xlsx";
         OffsetDateTime ahora = OffsetDateTime.now();
+
+        List<TelemetriaLectura> lecturas = telemetriaRepo.findByTsBetweenOrderByTsAsc(ahora.minusDays(365), ahora);
+        byte[] contenido = "csv".equals(formato)
+                ? exportService.generarCsv(lecturas)
+                : exportService.generarXlsx(lecturas);
+        String ext = "csv".equals(formato) ? "csv" : "xlsx";
+        String nombreArchivo = "axion_backup_" + canal + "_" + ahora.toEpochSecond() + "." + ext;
+
+        java.nio.file.Path rutaArchivo;
+        try {
+            java.nio.file.Path dir = java.nio.file.Paths.get("respaldos_locales");
+            java.nio.file.Files.createDirectories(dir);
+            rutaArchivo = dir.resolve(nombreArchivo);
+            java.nio.file.Files.write(rutaArchivo, contenido);
+        } catch (Exception e) {
+            throw new IllegalStateException("No se pudo escribir el archivo de respaldo en disco", e);
+        }
 
         if ("drive".equalsIgnoreCase(canal)) {
             SistemaPreferencias prefs = prefsRepo.findById(1).orElseGet(SistemaPreferencias::new);
@@ -106,17 +131,21 @@ public class ReporteController {
                     ? new java.util.HashMap<>((java.util.Map<String, Object>) m)
                     : new java.util.HashMap<>();
             driveMap.put("ultimoRespaldo", ahora.toString());
+            driveMap.put("ultimoArchivoLocal", rutaArchivo.toString());
             cfg.put("drive", driveMap);
             prefs.setConfigRespaldos(cfg);
             prefs.setActualizadoEn(ahora);
             prefsRepo.save(prefs);
         }
 
-        String detalle = destino.isBlank() ? canal : canal + " -> " + destino;
+        String detalle = (destino.isBlank() ? canal : canal + " -> " + destino) + " · " + nombreArchivo;
         auditService.registrar("Respaldos y Retención", "Respaldo Manual", "N/A", detalle);
         return Map.of(
-                "mensaje", "Respaldo manual ejecutado correctamente.",
+                "mensaje", "Respaldo generado en disco: " + nombreArchivo + " · " + lecturas.size() + " registros.",
                 "canal", canal,
+                "archivoGenerado", rutaArchivo.toString(),
+                "bytes", contenido.length,
+                "registrosRespaldados", lecturas.size(),
                 "ejecutadoEn", ahora.toString()
         );
     }

@@ -27,17 +27,36 @@ export default function initController() {
 
     try {
         (function () {
-            const cache = window.AxionCache;
-
             const UNIDADES_NIVEL = {
-                pct: { sufijo: "%", factor: 1, decimales: 0 },
-                cm: { sufijo: "cm", factor: 1, decimales: 0 },
-                L: { sufijo: "L", factor: 4.12, decimales: 0 },
-                kPa: { sufijo: "kPa", factor: 0.124, decimales: 2 },
-                MPa: { sufijo: "MPa", factor: 0.000124, decimales: 4 },
-                mH2O: { sufijo: "mH2O", factor: 0.0126, decimales: 2 },
-                m: { sufijo: "m", factor: 0.0133, decimales: 2 }
+                pct: { sufijo: "%", decimales: 0 },
+                cm: { sufijo: "cm", decimales: 1 },
+                L: { sufijo: "L", decimales: 0 },
+                kPa: { sufijo: "kPa", decimales: 2 },
+                MPa: { sufijo: "MPa", decimales: 4 },
+                mH2O: { sufijo: "mH2O", decimales: 2 },
+                m: { sufijo: "m", decimales: 2 }
             };
+
+            function convertirPctAUnidadNivel(pct, unidadKey, capacidadLitros = 350, nivelCmReal = null) {
+                const p = Number(pct);
+                if (!Number.isFinite(p)) return null;
+                const cm = Number.isFinite(Number(nivelCmReal)) ? Number(nivelCmReal) : p;
+                switch (unidadKey) {
+                    case "cm":
+                        return Number(cm.toFixed(1));
+                    case "L":
+                        return Math.round((p / 100) * (capacidadLitros || 350));
+                    case "kPa":
+                        return Number((cm * 0.0980665).toFixed(2));
+                    case "MPa":
+                        return Number((cm * 0.0000980665).toFixed(4));
+                    case "mH2O":
+                    case "m":
+                        return Number((cm / 100).toFixed(2));
+                    default:
+                        return Math.round(p);
+                }
+            }
 
             const CONFIG_SENSORES = {
                 ec: {
@@ -167,17 +186,14 @@ export default function initController() {
 
                 const hw = estado.estadoHw || "ok";
                 const esPausadoHw = hw === "pausado" || hw === "inactivo";
-                const esPendiente = hw === "pendiente";
-                const esErrorHw = hw === "error";
-                const tieneValor = !esPausadoHw && !esPendiente && !esErrorHw && Number.isFinite(estado.valor);
+                const esDesconectadoHw = hw === "desconectado" || hw === "pendiente" || hw === "error";
+                const tieneValor = !esPausadoHw && !esDesconectadoHw && Number.isFinite(estado.valor);
                 const claseColor = evaluarClaseColor(estado.valor, cfg, estado.enLinea);
 
                 if (!estado.enLinea || esPausadoHw) {
                     actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Pausado");
-                } else if (esPendiente) {
-                    actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Pendiente");
-                } else if (esErrorHw) {
-                    actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Error");
+                } else if (esDesconectadoHw) {
+                    actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Desconectado");
                 } else if (!tieneValor) {
                     actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Sin datos");
                 } else if (claseColor === "valor-normal") {
@@ -277,8 +293,7 @@ export default function initController() {
                 }
                 if (elSubmetricaSistema) {
                     const consumo = esp.consumoMa != null ? `${esp.consumoMa} mA` : "-- mA";
-                    const buf = esp.bufferTramas != null ? `${esp.bufferTramas} tramas` : "--";
-                    elSubmetricaSistema.textContent = `${consumo} · Muestreo ${esp.muestreoSeg}s · Buffer ${buf}`;
+                    elSubmetricaSistema.textContent = `${consumo} · Muestreo HTTP ${esp.muestreoSeg}s · Memoria NVS`;
                 }
             }
 
@@ -313,8 +328,8 @@ export default function initController() {
                     return;
                 }
 
-                if (hw === "pendiente" || hw === "error") {
-                    actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", hw === "error" ? "Error" : "Pendiente");
+                if (hw === "desconectado" || hw === "pendiente" || hw === "error") {
+                    actualizarBadgeEstado(elBadge, elTextoBadge, "sin-senal", "Desconectado");
                     if (elTemp) {
                         elTemp.classList.remove("valor-normal", "valor-advertencia", "valor-critico");
                         elTemp.textContent = "-- °C";
@@ -400,8 +415,14 @@ export default function initController() {
                             const u = UNIDADES_NIVEL[unidadKey];
                             CONFIG_SENSORES.nivel.unidad = u.sufijo;
                             CONFIG_SENSORES.nivel.decimales = u.decimales;
-                            if (Number.isFinite(Number(s.minNormal))) CONFIG_SENSORES.nivel.minNormal = Number((Number(s.minNormal) * (unidadKey === "pct" ? 1 : u.factor)).toFixed(u.decimales));
-                            if (Number.isFinite(Number(s.maxNormal))) CONFIG_SENSORES.nivel.maxNormal = Number((Number(s.maxNormal) * (unidadKey === "pct" ? 1 : u.factor)).toFixed(u.decimales));
+                            const minCm = Number.isFinite(Number(params.nivelMinCm)) ? Number(params.nivelMinCm) : Number(s.minNormal);
+                            const maxCm = Number.isFinite(Number(params.nivelMaxCm)) ? Number(params.nivelMaxCm) : Number(s.maxNormal);
+                            if (Number.isFinite(Number(s.minNormal))) {
+                                CONFIG_SENSORES.nivel.minNormal = convertirPctAUnidadNivel(s.minNormal, unidadKey, estadoDashboard.nivel.capacidadLitros, minCm);
+                            }
+                            if (Number.isFinite(Number(s.maxNormal))) {
+                                CONFIG_SENSORES.nivel.maxNormal = convertirPctAUnidadNivel(s.maxNormal, unidadKey, estadoDashboard.nivel.capacidadLitros, maxCm);
+                            }
                         } else if (s.modulo === "temp_agua") {
                             estadoDashboard.tempAgua.enLinea = Boolean(s.activo);
                             if (Number.isFinite(Number(s.minNormal))) CONFIG_SENSORES.tempAgua.minNormal = Number(s.minNormal);
@@ -430,8 +451,12 @@ export default function initController() {
                     if (ultimaLectura.ph != null) estadoDashboard.ph.valor = Number(ultimaLectura.ph);
                     if (ultimaLectura.nivelPct != null) {
                         estadoDashboard.nivel.valorPctCrudo = Number(ultimaLectura.nivelPct);
-                        const u = UNIDADES_NIVEL[estadoDashboard.nivel.unidadPrincipal] || UNIDADES_NIVEL.pct;
-                        estadoDashboard.nivel.valor = Number((estadoDashboard.nivel.valorPctCrudo * u.factor).toFixed(u.decimales));
+                        estadoDashboard.nivel.valor = convertirPctAUnidadNivel(
+                            estadoDashboard.nivel.valorPctCrudo,
+                            estadoDashboard.nivel.unidadPrincipal,
+                            estadoDashboard.nivel.capacidadLitros,
+                            ultimaLectura.nivelCm
+                        );
                     }
                     if (estadoDashboard.nivel.estadoHw === "ok" && ultimaLectura.nivelPct != null) {
                         estadoDashboard.nivel.litros = ultimaLectura.volumenL != null
@@ -442,7 +467,6 @@ export default function initController() {
                     }
                     if (ultimaLectura.tempAguaC != null) {
                         estadoDashboard.tempAgua.valor = Number(ultimaLectura.tempAguaC);
-                        if (cache) cache.guardarEnCache("temp_agua", { valorActual: estadoDashboard.tempAgua.valor });
                     }
                     if (ultimaLectura.tempAmbC != null) estadoDashboard.dht22.temperatura = Number(ultimaLectura.tempAmbC);
                     if (ultimaLectura.humAmbPct != null) estadoDashboard.dht22.humedad = Number(ultimaLectura.humAmbPct);
@@ -460,7 +484,7 @@ export default function initController() {
                 if (dispositivo) {
                     estadoDashboard.esp32.conectado = Boolean(dispositivo.conectado);
                     estadoDashboard.esp32.rssi = dispositivo.rssi;
-                    estadoDashboard.esp32.ssid = dispositivo.configRedMqtt?.ssid || null;
+                    estadoDashboard.esp32.ssid = dispositivo.ssid || dispositivo.configRed?.ssid || null;
                     estadoDashboard.esp32.alimentacion = dispositivo.alimentacion || "--";
                     estadoDashboard.esp32.consumoMa = dispositivo.consumoMa;
                     estadoDashboard.esp32.bufferTramas = dispositivo.bufferTramas;
@@ -518,8 +542,12 @@ export default function initController() {
                 }
             });
 
-            document.addEventListener("dashboard:actualizarLecturas", () => {
-                cargarResumenBackend();
+            document.addEventListener("dashboard:actualizarLecturas", (e) => {
+                if (e && e.detail && e.detail.dispositivo !== undefined) {
+                    aplicarResumenDesdeBackend(e.detail);
+                } else {
+                    cargarResumenBackend();
+                }
             });
 
             renderizarTodo();

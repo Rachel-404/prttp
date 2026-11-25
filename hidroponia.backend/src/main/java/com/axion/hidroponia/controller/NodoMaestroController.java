@@ -33,14 +33,36 @@ public class NodoMaestroController {
     @GetMapping("/{dispositivoId}")
     public Dispositivo obtenerEndpoint(@PathVariable String dispositivoId) {
         Dispositivo disp = obtener(dispositivoId);
-        if (disp.getConfigRedMqtt() != null) {
-            Map<String, Object> limpia = new HashMap<>(disp.getConfigRedMqtt());
+        Dispositivo copia = new Dispositivo();
+        copia.setId(disp.getId());
+        copia.setNombre(disp.getNombre());
+        copia.setFirmware(disp.getFirmware());
+        copia.setConectado(disp.isConectado());
+        copia.setRssi(disp.getRssi());
+        copia.setAlimentacion(disp.getAlimentacion());
+        copia.setConsumoMa(disp.getConsumoMa());
+        copia.setPsramOcupadaPct(disp.getPsramOcupadaPct());
+        copia.setBufferTramas(disp.getBufferTramas());
+        copia.setUltimoHeartbeat(disp.getUltimoHeartbeat());
+        copia.setConfigBuffer(disp.getConfigBuffer());
+        copia.setPinout(disp.getPinout());
+        copia.setActualizadoEn(disp.getActualizadoEn());
+
+        if (disp.getConfigRed() != null) {
+            Map<String, Object> limpia = new HashMap<>(disp.getConfigRed());
             limpia.remove("password");
             limpia.remove("wifiPassword");
             limpia.remove("passTransporte");
-            disp.setConfigRedMqtt(limpia);
+            limpia.remove("deviceKey");
+            limpia.remove("endpoint");
+            limpia.remove("habilitarTls");
+            if (!limpia.containsKey("serverUrl") && limpia.get("brokerUrl") != null) {
+                limpia.put("serverUrl", limpia.get("brokerUrl"));
+            }
+            limpia.remove("brokerUrl");
+            copia.setConfigRed(limpia);
         }
-        return disp;
+        return copia;
     }
 
     private Dispositivo obtener(String dispositivoId) {
@@ -53,7 +75,7 @@ public class NodoMaestroController {
             @PathVariable String dispositivoId,
             @RequestBody Map<String, Object> body) {
         Dispositivo disp = obtener(dispositivoId);
-        Map<String, Object> merged = new HashMap<>(disp.getConfigRedMqtt() != null ? disp.getConfigRedMqtt() : Map.of());
+        Map<String, Object> merged = new HashMap<>(disp.getConfigRed() != null ? disp.getConfigRed() : Map.of());
         merged.putAll(body);
 
         String wifiPass = extraerSecreto(merged.remove("password"));
@@ -63,12 +85,24 @@ public class NodoMaestroController {
             merged.remove("wifiPassword");
         }
         String passTransporte = extraerSecreto(merged.remove("passTransporte"));
+        if (passTransporte == null) {
+            passTransporte = extraerSecreto(merged.remove("deviceKey"));
+        }
 
-        disp.setConfigRedMqtt(merged);
+        merged.remove("endpoint");
+        merged.remove("brokerUrl");
+        merged.remove("habilitarTls");
+        merged.put("protocolo", "http");
+        if (passTransporte != null) {
+            merged.put("deviceKey", passTransporte);
+        }
+
+        disp.setConfigRed(merged);
         disp.setActualizadoEn(OffsetDateTime.now());
-        Dispositivo guardado = dispositivoRepo.save(disp);
+        dispositivoRepo.save(disp);
 
         Map<String, Object> cmdParams = new HashMap<>(merged);
+        cmdParams.remove("deviceKey");
         if (wifiPass != null) {
             cmdParams.put("password", wifiPass);
         }
@@ -76,9 +110,9 @@ public class NodoMaestroController {
             cmdParams.put("passTransporte", passTransporte);
         }
 
-        auditService.registrar("Nodo ESP32-S3", "Conectividad Wi-Fi / MQTT", "Anterior", String.valueOf(merged.getOrDefault("ssid", "Actualizado")));
+        auditService.registrar("Nodo ESP32-S3", "Conectividad Wi-Fi / HTTP", "Anterior", String.valueOf(merged.getOrDefault("ssid", "Actualizado")));
         commandService.encolarComando(dispositivoId, "CONFIG_CONECTIVIDAD", cmdParams);
-        return guardado;
+        return obtenerEndpoint(dispositivoId);
     }
 
     private String extraerSecreto(Object raw) {
@@ -106,29 +140,24 @@ public class NodoMaestroController {
             @PathVariable String dispositivoId,
             @RequestBody Map<String, Object> body) {
         Dispositivo disp = obtener(dispositivoId);
-        Map<String, Object> merged = new HashMap<>(disp.getConfigBuffer() != null ? disp.getConfigBuffer() : Map.of());
-        if (body != null) {
-            merged.putAll(body);
-        }
+        Map<String, Object> merged = new HashMap<>();
 
         Object rawIntervalo = (body != null && body.get("muestreoSeg") != null)
                 ? body.get("muestreoSeg")
                 : (body != null && body.get("envioSeg") != null
                         ? body.get("envioSeg")
-                        : (merged.get("muestreoSeg") != null ? merged.get("muestreoSeg") : merged.get("envioSeg")));
+                        : (disp.getConfigBuffer() != null ? disp.getConfigBuffer().getOrDefault("muestreoSeg", 300) : 300));
 
         Integer intervaloSeg = parsearEnteroPositivo(rawIntervalo);
-        if (intervaloSeg != null) {
-            int acotado = Math.min(3600, Math.max(15, intervaloSeg));
-            merged.put("muestreoSeg", acotado);
-            merged.put("envioSeg", acotado);
-        }
+        int acotado = intervaloSeg != null ? Math.min(3600, Math.max(15, intervaloSeg)) : 300;
+        merged.put("muestreoSeg", acotado);
+        merged.put("envioSeg", acotado);
 
         disp.setConfigBuffer(merged);
         disp.setActualizadoEn(OffsetDateTime.now());
         Dispositivo guardado = dispositivoRepo.save(disp);
 
-        auditService.registrar("Nodo ESP32-S3", "Temporización y Buffer", "Anterior", String.valueOf(merged.getOrDefault("envioSeg", "300")) + " s");
+        auditService.registrar("Nodo ESP32-S3", "Cadencia de Muestreo HTTP", "Anterior", acotado + " s");
         commandService.encolarComando(dispositivoId, "CONFIG_BUFFER", merged);
         return guardado;
     }

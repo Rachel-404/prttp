@@ -114,7 +114,7 @@ public class AlertEvaluationService {
         alerta.setNivel(nivel);
         alerta.setModulo(modulo);
         alerta.setTitulo(tituloBase);
-        alerta.setDetalle(String.format("Lectura: %.2f %s (Rango: %.2f – %.2f %s)", valor, unidad, min, max, unidad));
+        alerta.setDetalle(String.format("Lectura: %.2f %s · Rango: %.2f – %.2f %s", valor, unidad, min, max, unidad));
         alerta.setUrlDestino(urlDestino);
         alerta.setLeida(false);
         alerta.setCreadaEn(OffsetDateTime.now());

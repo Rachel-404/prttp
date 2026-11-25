@@ -25,6 +25,9 @@ export default function initController() {
     window.addEventListener = __winProxy;
     window.MutationObserver = __TrackedMO;
 
+    let toastTimer = null;
+    let escaneoWifiTimer = null;
+
     try {
         (function () {
             const DEVICE_ID = "ESP32_HIDRO_01";
@@ -33,7 +36,6 @@ export default function initController() {
             const elAlimentacion = document.getElementById("nodo-alimentacion");
             const elFirmware = document.getElementById("nodo-firmware");
             const elPsram = document.getElementById("nodo-psram");
-            const elBufferTramas = document.getElementById("nodo-buffer-tramas");
 
             const inputSsid = document.getElementById("nodo-ssid");
             const inputWifiPass = document.getElementById("nodo-wifi-pass");
@@ -43,8 +45,7 @@ export default function initController() {
             const inputMascara = document.getElementById("nodo-mascara");
             const inputGateway = document.getElementById("nodo-gateway");
             const inputDns = document.getElementById("nodo-dns");
-            const inputBroker = document.getElementById("nodo-broker-url");
-            const inputEndpoint = document.getElementById("nodo-endpoint");
+            const inputServerUrl = document.getElementById("nodo-server-url");
             const inputUsuario = document.getElementById("nodo-usuario");
             const inputPassTransporte = document.getElementById("nodo-pass-transporte");
             const btnEscanearWifi = document.getElementById("btn-escanear-wifi");
@@ -52,10 +53,6 @@ export default function initController() {
             const listaRedesWifi = document.getElementById("lista-redes-wifi");
 
             const inputMuestreo = document.getElementById("nodo-muestreo");
-            const inputParticion = document.getElementById("nodo-particion");
-            const selectFormato = document.getElementById("nodo-formato-buffer");
-            const inputLote = document.getElementById("nodo-lote");
-            const selectDesbordamiento = document.getElementById("nodo-desbordamiento");
 
             const formConectividad = document.getElementById("form-conectividad-nodo");
             const formBuffer = document.getElementById("form-buffer-nodo");
@@ -63,9 +60,6 @@ export default function initController() {
             const btnForzarSync = document.getElementById("btn-forzar-sync");
             const btnValidarPinout = document.getElementById("btn-validar-pinout");
             const toast = document.getElementById("toast-nodo-maestro");
-
-            let toastTimer = null;
-            let escaneoWifiTimer = null;
 
             function mostrarToast(mensaje) {
                 if (!toast) return;
@@ -172,7 +166,24 @@ export default function initController() {
                 });
             }
 
-            async function cargarDesdeBackend() {
+            function aplicarModoIpUi(modo) {
+                const esEstatica = modo === "estatica";
+                [inputIpLocal, inputMascara, inputGateway, inputDns].forEach((el) => {
+                    if (!el) return;
+                    el.readOnly = !esEstatica;
+                    el.style.opacity = esEstatica ? "1" : "0.75";
+                });
+                if (grupoIpEstatica) grupoIpEstatica.hidden = false;
+            }
+
+            function asignarSiNoEditando(el, valor) {
+                if (!el || valor == null || valor === "") return;
+                if (document.activeElement !== el) {
+                    el.value = valor;
+                }
+            }
+
+            async function cargarDesdeBackend(incluirRedesWifi = true) {
                 if (!window.AxionApi) return;
                 try {
                     const disp = await window.AxionApi.get(`/nodo-maestro/${DEVICE_ID}`);
@@ -183,7 +194,7 @@ export default function initController() {
 
                     if (elEstadoRed) {
                         elEstadoRed.textContent = disp.conectado
-                            ? `Conectado${disp.rssi != null ? ` (${disp.rssi} dBm)` : ""}`
+                            ? `Conectado${disp.rssi != null ? ` · ${disp.rssi} dBm` : ""}`
                             : "Desconectado";
                         elEstadoRed.classList.toggle("valor-metrica-normal", Boolean(disp.conectado));
                     }
@@ -194,56 +205,54 @@ export default function initController() {
                     }
                     if (elFirmware) elFirmware.textContent = disp.firmware ? `v${disp.firmware}` : "--";
                     if (elPsram) elPsram.textContent = disp.psramOcupadaPct != null ? `${disp.psramOcupadaPct}% Ocupado` : "--";
-                    if (elBufferTramas) elBufferTramas.textContent = `${disp.bufferTramas ?? 0} tramas`;
 
-                    const red = disp.configRedMqtt || {};
-                    if (inputSsid && red.ssid) inputSsid.value = red.ssid;
-                    if (selectIp && red.asignacionIp) {
+                    const red = disp.configRed || {};
+                    asignarSiNoEditando(inputSsid, red.ssid);
+                    if (selectIp && red.asignacionIp && document.activeElement !== selectIp) {
                         selectIp.value = red.asignacionIp;
-                        if (grupoIpEstatica) grupoIpEstatica.hidden = red.asignacionIp !== "estatica";
                     }
-                    if (inputIpLocal && red.ipLocal) inputIpLocal.value = red.ipLocal;
-                    if (inputMascara && red.mascara) inputMascara.value = red.mascara;
-                    if (inputGateway && red.gateway) inputGateway.value = red.gateway;
-                    if (inputDns && red.dns) inputDns.value = red.dns;
-                    if (inputBroker && red.brokerUrl) inputBroker.value = red.brokerUrl;
-                    if (inputEndpoint && red.endpoint) inputEndpoint.value = red.endpoint;
+                    aplicarModoIpUi(selectIp ? selectIp.value : (red.asignacionIp || "dhcp"));
+                    asignarSiNoEditando(inputIpLocal, red.ipLocal);
+                    asignarSiNoEditando(inputMascara, red.mascara);
+                    asignarSiNoEditando(inputGateway, red.gateway);
+                    asignarSiNoEditando(inputDns, red.dns);
+                    if (inputServerUrl && red.serverUrl) inputServerUrl.value = red.serverUrl;
                     if (inputUsuario) {
-                        inputUsuario.value = (red.usuario && red.usuario !== "esp32_nodo_01")
-                            ? red.usuario
-                            : (disp.id || DEVICE_ID);
+                        inputUsuario.value = red.usuario || disp.id || DEVICE_ID;
                     }
 
                     const buf = disp.configBuffer || {};
-                    if (inputMuestreo && buf.muestreoSeg) {
-                        const val = Math.min(3600, Math.max(300, Number(buf.muestreoSeg) || 300));
+                    if (inputMuestreo && (buf.muestreoSeg || buf.envioSeg) && document.activeElement !== inputMuestreo) {
+                        const val = Math.min(3600, Math.max(15, Number(buf.muestreoSeg || buf.envioSeg) || 300));
                         inputMuestreo.value = String(val);
                     }
-                    if (inputParticion && buf.particionMb) inputParticion.value = String(buf.particionMb);
-                    if (selectFormato && buf.formatoBuffer) selectFormato.value = buf.formatoBuffer;
-                    if (inputLote && buf.loteTramas) inputLote.value = String(buf.loteTramas);
-                    if (selectDesbordamiento && buf.politicaDesbordamiento) {
-                        selectDesbordamiento.value = buf.politicaDesbordamiento;
-                    }
 
-                    const wifiRes = await window.AxionApi.get(`/nodo-maestro/${DEVICE_ID}/wifi/redes`).catch(() => null);
-                    const redes = Array.isArray(wifiRes?.redes) ? wifiRes.redes : [];
-                    if (redes.length > 0) {
-                        renderizarRedesWifi(redes);
-                        if (estadoEscaneoWifi) {
-                            estadoEscaneoWifi.textContent = `${redes.length} red(es) encontrada(s). Haz clic en una para seleccionarla.`;
+                    if (incluirRedesWifi) {
+                        const wifiRes = await window.AxionApi.get(`/nodo-maestro/${DEVICE_ID}/wifi/redes`).catch(() => null);
+                        const redes = Array.isArray(wifiRes?.redes) ? wifiRes.redes : [];
+                        if (redes.length > 0) {
+                            renderizarRedesWifi(redes);
+                            if (estadoEscaneoWifi) {
+                                estadoEscaneoWifi.textContent = `${redes.length} red(es) encontrada(s). Haz clic en una para seleccionarla.`;
+                            }
                         }
                     }
                 } catch (err) {
-                    mostrarToast(err.message || "No se pudo cargar la configuración del controlador desde el backend.");
+                    if (incluirRedesWifi) {
+                        mostrarToast(err.message || "No se pudo cargar la configuración del controlador desde el backend.");
+                    }
                 }
             }
 
-            if (selectIp && grupoIpEstatica) {
+            if (selectIp) {
                 selectIp.addEventListener("change", () => {
-                    grupoIpEstatica.hidden = selectIp.value !== "estatica";
+                    aplicarModoIpUi(selectIp.value);
                 });
             }
+
+            document.addEventListener("dashboard:actualizarLecturas", () => {
+                cargarDesdeBackend(false);
+            });
 
             if (btnEscanearWifi) {
                 btnEscanearWifi.addEventListener("click", async () => {
@@ -305,15 +314,15 @@ export default function initController() {
                     const payloadConectividad = {
                         ssid: (inputSsid?.value || "").trim(),
                         asignacionIp: selectIp?.value || "dhcp",
-                        ipLocal: (inputIpLocal?.value || "").trim(),
-                        mascara: (inputMascara?.value || "").trim(),
-                        gateway: (inputGateway?.value || "").trim(),
-                        dns: (inputDns?.value || "").trim(),
-                        protocolo: "http",
-                        brokerUrl: (inputBroker?.value || "").trim(),
-                        endpoint: (inputEndpoint?.value || "").trim(),
-                        usuario: (inputUsuario?.value || DEVICE_ID).trim()
+                        protocolo: "http"
                     };
+
+                    if (payloadConectividad.asignacionIp === "estatica") {
+                        payloadConectividad.ipLocal = (inputIpLocal?.value || "").trim();
+                        payloadConectividad.mascara = (inputMascara?.value || "").trim();
+                        payloadConectividad.gateway = (inputGateway?.value || "").trim();
+                        payloadConectividad.dns = (inputDns?.value || "").trim();
+                    }
 
                     if (wifiPass && wifiPass !== "********") {
                         payloadConectividad.password = wifiPass;
@@ -322,8 +331,8 @@ export default function initController() {
                         payloadConectividad.passTransporte = passTransporte;
                     }
 
-                    if (!payloadConectividad.ssid || !payloadConectividad.brokerUrl || !payloadConectividad.endpoint) {
-                        mostrarToast("Completa el SSID, URL del backend y endpoint de telemetría.");
+                    if (!payloadConectividad.ssid) {
+                        mostrarToast("Completa el SSID de la red Wi-Fi.");
                         return;
                     }
 
@@ -341,24 +350,20 @@ export default function initController() {
                 formBuffer.addEventListener("submit", async (e) => {
                     e.preventDefault();
                     const muestreoSeg = Number(inputMuestreo?.value || 300);
-                    if (!Number.isFinite(muestreoSeg) || muestreoSeg < 300 || muestreoSeg > 3600) {
-                        mostrarToast("La frecuencia de muestreo debe estar entre 300 s y 3600 s.");
+                    if (!Number.isFinite(muestreoSeg) || muestreoSeg < 15 || muestreoSeg > 3600) {
+                        mostrarToast("La frecuencia de muestreo debe estar entre 15 s y 3600 s.");
                         return;
                     }
                     const payloadBuffer = {
                         muestreoSeg,
-                        envioSeg: muestreoSeg,
-                        particionMb: Number(inputParticion?.value || 10),
-                        formatoBuffer: selectFormato?.value || "cbor",
-                        loteTramas: Number(inputLote?.value || 50),
-                        politicaDesbordamiento: selectDesbordamiento?.value || "fifo"
+                        envioSeg: muestreoSeg
                     };
 
                     try {
                         await window.AxionApi.put(`/nodo-maestro/${DEVICE_ID}/buffer`, payloadBuffer);
-                        mostrarToast("Política de temporización y buffer offline guardada.");
+                        mostrarToast("Cadencia de muestreo HTTP guardada en el ESP32-S3.");
                     } catch (err) {
-                        mostrarToast(err.message || "Error al guardar la política de buffer.");
+                        mostrarToast(err.message || "Error al guardar la cadencia de muestreo.");
                     }
                 });
             }
@@ -425,6 +430,8 @@ export default function initController() {
     }
 
     return () => {
+        if (toastTimer) clearTimeout(toastTimer);
+        if (escaneoWifiTimer) clearInterval(escaneoWifiTimer);
         __docListeners.forEach(([t, fn, opts]) => document.removeEventListener(t, fn, opts));
         __winListeners.forEach(([t, fn, opts]) => window.removeEventListener(t, fn, opts));
         __observers.forEach((obs) => obs.disconnect());

@@ -65,8 +65,20 @@ public class AuthController {
         AdminCuenta admin = adminRepo.findById(1)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cuenta no encontrada"));
 
-        if (admin.getTokenRecuperacion() == null
-                || !admin.getTokenRecuperacion().equals(req.tokenRecuperacion().trim())) {
+        String almacenado = admin.getTokenRecuperacion();
+        String ingresado = req.tokenRecuperacion().trim();
+        boolean tokenValido = false;
+        if (almacenado != null && !almacenado.isBlank()) {
+            if (almacenado.startsWith("$2a$") || almacenado.startsWith("$2b$") || almacenado.startsWith("$2y$")) {
+                tokenValido = passwordEncoder.matches(ingresado, almacenado);
+            } else {
+                tokenValido = java.security.MessageDigest.isEqual(
+                        almacenado.getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                        ingresado.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+                );
+            }
+        }
+        if (!tokenValido) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Token de recuperación inválido");
         }
         if (req.nuevaPassword().trim().length() < 6) {

@@ -31,9 +31,11 @@ public class JwtService {
             AdminCuentaRepository adminRepo) {
         byte[] bytes = secret.getBytes(StandardCharsets.UTF_8);
         if (bytes.length < 32) {
-            byte[] padded = new byte[32];
-            System.arraycopy(bytes, 0, padded, 0, bytes.length);
-            bytes = padded;
+            try {
+                bytes = java.security.MessageDigest.getInstance("SHA-256").digest(bytes);
+            } catch (java.security.NoSuchAlgorithmException e) {
+                throw new IllegalStateException("SHA-256 no disponible para derivar clave JWT", e);
+            }
         }
         this.key = Keys.hmacShaKeyFor(bytes);
         this.expirationMs = expirationMs;

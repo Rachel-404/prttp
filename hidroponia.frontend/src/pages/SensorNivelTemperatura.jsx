@@ -56,30 +56,17 @@ export default function SensorNivelTemperatura() {
                 </header>
 
                 <form id="form-control-na" className="cuerpo-card" noValidate>
-                  <div className="fila-dos-cols">
-                    <div className="grupo-campo">
-                      <label htmlFor="frecuencia-lectura-na" className="etiqueta-campo">Frecuencia de Lectura</label>
-                      <select id="frecuencia-lectura-na" name="frecuenciaLectura" className="campo-control" defaultValue="300">
-                        <option value="300">Cada 5 minutos</option>
-                        <option value="600">Cada 10 minutos</option>
-                        <option value="900">Cada 15 minutos</option>
-                        <option value="1800">Cada 30 minutos</option>
-                        <option value="3600">Cada 1 hora</option>
-                      </select>
-                    </div>
-
-                    <div className="grupo-campo">
-                      <label htmlFor="unidad-principal-na" className="etiqueta-campo">Unidad Principal a Mostrar</label>
-                      <select id="unidad-principal-na" name="unidadPrincipal" className="campo-control" defaultValue="pct">
-                        <option value="pct">Porcentaje</option>
-                        <option value="cm">Centímetros</option>
-                        <option value="L">Litros</option>
-                        <option value="kPa">Kilopascales</option>
-                        <option value="MPa">Megapascales</option>
-                        <option value="mH2O">Metros columna de agua</option>
-                        <option value="m">Metros</option>
-                      </select>
-                    </div>
+                  <div className="grupo-campo">
+                    <label htmlFor="unidad-principal-na" className="etiqueta-campo">Unidad Principal a Mostrar</label>
+                    <select id="unidad-principal-na" name="unidadPrincipal" className="campo-control" defaultValue="pct">
+                      <option value="pct">Porcentaje</option>
+                      <option value="cm">Centímetros</option>
+                      <option value="L">Litros</option>
+                      <option value="kPa">Kilopascales</option>
+                      <option value="MPa">Megapascales</option>
+                      <option value="mH2O">Metros columna de agua</option>
+                      <option value="m">Metros</option>
+                    </select>
                   </div>
 
                   <div className="fila-dos-cols">
@@ -151,12 +138,12 @@ export default function SensorNivelTemperatura() {
 
                       <div className="grupo-campo">
                         <label htmlFor="tec-na-shunt" className="etiqueta-campo">Resistencia Shunt Ω</label>
-                        <input type="number" id="tec-na-shunt" name="resistenciaShunt" className="campo-control" min="10" max="165" step="1" defaultValue="100" required />
+                        <input type="number" id="tec-na-shunt" name="resistenciaShunt" className="campo-control" min="10" max="165" step="1" defaultValue="150" required />
                       </div>
 
                       <div className="grupo-campo">
                         <label htmlFor="tec-na-adc-420" className="etiqueta-campo">Pin ADC1 ESP32-S3</label>
-                        <select id="tec-na-adc-420" name="pinAdc420" className="campo-control" defaultValue="GPIO2">
+                        <select id="tec-na-adc-420" name="pinAdc420" className="campo-control" defaultValue="GPIO7">
                           <option value="GPIO1">GPIO 1</option>
                           <option value="GPIO2">GPIO 2</option>
                           <option value="GPIO3">GPIO 3</option>
@@ -196,26 +183,15 @@ export default function SensorNivelTemperatura() {
                 </header>
 
                 <form id="form-control-temp" className="cuerpo-card" noValidate>
-                  <div className="grupo-campo">
-                    <label htmlFor="frecuencia-lectura-temp" className="etiqueta-campo">Frecuencia de Lectura</label>
-                    <select id="frecuencia-lectura-temp" name="frecuenciaLectura" className="campo-control" defaultValue="300">
-                      <option value="300">Cada 5 minutos</option>
-                      <option value="600">Cada 10 minutos</option>
-                      <option value="900">Cada 15 minutos</option>
-                      <option value="1800">Cada 30 minutos</option>
-                      <option value="3600">Cada 1 hora</option>
-                    </select>
-                  </div>
-
                   <div className="fila-dos-cols">
                     <div className="grupo-campo">
                       <label htmlFor="temp-minimo-agua" className="etiqueta-campo">Temperatura Mínima Agua °C</label>
-                      <input type="number" id="temp-minimo-agua" name="tempMinimaAgua" className="campo-control" min="-50.0" max="200.0" step="0.1" defaultValue="18.0" required />
+                      <input type="number" id="temp-minimo-agua" name="tempMinimaAgua" className="campo-control" min="0.0" max="400.0" step="0.1" defaultValue="18.0" required />
                     </div>
 
                     <div className="grupo-campo">
                       <label htmlFor="temp-maximo-agua" className="etiqueta-campo">Temperatura Máxima Agua °C</label>
-                      <input type="number" id="temp-maximo-agua" name="tempMaximaAgua" className="campo-control" min="-50.0" max="200.0" step="0.1" defaultValue="24.0" required />
+                      <input type="number" id="temp-maximo-agua" name="tempMaximaAgua" className="campo-control" min="0.0" max="400.0" step="0.1" defaultValue="24.0" required />
                     </div>
                   </div>
 
@@ -298,11 +274,6 @@ export default function SensorNivelTemperatura() {
                       <div className="grupo-campo">
                         <label htmlFor="tec-temp-rref" className="etiqueta-campo">Resistencia Rref Ω</label>
                         <input type="number" id="tec-temp-rref" name="rrefOhmios" className="campo-control" min="100" max="1000" step="0.1" defaultValue="430.0" required />
-                      </div>
-
-                      <div className="grupo-campo">
-                        <label htmlFor="tec-temp-alpha" className="etiqueta-campo">Coeficiente Platino α</label>
-                        <input type="number" id="tec-temp-alpha" name="coeficienteAlpha" className="campo-control" min="0.001" max="0.01" step="0.00001" defaultValue="0.00385" required />
                       </div>
 
                       <div className="grupo-campo">

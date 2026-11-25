@@ -21,14 +21,14 @@ export default function Reles() {
 
             <header className="encabezado-modulo">
                 <h1>Control de Equipos y Relés</h1>
-                <p className="subtitulo-modulo">Activación manual, modo automático por temporizador y asignación de pines GPIO.</p>
+                <p className="subtitulo-modulo">Activación manual, automatización inteligente por sensores y asignación de pines GPIO.</p>
             </header>
             <div className="reles-columna-unica">
 
                 
                 <section className="card card-reles" aria-label="Control manual y modo de operación">
                     <header className="titulo-card encabezado-reles">
-                        <h3>Control Manual y Modo de Operación</h3>
+                        <h3>Control Manual y Automatización por Sensores</h3>
                         <div className="control-modo-global">
                             <label htmlFor="modo-operacion-reles" className="etiqueta-campo">Modo:</label>
                             <select id="modo-operacion-reles" className="campo-control selector-modo-reles" defaultValue="manual">
@@ -40,8 +40,8 @@ export default function Reles() {
 
                     <div className="cuerpo-card">
                         <p id="aviso-modo-automatico" className="aviso-modo-auto" role="status" aria-live="polite" hidden>
- Modo Automático activo: el control manual de los relés está bloqueado temporalmente para evitar conflictos con la programación del ESP32-S3.
- </p>
+                            Modo Automático activo: el control manual está bloqueado y cada equipo con regla configurada se enciende o apaga automáticamente según las lecturas y rangos de los sensores.
+                        </p>
 
                         
                         <div className="grid-reles-canales" id="grid-reles-canales" aria-live="polite"></div>
@@ -62,32 +62,42 @@ export default function Reles() {
                                     <div className="grid-pines-reles">
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-1" className="etiqueta-campo">Relé 1</label>
-                                            <input type="text" id="pin-rele-1" name="pinRele1" className="campo-control" defaultValue="GPIO 14" required />
+                                            <input type="text" id="pin-rele-1" name="pinRele1" className="campo-control" defaultValue="GPIO 16" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-2" className="etiqueta-campo">Relé 2</label>
-                                            <input type="text" id="pin-rele-2" name="pinRele2" className="campo-control" defaultValue="GPIO 15" required />
+                                            <input type="text" id="pin-rele-2" name="pinRele2" className="campo-control" defaultValue="GPIO 17" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-3" className="etiqueta-campo">Relé 3</label>
-                                            <input type="text" id="pin-rele-3" name="pinRele3" className="campo-control" defaultValue="GPIO 16" required />
+                                            <input type="text" id="pin-rele-3" name="pinRele3" className="campo-control" defaultValue="GPIO 18" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-4" className="etiqueta-campo">Relé 4</label>
-                                            <input type="text" id="pin-rele-4" name="pinRele4" className="campo-control" defaultValue="GPIO 17" required />
+                                            <input type="text" id="pin-rele-4" name="pinRele4" className="campo-control" defaultValue="GPIO 8" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-5" className="etiqueta-campo">Relé 5</label>
-                                            <input type="text" id="pin-rele-5" name="pinRele5" className="campo-control" defaultValue="GPIO 18" required />
+                                            <input type="text" id="pin-rele-5" name="pinRele5" className="campo-control" defaultValue="GPIO 42" required />
                                         </div>
 
                                         <div className="grupo-campo">
                                             <label htmlFor="pin-rele-6" className="etiqueta-campo">Relé 6</label>
-                                            <input type="text" id="pin-rele-6" name="pinRele6" className="campo-control" defaultValue="GPIO 21" required />
+                                            <input type="text" id="pin-rele-6" name="pinRele6" className="campo-control" defaultValue="GPIO 41" required />
+                                        </div>
+
+                                        <div className="grupo-campo">
+                                            <label htmlFor="pin-rele-7" className="etiqueta-campo">Relé 7</label>
+                                            <input type="text" id="pin-rele-7" name="pinRele7" className="campo-control" defaultValue="GPIO 40" required />
+                                        </div>
+
+                                        <div className="grupo-campo">
+                                            <label htmlFor="pin-rele-8" className="etiqueta-campo">Relé 8</label>
+                                            <input type="text" id="pin-rele-8" name="pinRele8" className="campo-control" defaultValue="GPIO 39" required />
                                         </div>
                                     </div>
 

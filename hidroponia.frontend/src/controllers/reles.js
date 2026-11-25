@@ -28,14 +28,17 @@ export default function initController() {
 
     try {
         (function () {
+            const TOTAL_CANALES_RELES = 8;
             const DEFAULTS_TECNICOS_RELES = {
                 pines: {
-                    1: "GPIO 14",
-                    2: "GPIO 15",
-                    3: "GPIO 16",
-                    4: "GPIO 17",
-                    5: "GPIO 18",
-                    6: "GPIO 21"
+                    1: "GPIO 16",
+                    2: "GPIO 17",
+                    3: "GPIO 18",
+                    4: "GPIO 8",
+                    5: "GPIO 42",
+                    6: "GPIO 41",
+                    7: "GPIO 40",
+                    8: "GPIO 39"
                 },
                 logicaDisparo: "low"
             };
@@ -117,7 +120,7 @@ export default function initController() {
 
             function calcularFirmaEstadoActual() {
                 const canalesFirma = estadoOperacionReles.canales
-                    .map((c) => `${c.canal}|${Boolean(c.encendido)}|${c.nombre}|${estadoTecnicoReles.pines[c.canal] || ""}`)
+                    .map((c) => `${c.canal}|${Boolean(c.encendido)}|${c.nombre}|${estadoTecnicoReles.pines[c.canal] || ""}|${JSON.stringify(c.reglaAuto || {})}`)
                     .join(";");
                 return `${estadoOperacionReles.modo}|${estadoTecnicoReles.logicaDisparo}|${canalesFirma}`;
             }
@@ -129,7 +132,7 @@ export default function initController() {
                     .map((r) => {
                         const nombre = String(r.nombre || `Canal ${r.canal}`).replace(/\s*\([^()]+\)/g, "");
                         const pin = r.pinGpio || estadoTecnicoReles.pines[r.canal] || "";
-                        return `${r.canal}|${Boolean(r.encendido)}|${nombre}|${pin}`;
+                        return `${r.canal}|${Boolean(r.encendido)}|${nombre}|${pin}|${JSON.stringify(r.reglaAuto || {})}`;
                     })
                     .join(";");
                 return `${modo}|${logica}|${canalesFirma}`;
@@ -141,7 +144,11 @@ export default function initController() {
                     const activo = document.activeElement;
                     const editandoUi = !modal.hidden
                         || (selectModo && activo === selectModo)
-                        || (activo && (activo.classList?.contains("input-nombre-rele") || (formTecnico && formTecnico.contains(activo))));
+                        || (activo && (
+                            activo.classList?.contains("input-nombre-rele")
+                            || activo.closest?.(".bloque-regla-auto")
+                            || (formTecnico && formTecnico.contains(activo))
+                        ));
                     if (editandoUi) return;
                     if (calcularFirmaListaRemota(lista) === calcularFirmaEstadoActual()) return;
                 }
@@ -149,7 +156,8 @@ export default function initController() {
                 estadoOperacionReles.canales = lista.map((r) => ({
                     canal: r.canal,
                     nombre: String(r.nombre || `Canal ${r.canal}`).replace(/\s*\([^()]+\)/g, ""),
-                    encendido: Boolean(r.encendido)
+                    encendido: Boolean(r.encendido),
+                    reglaAuto: r.reglaAuto && typeof r.reglaAuto === "object" ? { ...r.reglaAuto } : { variable: "ninguna" }
                 }));
                 estadoTecnicoReles.logicaDisparo = lista[0].logicaDisparo === "high" ? "high" : "low";
                 lista.forEach((r) => {
@@ -179,6 +187,41 @@ export default function initController() {
                 }
             }
 
+            const OPCIONES_VARIABLES_REGLA = [
+                ["ninguna", "Sin regla automática"],
+                ["temp_aire", "Temperatura del Aire"],
+                ["humedad_aire", "Humedad del Aire"],
+                ["temp_agua", "Temperatura del Agua"],
+                ["ph", "Nivel de pH"],
+                ["ec", "Conductividad EC"],
+                ["tds", "Sólidos Disueltos TDS"],
+                ["nivel_agua", "Nivel de Agua"]
+            ];
+
+            const OPCIONES_ENCENDER = [
+                ["menor_min", "Baja del mínimo configurado"],
+                ["mayor_max", "Supera el máximo configurado"],
+                ["fuera_rango", "Sale del rango normal"],
+                ["dentro_rango", "Está dentro del rango normal"],
+                ["menor_valor", "Es menor que un valor"],
+                ["mayor_valor", "Es mayor que un valor"]
+            ];
+
+            const OPCIONES_APAGAR = [
+                ["en_rango", "Vuelve al rango normal"],
+                ["inverso_encendido", "Deja de cumplirse la condición de encendido"],
+                ["mayor_igual_max", "Alcanza o supera el máximo"],
+                ["menor_igual_min", "Baja o alcanza el mínimo"],
+                ["mayor_igual_valor", "Es mayor o igual a un valor"],
+                ["menor_igual_valor", "Es menor o igual a un valor"]
+            ];
+
+            function construirOpcionesHtml(lista, valorActual) {
+                return lista
+                    .map(([val, txt]) => `<option value="${val}"${val === valorActual ? " selected" : ""}>${txt}</option>`)
+                    .join("");
+            }
+
             function renderizarTarjetasCanales() {
                 const esAutomatico = estadoOperacionReles.modo === "automatico";
                 selectModo.value = estadoOperacionReles.modo;
@@ -193,6 +236,12 @@ export default function initController() {
 
                     const claseEstado = canalObj.encendido ? "encendido" : "apagado";
                     const textoEstado = canalObj.encendido ? "Encendido" : "Apagado";
+                    const regla = canalObj.reglaAuto || {};
+                    const varGuardada = regla.variable || "ninguna";
+                    const encGuardado = regla.encenderCuando || "menor_min";
+                    const apaGuardado = regla.apagarCuando || "en_rango";
+                    const umbEncGuardado = regla.umbralEncendido != null ? String(regla.umbralEncendido) : "";
+                    const umbApaGuardado = regla.umbralApagado != null ? String(regla.umbralApagado) : "";
 
                     card.innerHTML = `
                         <div class="cabecera-canal">
@@ -211,6 +260,54 @@ export default function initController() {
                                 value="${canalObj.nombre.replace(/"/g, "&quot;")}"
                             />
                         </div>
+                        <div class="bloque-regla-auto" ${esAutomatico ? "" : "hidden"}>
+                            <div class="fila-condicion-regla">
+                                <label for="regla-var-${canalObj.canal}" class="etiqueta-campo">Regla automática</label>
+                                <select id="regla-var-${canalObj.canal}" class="campo-control">
+                                    ${construirOpcionesHtml(OPCIONES_VARIABLES_REGLA, varGuardada)}
+                                </select>
+                            </div>
+                            <div class="detalle-regla-auto" id="detalle-regla-${canalObj.canal}" ${varGuardada === "ninguna" ? "hidden" : ""}>
+                                <div class="fila-condicion-regla">
+                                    <label for="regla-enc-${canalObj.canal}" class="etiqueta-campo">Encender si</label>
+                                    <select id="regla-enc-${canalObj.canal}" class="campo-control">
+                                        ${construirOpcionesHtml(OPCIONES_ENCENDER, encGuardado)}
+                                    </select>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        id="regla-umb-enc-${canalObj.canal}"
+                                        class="campo-control input-umbral-regla"
+                                        placeholder="Valor de encendido"
+                                        value="${umbEncGuardado}"
+                                        ${encGuardado.endsWith("_valor") ? "" : "hidden"}
+                                    />
+                                </div>
+                                <div class="fila-condicion-regla">
+                                    <label for="regla-apa-${canalObj.canal}" class="etiqueta-campo">Apagar si</label>
+                                    <select id="regla-apa-${canalObj.canal}" class="campo-control">
+                                        ${construirOpcionesHtml(OPCIONES_APAGAR, apaGuardado)}
+                                    </select>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        id="regla-umb-apa-${canalObj.canal}"
+                                        class="campo-control input-umbral-regla"
+                                        placeholder="Valor de apagado"
+                                        value="${umbApaGuardado}"
+                                        ${apaGuardado.endsWith("_valor") ? "" : "hidden"}
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                id="btn-guardar-regla-${canalObj.canal}"
+                                class="btn-modal btn-modal-activar btn-guardar-regla"
+                                ${varGuardada === "ninguna" ? "hidden" : ""}
+                            >
+                                Guardar Regla
+                            </button>
+                        </div>
                         <div class="pie-canal">
                             <span class="texto-accion-rele">Control manual</span>
                             <label class="switch-rele" aria-label="Encender o apagar Canal ${canalObj.canal}">
@@ -224,6 +321,67 @@ export default function initController() {
                             </label>
                         </div>
                     `;
+
+                    const selVar = card.querySelector(`#regla-var-${canalObj.canal}`);
+                    const detRegla = card.querySelector(`#detalle-regla-${canalObj.canal}`);
+                    const selEnc = card.querySelector(`#regla-enc-${canalObj.canal}`);
+                    const inpUmbEnc = card.querySelector(`#regla-umb-enc-${canalObj.canal}`);
+                    const selApa = card.querySelector(`#regla-apa-${canalObj.canal}`);
+                    const inpUmbApa = card.querySelector(`#regla-umb-apa-${canalObj.canal}`);
+                    const btnGuardarRegla = card.querySelector(`#btn-guardar-regla-${canalObj.canal}`);
+
+                    const actualizarVisibilidadRegla = () => {
+                        const esNinguna = selVar.value === "ninguna";
+                        detRegla.hidden = esNinguna;
+                        inpUmbEnc.hidden = esNinguna || !selEnc.value.endsWith("_valor");
+                        inpUmbApa.hidden = esNinguna || !selApa.value.endsWith("_valor");
+                        btnGuardarRegla.hidden = esNinguna && varGuardada === "ninguna";
+                        btnGuardarRegla.textContent = esNinguna ? "Quitar Regla" : "Guardar Regla";
+                    };
+
+                    selVar.addEventListener("change", actualizarVisibilidadRegla);
+                    selEnc.addEventListener("change", actualizarVisibilidadRegla);
+                    selApa.addEventListener("change", actualizarVisibilidadRegla);
+
+                    btnGuardarRegla.addEventListener("click", async () => {
+                        const variable = selVar.value;
+                        const payload = { variable };
+                        if (variable !== "ninguna") {
+                            payload.encenderCuando = selEnc.value;
+                            payload.apagarCuando = selApa.value;
+                            if (selEnc.value.endsWith("_valor")) {
+                                const vEnc = Number.parseFloat(inpUmbEnc.value);
+                                if (!Number.isFinite(vEnc)) {
+                                    mostrarToast("Ingresa un valor numérico válido para encender.");
+                                    inpUmbEnc.focus();
+                                    return;
+                                }
+                                payload.umbralEncendido = vEnc;
+                            }
+                            if (selApa.value.endsWith("_valor")) {
+                                const vApa = Number.parseFloat(inpUmbApa.value);
+                                if (!Number.isFinite(vApa)) {
+                                    mostrarToast("Ingresa un valor numérico válido para apagar.");
+                                    inpUmbApa.focus();
+                                    return;
+                                }
+                                payload.umbralApagado = vApa;
+                            }
+                        }
+                        try {
+                            const actualizado = await window.AxionApi.put(`/reles/${canalObj.canal}/regla`, payload);
+                            canalObj.reglaAuto = actualizado.reglaAuto || payload;
+                            canalObj.encendido = Boolean(actualizado.encendido);
+                            renderizarTarjetasCanales();
+                            mostrarToast(
+                                variable === "ninguna"
+                                    ? `Regla eliminada del Canal ${canalObj.canal}.`
+                                    : `Regla automática guardada para el Canal ${canalObj.canal}.`
+                            );
+                        } catch (err) {
+                            mostrarToast(err.message || "Error al guardar la regla automática.");
+                        }
+                    });
 
                     const inputNombre = card.querySelector(`#nombre-rele-${canalObj.canal}`);
                     inputNombre.addEventListener("change", async () => {
@@ -280,7 +438,7 @@ export default function initController() {
             }
 
             function sincronizarCamposTecnicos() {
-                for (let i = 1; i <= 6; i++) {
+                for (let i = 1; i <= TOTAL_CANALES_RELES; i++) {
                     const inputPin = document.getElementById(`pin-rele-${i}`);
                     if (inputPin) inputPin.value = estadoTecnicoReles.pines[i] || "";
                 }
@@ -309,6 +467,12 @@ export default function initController() {
             }
 
             if (formTecnico) {
+                const GPIOS_RESERVADOS_S3 = new Set([
+                    0, 3, 19, 20, 22, 23, 24, 25,
+                    26, 27, 28, 29, 30, 31, 32,
+                    33, 34, 35, 36, 37, 45, 46
+                ]);
+
                 formTecnico.addEventListener("submit", async (e) => {
                     e.preventDefault();
                     limpiarErrorTecnico();
@@ -316,19 +480,29 @@ export default function initController() {
                     const nuevosPines = {};
                     const usados = new Set();
 
-                    for (let i = 1; i <= 6; i++) {
+                    for (let i = 1; i <= TOTAL_CANALES_RELES; i++) {
                         const val = (document.getElementById(`pin-rele-${i}`)?.value || "").trim();
                         if (!val) {
                             mostrarErrorTecnico(`Indica el pin GPIO para el Relé ${i}.`);
                             return;
                         }
-                        const clave = val.toUpperCase();
+                        const limpio = val.toUpperCase().replace(/^GPIO\s*/, "").trim();
+                        if (!/^\d+$/.test(limpio)) {
+                            mostrarErrorTecnico(`Formato inválido en Relé ${i}: "${val}". Usa ej. GPIO 16.`);
+                            return;
+                        }
+                        const numGpio = Number.parseInt(limpio, 10);
+                        if (numGpio < 1 || numGpio > 48 || GPIOS_RESERVADOS_S3.has(numGpio)) {
+                            mostrarErrorTecnico(`GPIO ${numGpio} está reservado en el ESP32-S3.`);
+                            return;
+                        }
+                        const clave = `GPIO ${numGpio}`;
                         if (usados.has(clave)) {
-                            mostrarErrorTecnico(`El pin "${val}" está duplicado. Cada relé requiere un GPIO único.`);
+                            mostrarErrorTecnico(`El pin "${clave}" está duplicado. Cada relé requiere un GPIO único.`);
                             return;
                         }
                         usados.add(clave);
-                        nuevosPines[i] = val;
+                        nuevosPines[i] = clave;
                     }
 
                     const payloadTecnico = {
@@ -345,7 +519,7 @@ export default function initController() {
                     }
                 });
 
-                for (let i = 1; i <= 6; i++) {
+                for (let i = 1; i <= TOTAL_CANALES_RELES; i++) {
                     const inputPin = document.getElementById(`pin-rele-${i}`);
                     if (inputPin) inputPin.addEventListener("input", limpiarErrorTecnico);
                 }

@@ -20,7 +20,7 @@ export default function SensorPh() {
       <Layout plana>
         <header className="encabezado-modulo">
           <h1>Configuración del Sensor de pH</h1>
-          <p className="subtitulo-modulo">Umbrales de acidez, calibración en 2 puntos (pH 7.0 / pH 4.0) y entrada analógica ADC1 (GPIO 4).</p>
+          <p className="subtitulo-modulo">Umbrales de acidez, calibración en 2 puntos y entrada analógica ADC1.</p>
         </header>
 
         <div className="ordenar-div">
@@ -33,17 +33,6 @@ export default function SensorPh() {
             </header>
 
             <form id="form-control-cultivo" className="cuerpo-card" noValidate>
-              <div className="grupo-campo">
-                <label htmlFor="frecuencia-lectura" className="etiqueta-campo">Frecuencia de Lectura</label>
-                <select id="frecuencia-lectura" name="frecuenciaLectura" className="campo-control" defaultValue="300">
-                  <option value="300">Cada 5 minutos</option>
-                  <option value="600">Cada 10 minutos</option>
-                  <option value="900">Cada 15 minutos</option>
-                  <option value="1800">Cada 30 minutos</option>
-                  <option value="3600">Cada 1 hora</option>
-                </select>
-              </div>
-
               <div className="fila-dos-cols">
                 <div className="grupo-campo">
                   <label htmlFor="ph-minimo" className="etiqueta-campo">pH Mínimo</label>
@@ -68,7 +57,7 @@ export default function SensorPh() {
 
           <div className="card">
             <header className="titulo-card">
-              <h3>Calibración Analógica del pH (DFRobot Gravity V2.0)</h3>
+              <h3>Calibración Analógica del pH</h3>
             </header>
 
             <div className="cuerpo-card">
@@ -107,14 +96,14 @@ export default function SensorPh() {
               </div>
 
               <div className="subseccion-tecnica">
-                <p className="subtitulo-tecnico">Voltajes de Calibración Analógica (mV a 25 °C)</p>
+                <p className="subtitulo-tecnico">Voltajes de Calibración Analógica en mV a 25 °C</p>
                 <div className="fila-dos-cols">
                   <div className="grupo-campo">
-                    <label htmlFor="ph-voltaje-neutro" className="etiqueta-campo">Voltaje en pH 7.0 (mV)</label>
+                    <label htmlFor="ph-voltaje-neutro" className="etiqueta-campo">Voltaje en pH 7.0 mV</label>
                     <input type="number" id="ph-voltaje-neutro" name="voltajeNeutroMv" className="campo-control" min="0" max="3300" step="0.1" defaultValue="1500.0" />
                   </div>
                   <div className="grupo-campo">
-                    <label htmlFor="ph-voltaje-acido" className="etiqueta-campo">Voltaje en pH 4.0 (mV)</label>
+                    <label htmlFor="ph-voltaje-acido" className="etiqueta-campo">Voltaje en pH 4.0 mV</label>
                     <input type="number" id="ph-voltaje-acido" name="voltajeAcidoMv" className="campo-control" min="0" max="3300" step="0.01" defaultValue="2032.44" />
                   </div>
                 </div>
@@ -134,7 +123,7 @@ export default function SensorPh() {
 
             <form id="form-tecnico-ph" className="cuerpo-card" noValidate>
               <fieldset className="subseccion-tecnica">
-                <legend className="subtitulo-tecnico">Conexión Analógica ADC1 (ESP32-S3) y Atenuación</legend>
+                <legend className="subtitulo-tecnico">Conexión Analógica ADC1 y Atenuación</legend>
 
                 <div className="fila-dos-cols">
                   <div className="grupo-campo">

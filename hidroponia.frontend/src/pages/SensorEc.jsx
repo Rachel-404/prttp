@@ -33,36 +33,25 @@ export default function SensorEc() {
             </header>
 
             <form id="form-control-ec" className="cuerpo-card" noValidate>
-              <div className="grupo-campo">
-                <label htmlFor="frecuencia-lectura-ec" className="etiqueta-campo">Frecuencia de Lectura</label>
-                <select id="frecuencia-lectura-ec" name="frecuenciaLectura" className="campo-control" defaultValue="300">
-                  <option value="300">Cada 5 minutos</option>
-                  <option value="600">Cada 10 minutos</option>
-                  <option value="900">Cada 15 minutos</option>
-                  <option value="1800">Cada 30 minutos</option>
-                  <option value="3600">Cada 1 hora</option>
-                </select>
-              </div>
-
               <div className="fila-umbrales-ec">
                 <div className="grupo-campo">
                   <label htmlFor="ec-minimo" className="etiqueta-campo">EC Mínima mS/cm</label>
-                  <input type="number" id="ec-minimo" name="ecMinimo" className="campo-control" min="0.0" max="5.0" step="0.01" defaultValue="0.80" required />
+                  <input type="number" id="ec-minimo" name="ecMinimo" className="campo-control" min="0.0" max="2.0" step="0.01" defaultValue="0.80" required />
                 </div>
 
                 <div className="grupo-campo">
                   <label htmlFor="ec-maximo" className="etiqueta-campo">EC Máxima mS/cm</label>
-                  <input type="number" id="ec-maximo" name="ecMaximo" className="campo-control" min="0.0" max="5.0" step="0.01" defaultValue="1.80" required />
+                  <input type="number" id="ec-maximo" name="ecMaximo" className="campo-control" min="0.0" max="2.0" step="0.01" defaultValue="1.80" required />
                 </div>
 
                 <div className="grupo-campo">
                   <label htmlFor="tds-minimo" className="etiqueta-campo">TDS Mínimo ppm</label>
-                  <input type="number" id="tds-minimo" name="tdsMinimo" className="campo-control" min="0" max="3000" step="1" defaultValue="400" required />
+                  <input type="number" id="tds-minimo" name="tdsMinimo" className="campo-control" min="0" max="1000" step="1" defaultValue="400" required />
                 </div>
 
                 <div className="grupo-campo">
                   <label htmlFor="tds-maximo" className="etiqueta-campo">TDS Máximo ppm</label>
-                  <input type="number" id="tds-maximo" name="tdsMaximo" className="campo-control" min="0" max="3000" step="1" defaultValue="900" required />
+                  <input type="number" id="tds-maximo" name="tdsMaximo" className="campo-control" min="0" max="1000" step="1" defaultValue="900" required />
                 </div>
               </div>
 

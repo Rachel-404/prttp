@@ -145,6 +145,37 @@ body.tema-claro .estado-rele-badge.apagado {
     border-top: 1px solid var(--border-color);
 }
 
+.bloque-regla-auto {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.detalle-regla-auto {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fila-condicion-regla {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-umbral-regla {
+    margin-top: 2px;
+}
+
+.btn-guardar-regla {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: calc(var(--font-size-base) - 1px);
+    margin-top: 2px;
+}
+
 .texto-accion-rele {
     font-size: calc(var(--font-size-base) - 1px);
     font-weight: 600;

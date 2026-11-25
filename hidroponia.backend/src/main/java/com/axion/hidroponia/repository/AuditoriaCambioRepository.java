@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AuditoriaCambioRepository extends JpaRepository<AuditoriaCambio, Long> {
     Page<AuditoriaCambio> findAllByOrderByFechaHoraDesc(Pageable pageable);
     Page<AuditoriaCambio> findByModuloOrderByFechaHoraDesc(String modulo, Pageable pageable);
+    Page<AuditoriaCambio> findByModuloContainingIgnoreCaseOrderByFechaHoraDesc(String modulo, Pageable pageable);
 }

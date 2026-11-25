@@ -29,7 +29,7 @@ public class SensorController {
         this.commandService = commandService;
     }
 
-    public record ControlSensorRequest(Boolean activo, Integer frecuenciaSeg, Double minNormal, Double maxNormal) {}
+    public record ControlSensorRequest(Boolean activo, Double minNormal, Double maxNormal) {}
 
     @GetMapping("/{modulo}")
     public SensorConfiguracion obtenerSensor(@PathVariable String modulo) {
@@ -43,25 +43,56 @@ public class SensorController {
             @RequestBody ControlSensorRequest req) {
         SensorConfiguracion cfg = obtenerSensor(modulo);
 
-        if ("dht22".equals(modulo) && req.frecuenciaSeg() != null && req.frecuenciaSeg() < 2) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El periodo mínimo de muestreo del DHT22 es 2 segundos");
-        }
-        if (req.minNormal() != null && req.maxNormal() != null && req.minNormal() >= req.maxNormal()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El umbral mínimo debe ser menor que el máximo");
+        Double effMin = req.minNormal() != null ? req.minNormal() : cfg.getMinNormal();
+        Double effMax = req.maxNormal() != null ? req.maxNormal() : cfg.getMaxNormal();
+        if (effMin != null && effMax != null) {
+            if (!Double.isFinite(effMin) || !Double.isFinite(effMax) || effMin >= effMax) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El umbral mínimo debe ser menor que el máximo");
+            }
+            validarLimitesFisicosSensor(modulo, effMin, effMax);
         }
 
-        String valorPrevio = String.format("%s–%s (%ds)", cfg.getMinNormal(), cfg.getMaxNormal(), cfg.getFrecuenciaSeg());
+        String valorPrevio = String.format("%s–%s · %s", cfg.getMinNormal(), cfg.getMaxNormal(), cfg.isActivo() ? "activo" : "pausado");
         if (req.activo() != null) cfg.setActivo(req.activo());
-        if (req.frecuenciaSeg() != null) cfg.setFrecuenciaSeg(req.frecuenciaSeg());
         if (req.minNormal() != null) cfg.setMinNormal(req.minNormal());
         if (req.maxNormal() != null) cfg.setMaxNormal(req.maxNormal());
         cfg.setActualizadoEn(OffsetDateTime.now());
 
         SensorConfiguracion guardado = sensorRepo.save(cfg);
-        auditService.registrar(cfg.getNombre(), "Límites y Muestreo", valorPrevio,
-                String.format("%s–%s (%ds)", guardado.getMinNormal(), guardado.getMaxNormal(), guardado.getFrecuenciaSeg()));
-        commandService.encolarComando("CONFIG_SENSOR", Map.of("modulo", modulo, "config", guardado));
+        auditService.registrar(cfg.getNombre(), "Umbrales y Estado", valorPrevio,
+                String.format("%s–%s · %s", guardado.getMinNormal(), guardado.getMaxNormal(), guardado.isActivo() ? "activo" : "pausado"));
+        commandService.encolarComando("CONFIG_SENSOR", Map.of("modulo", modulo, "activo", guardado.isActivo()));
         return guardado;
+    }
+
+    private void validarLimitesFisicosSensor(String modulo, double min, double max) {
+        switch (modulo) {
+            case "ph" -> {
+                if (min < 0.0 || max > 14.0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rango físico del electrodo de pH H-101 es 0.00 a 14.00 pH");
+                }
+            }
+            case "ec" -> {
+                if (min < 0.0 || max > 2000.0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rango físico del sensor TDS Meter V1.0 es 0 a 2000 µS/cm");
+                }
+            }
+            case "temp_agua" -> {
+                if (min < 0.0 || max > 400.0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rango físico de la sonda PT100 es 0.0 a 400.0 °C");
+                }
+            }
+            case "dht22" -> {
+                if (min < -40.0 || max > 80.0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El rango físico del sensor DHT22 es -40.0 a 80.0 °C");
+                }
+            }
+            case "nivel_agua" -> {
+                if (min < 0.0 || max > 100.0) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los umbrales normalizados de nivel deben estar entre 0% y 100%");
+                }
+            }
+        }
     }
 
     @PutMapping("/{modulo}/tecnico")

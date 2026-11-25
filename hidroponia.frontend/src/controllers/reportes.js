@@ -787,6 +787,16 @@ export default function initController() {
                         estadoBackupDrive.ultimoRespaldo = formatearFechaLegible(new Date(cfg.drive.ultimoRespaldo));
                     }
                 }
+                const elProg = document.getElementById("progreso-almacenamiento-historico");
+                const elTxtAlm = document.getElementById("texto-almacenamiento-historico");
+                const totalLecturas = Number(cfg.totalLecturasActivas ?? 0);
+                if (elTxtAlm) {
+                    const kbEstimados = Math.max(1, Math.round((totalLecturas * 256) / 1024));
+                    elTxtAlm.innerHTML = `Espacio utilizado: <strong>${kbEstimados} KB / 2.0 GB</strong> · Registros activos en PostgreSQL: <strong>${totalLecturas} lecturas</strong>`;
+                }
+                if (elProg) {
+                    elProg.value = String(Math.min(100, Math.max(0.5, (totalLecturas / 500000) * 100)));
+                }
                 sincronizarVistaRespaldos();
             } catch (err) {
                 mostrarToast(err.message || "No se pudo cargar la política de respaldos desde el servidor.");

@@ -20,12 +20,12 @@ public class Dispositivo {
     private String nombre;
 
     @Column(nullable = false, length = 32)
-    private String firmware = "1.0.3";
+    private String firmware = "1.1.0-http-real";
 
     @Column(nullable = false)
-    private boolean conectado = true;
+    private boolean conectado = false;
 
-    private Integer rssi = -58;
+    private Integer rssi;
 
     @Column(length = 64)
     private String alimentacion = "5V USB-C";
@@ -43,8 +43,8 @@ public class Dispositivo {
     private OffsetDateTime ultimoHeartbeat;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "config_red_mqtt", columnDefinition = "jsonb", nullable = false)
-    private Map<String, Object> configRedMqtt;
+    @Column(name = "config_red", columnDefinition = "jsonb", nullable = false)
+    private Map<String, Object> configRed;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "config_buffer", columnDefinition = "jsonb", nullable = false)
@@ -77,8 +77,8 @@ public class Dispositivo {
     public void setBufferTramas(Integer bufferTramas) { this.bufferTramas = bufferTramas; }
     public OffsetDateTime getUltimoHeartbeat() { return ultimoHeartbeat; }
     public void setUltimoHeartbeat(OffsetDateTime ultimoHeartbeat) { this.ultimoHeartbeat = ultimoHeartbeat; }
-    public Map<String, Object> getConfigRedMqtt() { return configRedMqtt; }
-    public void setConfigRedMqtt(Map<String, Object> configRedMqtt) { this.configRedMqtt = configRedMqtt; }
+    public Map<String, Object> getConfigRed() { return configRed; }
+    public void setConfigRed(Map<String, Object> configRed) { this.configRed = configRed; }
     public Map<String, Object> getConfigBuffer() { return configBuffer; }
     public void setConfigBuffer(Map<String, Object> configBuffer) { this.configBuffer = configBuffer; }
     public List<Map<String, Object>> getPinout() { return pinout; }

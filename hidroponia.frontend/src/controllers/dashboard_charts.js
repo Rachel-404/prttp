@@ -305,7 +305,7 @@ export default function initController() {
                 if (el) el.addEventListener("change", () => renderizarGrafica(selector.value));
             });
 
-            document.addEventListener("dashboard:actualizarLecturas", () => {
+            window.addEventListener("axion:telemetria", () => {
                 renderizarGrafica(selector.value);
             });
 

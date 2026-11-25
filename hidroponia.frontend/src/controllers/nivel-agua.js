@@ -29,20 +29,18 @@ export default function initController() {
         (function () {
             const MODULO = "nivel_agua";
             const ALTURA_TANQUE_CM = 100;
-            const FRECUENCIAS_VALIDAS = [300, 600, 900, 1800, 3600];
             const UNIDADES_VALIDAS = ["pct", "cm", "L", "kPa", "MPa", "mH2O", "m"];
             const RANGOS_VALIDOS = ["C203G", "C403G", "C104G"];
             const PINES_ADC_VALIDOS = ["GPIO1", "GPIO2", "GPIO3", "GPIO4", "GPIO5", "GPIO6", "GPIO7"];
 
             const DEFAULTS_TECNICOS_NA = {
                 rangoNominal: "C203G",
-                resistenciaShunt: 100,
-                pinAdc420: "GPIO2"
+                resistenciaShunt: 150,
+                pinAdc420: "GPIO7"
             };
 
             const estadoModuloNa = {
                 activo: true,
-                frecuenciaLecturaSeg: 300,
                 unidadPrincipal: "pct",
                 nivelMinimoCm: 15,
                 nivelMaximoCm: 90,
@@ -54,7 +52,6 @@ export default function initController() {
             const btnEstado = document.getElementById("btn-estado-na");
             const txtEstado = document.getElementById("estado-na");
             const formControl = document.getElementById("form-control-na");
-            const selectFrecuencia = document.getElementById("frecuencia-lectura-na");
             const selectUnidad = document.getElementById("unidad-principal-na");
             const inputNivelMin = document.getElementById("nivel-minimo-na");
             const inputNivelMax = document.getElementById("nivel-maximo-na");
@@ -106,15 +103,9 @@ export default function initController() {
                 accionConfirmarPendiente = null;
             }
 
-            function normalizarFrecuencia(val) {
-                const n = Number(val);
-                return FRECUENCIAS_VALIDAS.includes(n) ? n : 300;
-            }
-
             function aplicarDesdeBackend(cfg) {
                 if (!cfg) return;
                 if (typeof cfg.activo === "boolean") estadoModuloNa.activo = cfg.activo;
-                estadoModuloNa.frecuenciaLecturaSeg = normalizarFrecuencia(cfg.frecuenciaSeg);
 
                 const p = cfg.parametrosTecnicos || {};
                 if (UNIDADES_VALIDAS.includes(p.unidadPrincipal)) estadoModuloNa.unidadPrincipal = p.unidadPrincipal;
@@ -154,7 +145,6 @@ export default function initController() {
                 const maxPct = Math.min(100, Math.max(0, Number(((estadoModuloNa.nivelMaximoCm / ALTURA_TANQUE_CM) * 100).toFixed(1))));
                 await window.AxionApi.put(`/sensores/${MODULO}/control`, {
                     activo: estadoModuloNa.activo,
-                    frecuenciaSeg: estadoModuloNa.frecuenciaLecturaSeg,
                     minNormal: minPct,
                     maxNormal: maxPct
                 });
@@ -185,7 +175,6 @@ export default function initController() {
 
             function sincronizarFormulario() {
                 actualizarIndicadorVisual(estadoModuloNa.activo);
-                if (selectFrecuencia) selectFrecuencia.value = String(estadoModuloNa.frecuenciaLecturaSeg);
                 if (selectUnidad) selectUnidad.value = estadoModuloNa.unidadPrincipal;
                 if (inputNivelMin) inputNivelMin.value = String(estadoModuloNa.nivelMinimoCm);
                 if (inputNivelMax) inputNivelMax.value = String(estadoModuloNa.nivelMaximoCm);
@@ -234,15 +223,10 @@ export default function initController() {
                 e.preventDefault();
                 limpiarError(errorControl);
 
-                const frecuencia = Number(selectFrecuencia.value);
                 const unidad = selectUnidad.value;
                 const nivelMin = Number.parseFloat(inputNivelMin.value);
                 const nivelMax = Number.parseFloat(inputNivelMax.value);
 
-                if (!FRECUENCIAS_VALIDAS.includes(frecuencia)) {
-                    mostrarError(errorControl, "Selecciona una frecuencia entre 5 minutos y 1 hora.");
-                    return;
-                }
                 if (!UNIDADES_VALIDAS.includes(unidad)) {
                     mostrarError(errorControl, "Selecciona una unidad de visualización válida.");
                     return;
@@ -252,7 +236,6 @@ export default function initController() {
                     return;
                 }
 
-                estadoModuloNa.frecuenciaLecturaSeg = frecuencia;
                 estadoModuloNa.unidadPrincipal = unidad;
                 estadoModuloNa.nivelMinimoCm = Number(nivelMin.toFixed(1));
                 estadoModuloNa.nivelMaximoCm = Number(nivelMax.toFixed(1));
@@ -330,7 +313,7 @@ export default function initController() {
                 btnRestaurarFabrica.addEventListener("click", () => {
                     abrirModalConfirmacion({
                         titulo: "¿Restaurar valores de fábrica?",
-                        mensaje: "Se restablecerán la cápsula C203G, el Shunt de 100 Ω y el pin GPIO 2.",
+                        mensaje: "Se restablecerán la cápsula C203G, el Shunt de 150 Ω y el pin GPIO 7.",
                         claseBoton: "btn-modal-pausar",
                         onAceptar: async () => {
                             estadoTecnicoNa = { ...DEFAULTS_TECNICOS_NA };

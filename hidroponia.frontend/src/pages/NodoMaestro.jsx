@@ -21,7 +21,7 @@ export default function NodoMaestro() {
 
             <header className="encabezado-modulo">
                 <h1>Controlador Maestro ESP32-S3</h1>
-                <p className="subtitulo-modulo">Gestión de conectividad inalámbrica, transporte de telemetría, buffer offline LittleFS y matriz de pines GPIO.</p>
+                <p className="subtitulo-modulo">Gestión de conectividad inalámbrica Wi-Fi, transporte HTTP REST, cadencia de muestreo en memoria NVS y matriz de pines GPIO.</p>
             </header>
 
             
@@ -93,7 +93,7 @@ export default function NodoMaestro() {
                                         name="wifiPassword"
                                         className="campo-control"
                                         defaultValue=""
-                                        placeholder="Ingresa la contraseña Wi-Fi (dejar vacío para mantener)"
+                                        placeholder="Dejar vacío para mantener actual"
                                     />
                                 </div>
                             </div>
@@ -106,22 +106,22 @@ export default function NodoMaestro() {
                                 </select>
                             </div>
 
-                            <div id="grupo-ip-estatica" className="fila-dos-cols" hidden>
+                            <div id="grupo-ip-estatica" className="fila-dos-cols">
                                 <div className="grupo-campo">
                                     <label htmlFor="nodo-ip-local" className="etiqueta-campo">IP Local</label>
-                                    <input type="text" id="nodo-ip-local" name="ipLocal" className="campo-control" defaultValue="192.168.1.120" />
+                                    <input type="text" id="nodo-ip-local" name="ipLocal" className="campo-control" defaultValue="--" readOnly />
                                 </div>
                                 <div className="grupo-campo">
                                     <label htmlFor="nodo-mascara" className="etiqueta-campo">Máscara de Subred</label>
-                                    <input type="text" id="nodo-mascara" name="mascara" className="campo-control" defaultValue="255.255.255.0" />
+                                    <input type="text" id="nodo-mascara" name="mascara" className="campo-control" defaultValue="255.255.255.0" readOnly />
                                 </div>
                                 <div className="grupo-campo">
                                     <label htmlFor="nodo-gateway" className="etiqueta-campo">Gateway</label>
-                                    <input type="text" id="nodo-gateway" name="gateway" className="campo-control" defaultValue="192.168.1.1" />
+                                    <input type="text" id="nodo-gateway" name="gateway" className="campo-control" defaultValue="--" readOnly />
                                 </div>
                                 <div className="grupo-campo">
                                     <label htmlFor="nodo-dns" className="etiqueta-campo">DNS</label>
-                                    <input type="text" id="nodo-dns" name="dns" className="campo-control" defaultValue="8.8.8.8" />
+                                    <input type="text" id="nodo-dns" name="dns" className="campo-control" defaultValue="8.8.8.8" readOnly />
                                 </div>
                             </div>
                         </fieldset>
@@ -130,19 +130,14 @@ export default function NodoMaestro() {
                             <legend className="subtitulo-tecnico">Conexión HTTP al Backend</legend>
 
                             <div className="grupo-campo">
-                                <label htmlFor="nodo-broker-url" className="etiqueta-campo">URL del Servidor Backend</label>
-                                <input type="text" id="nodo-broker-url" name="brokerUrl" className="campo-control" defaultValue="http://localhost:8080" required />
-                            </div>
-
-                            <div className="grupo-campo">
-                                <label htmlFor="nodo-endpoint" className="etiqueta-campo">Endpoint de Telemetría</label>
-                                <input type="text" id="nodo-endpoint" name="endpoint" className="campo-control" defaultValue="/api/v1/iot/telemetria" required />
+                                <label htmlFor="nodo-server-url" className="etiqueta-campo">URL del Servidor Backend</label>
+                                <input type="text" id="nodo-server-url" name="serverUrl" className="campo-control" defaultValue="--" readOnly />
                             </div>
 
                             <div className="fila-dos-cols">
                                 <div className="grupo-campo">
                                     <label htmlFor="nodo-usuario" className="etiqueta-campo">Dispositivo ID</label>
-                                    <input type="text" id="nodo-usuario" name="usuario" className="campo-control" defaultValue="ESP32_HIDRO_01" />
+                                    <input type="text" id="nodo-usuario" name="usuario" className="campo-control" defaultValue="ESP32_HIDRO_01" readOnly />
                                 </div>
 
                                 <div className="grupo-campo">
@@ -163,64 +158,30 @@ export default function NodoMaestro() {
                 
                 <div className="card">
                     <header className="titulo-card">
-                        <h3>Temporización y Buffer Offline</h3>
+                        <h3>Cadencia de Muestreo y Sincronización HTTP</h3>
                     </header>
 
                     <form id="form-buffer-nodo" className="cuerpo-card" noValidate>
                         <div className="grupo-campo">
-                            <label htmlFor="nodo-muestreo" className="etiqueta-campo">Frecuencia de Muestreo y Envío Inmediato</label>
-                            <input type="number" id="nodo-muestreo" name="muestreoSeg" className="campo-control" min="300" max="3600" defaultValue="300" required />
+                            <label htmlFor="nodo-muestreo" className="etiqueta-campo">Frecuencia de Muestreo y Envío HTTP en segundos</label>
+                            <input type="number" id="nodo-muestreo" name="muestreoSeg" className="campo-control" min="15" max="3600" defaultValue="300" required />
                         </div>
 
-                        <fieldset className="subseccion-tecnica">
-                            <legend className="subtitulo-tecnico">Cola Circular Offline</legend>
-
-                            <div className="fila-dos-cols">
-                                <div className="grupo-campo">
-                                    <label htmlFor="nodo-particion" className="etiqueta-campo">Tamaño de Partición LittleFS</label>
-                                    <input type="number" id="nodo-particion" name="particionMb" className="campo-control" min="1" max="14" defaultValue="10" required />
-                                </div>
-
-                                <div className="grupo-campo">
-                                    <label htmlFor="nodo-formato-buffer" className="etiqueta-campo">Formato de Registro Compacto</label>
-                                    <select id="nodo-formato-buffer" name="formatoBuffer" className="campo-control" defaultValue="cbor">
-                                        <option value="cbor">Binario / CBOR</option>
-                                        <option value="csv">CSV Compacto</option>
-                                    </select>
-                                </div>
+                        <div className="paso-calibracion">
+                            <div className="paso-info">
+                                <span className="etiqueta-campo">Sincronización Inmediata con el ESP32-S3</span>
+                                <p className="texto-guia">Ordena al controlador realizar una lectura inmediata de los 5 sensores y enviarla por HTTP.</p>
                             </div>
-
-                            <div className="fila-dos-cols">
-                                <div className="grupo-campo">
-                                    <label htmlFor="nodo-lote" className="etiqueta-campo">Tamaño de Lote de Sincronización</label>
-                                    <input type="number" id="nodo-lote" name="loteTramas" className="campo-control" min="1" max="500" defaultValue="50" required />
-                                </div>
-
-                                <div className="grupo-campo">
-                                    <label htmlFor="nodo-desbordamiento" className="etiqueta-campo">Política de Desbordamiento</label>
-                                    <select id="nodo-desbordamiento" name="politicaDesbordamiento" className="campo-control" defaultValue="fifo">
-                                        <option value="fifo">Sobrescribir tramas más antiguas y alertar</option>
-                                        <option value="detener">Detener captura al llenar partición</option>
-                                    </select>
-                                </div>
+                            <div className="paso-accion">
+                                <button type="button" id="btn-forzar-sync" className="btn-modal btn-modal-cancelar">
+                                    Solicitar Lectura Ahora
+                                </button>
                             </div>
-
-                            <div className="paso-calibracion">
-                                <div className="paso-info">
-                                    <span className="etiqueta-campo">Tramas pendientes en buffer</span>
-                                    <p className="texto-registro"><strong id="nodo-buffer-tramas">-- tramas</strong></p>
-                                </div>
-                                <div className="paso-accion">
-                                    <button type="button" id="btn-forzar-sync" className="btn-modal btn-modal-cancelar">
-                                        Forzar Sincronización Ahora
-                                    </button>
-                                </div>
-                            </div>
-                        </fieldset>
+                        </div>
 
                         <footer className="acciones-card">
                             <button type="submit" className="btn-modal btn-modal-activar">
-                                Guardar Política de Buffer
+                                Guardar Cadencia de Muestreo
                             </button>
                         </footer>
                     </form>

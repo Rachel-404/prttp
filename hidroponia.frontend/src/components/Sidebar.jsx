@@ -5,31 +5,26 @@ import { useAxion } from "../context/AxionContext";
 const SUBMENU_CONFIG = [
   {
     ruta: "/sensores/ph",
-    alias: "/views/sensores/ph",
     icono: "water_ph",
     texto: "Sensor de pH"
   },
   {
     ruta: "/sensores/ec",
-    alias: "/views/sensores/ec",
     icono: "water_ec",
     texto: "Sensor de EC"
   },
   {
     ruta: "/sensores/nivel-temperatura",
-    alias: "/views/sensores/nivel",
     icono: "water",
     texto: "Nivel y Temperatura"
   },
   {
     ruta: "/sensores/temperatura-humedad",
-    alias: "/views/sensores/temperatura_humedad",
     icono: "humidity_percentage",
     texto: "Temperatura y Humedad"
   },
   {
     ruta: "/reles",
-    alias: "/views/reles",
     icono: "bolt",
     texto: "Control de Equipos"
   }
@@ -42,9 +37,7 @@ export default function Sidebar() {
 
   const coincideItem = (item) =>
     p.startsWith(item.ruta) ||
-    p.startsWith(item.alias) ||
-    (item.ruta === "/sensores/nivel-temperatura" &&
-      (p.startsWith("/sensores/temperatura") || p.startsWith("/views/sensores/temperatura/")));
+    (item.ruta === "/sensores/nivel-temperatura" && p.startsWith("/sensores/temperatura"));
 
   const enRutaSubmenu = SUBMENU_CONFIG.some(coincideItem);
   const [configAbierto, setConfigAbierto] = useState(enRutaSubmenu);
@@ -55,10 +48,10 @@ export default function Sidebar() {
     }
   }, [enRutaSubmenu]);
 
-  const esDashboard = p === "/" || p === "/index.html";
-  const esNodo = p.startsWith("/nodo-maestro") || p.startsWith("/views/nodo-maestro");
-  const esReportes = p.startsWith("/reportes") || p.startsWith("/views/reportes");
-  const esConfigGeneral = p.startsWith("/configuracion") || p.startsWith("/views/configuracion");
+  const esDashboard = p === "/";
+  const esNodo = p.startsWith("/nodo-maestro");
+  const esReportes = p.startsWith("/reportes");
+  const esConfigGeneral = p.startsWith("/configuracion");
 
   return (
     <aside

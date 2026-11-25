@@ -68,9 +68,14 @@ public class DeviceCommandService {
     public List<ComandoPendiente> obtenerYEntregarPendientes(String dispositivoId) {
         String idDestino = (dispositivoId != null && !dispositivoId.isBlank()) ? dispositivoId.trim() : DEFAULT_DEVICE_ID;
         validarDispositivo(idDestino);
-        List<ComandoPendiente> pendientes = comandoRepo.findByDispositivoIdAndEstadoOrderByCreadoEnAsc(idDestino, "PENDIENTE");
+        OffsetDateTime ahora = OffsetDateTime.now();
+        OffsetDateTime ventanaValidez = ahora.minusMinutes(30);
+        List<ComandoPendiente> pendientes = comandoRepo.findByDispositivoIdAndEstadoInAndCreadoEnAfterOrderByCreadoEnAsc(
+                idDestino,
+                List.of("PENDIENTE", "ENTREGADO"),
+                ventanaValidez
+        );
         if (!pendientes.isEmpty()) {
-            OffsetDateTime ahora = OffsetDateTime.now();
             pendientes.forEach(c -> {
                 c.setEstado("ENTREGADO");
                 c.setEntregadoEn(ahora);

@@ -28,7 +28,6 @@ export default function initController() {
     try {
         (function () {
             const MODULO = "dht22";
-            const FRECUENCIAS_VALIDAS = [300, 600, 900, 1800, 3600];
             const GPIOS_VALIDOS = ["GPIO 4", "GPIO 5", "GPIO 6", "GPIO 15", "GPIO 16", "GPIO 17", "GPIO 18", "GPIO 21"];
             const PULLUPS_VALIDOS = ["externa_10k", "interna_esp32"];
 
@@ -39,7 +38,6 @@ export default function initController() {
 
             const estadoModuloDht22 = {
                 activo: true,
-                frecuenciaLecturaSeg: 300,
                 tempMinimaAire: 18.0,
                 tempMaximaAire: 28.0,
                 humedadMinima: 50,
@@ -53,7 +51,6 @@ export default function initController() {
             const btnEstado = document.getElementById("btn-estado-dht22");
             const txtEstado = document.getElementById("estado-dht22");
             const formControl = document.getElementById("form-control-dht22");
-            const selectFrecuencia = document.getElementById("frecuencia-lectura-dht22");
             const inputTempMin = document.getElementById("temp-min-aire");
             const inputTempMax = document.getElementById("temp-max-aire");
             const inputHumMin = document.getElementById("humedad-min-aire");
@@ -107,15 +104,9 @@ export default function initController() {
                 accionConfirmarPendiente = null;
             }
 
-            function normalizarFrecuencia(val) {
-                const n = Number(val);
-                return FRECUENCIAS_VALIDAS.includes(n) ? n : 300;
-            }
-
             function aplicarDesdeBackend(cfg) {
                 if (!cfg) return;
                 if (typeof cfg.activo === "boolean") estadoModuloDht22.activo = cfg.activo;
-                estadoModuloDht22.frecuenciaLecturaSeg = normalizarFrecuencia(cfg.frecuenciaSeg);
 
                 const p = cfg.parametrosTecnicos || {};
                 if (Number.isFinite(Number(p.tempMin ?? cfg.minNormal))) {
@@ -147,7 +138,6 @@ export default function initController() {
             async function guardarControlEnBackend() {
                 await window.AxionApi.put(`/sensores/${MODULO}/control`, {
                     activo: estadoModuloDht22.activo,
-                    frecuenciaSeg: estadoModuloDht22.frecuenciaLecturaSeg,
                     minNormal: estadoModuloDht22.tempMinimaAire,
                     maxNormal: estadoModuloDht22.tempMaximaAire
                 });
@@ -178,7 +168,6 @@ export default function initController() {
 
             function sincronizarFormulario() {
                 actualizarIndicadorVisual(estadoModuloDht22.activo);
-                if (selectFrecuencia) selectFrecuencia.value = String(estadoModuloDht22.frecuenciaLecturaSeg);
                 if (inputTempMin) inputTempMin.value = estadoModuloDht22.tempMinimaAire.toFixed(1);
                 if (inputTempMax) inputTempMax.value = estadoModuloDht22.tempMaximaAire.toFixed(1);
                 if (inputHumMin) inputHumMin.value = String(Math.round(estadoModuloDht22.humedadMinima));
@@ -228,16 +217,11 @@ export default function initController() {
                 e.preventDefault();
                 limpiarError(errorControl);
 
-                const frecuencia = Number(selectFrecuencia.value);
                 const tempMin = Number.parseFloat(inputTempMin.value);
                 const tempMax = Number.parseFloat(inputTempMax.value);
                 const humMin = Number.parseFloat(inputHumMin.value);
                 const humMax = Number.parseFloat(inputHumMax.value);
 
-                if (!FRECUENCIAS_VALIDAS.includes(frecuencia)) {
-                    mostrarError(errorControl, "Selecciona una frecuencia entre 5 minutos y 1 hora.");
-                    return;
-                }
                 if (!Number.isFinite(tempMin) || !Number.isFinite(tempMax) || tempMin < -40 || tempMax > 80 || tempMin >= tempMax) {
                     mostrarError(errorControl, "Temperatura Mínima debe ser menor que Temperatura Máxima dentro de -40 a 80 °C.");
                     return;
@@ -247,7 +231,6 @@ export default function initController() {
                     return;
                 }
 
-                estadoModuloDht22.frecuenciaLecturaSeg = frecuencia;
                 estadoModuloDht22.tempMinimaAire = Number(tempMin.toFixed(1));
                 estadoModuloDht22.tempMaximaAire = Number(tempMax.toFixed(1));
                 estadoModuloDht22.humedadMinima = Math.round(humMin);
@@ -325,7 +308,7 @@ export default function initController() {
                 btnRestaurarFabrica.addEventListener("click", () => {
                     abrirModalConfirmacion({
                         titulo: "¿Restaurar valores de fábrica?",
-                        mensaje: "Se restablecerán el pin GPIO 4 y la resistencia Pull-Up externa de 10 kΩ.",
+                        mensaje: "Se restablecerán el pin GPIO 6 y la resistencia Pull-Up integrada de 10 kΩ.",
                         claseBoton: "btn-modal-pausar",
                         onAceptar: async () => {
                             estadoTecnicoDht22 = { ...DEFAULTS_TECNICOS_DHT22 };

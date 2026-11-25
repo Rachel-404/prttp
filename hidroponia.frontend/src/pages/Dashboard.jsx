@@ -213,6 +213,20 @@ export default function Dashboard() {
                             <span className="texto-estado-equipo">Apagado</span>
                         </span>
                     </div>
+                    <div className="item-equipo" data-canal="7">
+                        <span className="nombre-equipo">7. Canal Reserva 3</span>
+                        <span className="estado-equipo apagado" id="dash-estado-rele-7">
+                            <span className="punto-estado-equipo" aria-hidden="true"></span>
+                            <span className="texto-estado-equipo">Apagado</span>
+                        </span>
+                    </div>
+                    <div className="item-equipo" data-canal="8">
+                        <span className="nombre-equipo">8. Canal Reserva 4</span>
+                        <span className="estado-equipo apagado" id="dash-estado-rele-8">
+                            <span className="punto-estado-equipo" aria-hidden="true"></span>
+                            <span className="texto-estado-equipo">Apagado</span>
+                        </span>
+                    </div>
                 </div>
             </section>
 

@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "../services/axionCache.js";
 import { apiGet, apiPost } from "../services/apiClient.js";
 
 const CLAVE_TEMA = "axion_tema";
@@ -58,26 +57,7 @@ window.AxionAuth = {
 export function normalizarRutaSpa(ruta) {
   if (!ruta) return "/";
   const limpia = String(ruta).trim().replace(/^(\.\/|\.\.\/)+/, "");
-  const [pathname, search] = limpia.split("?");
-  const qs = search ? `?${search}` : "";
-
-  if (pathname === "" || pathname === "/" || pathname.endsWith("index.html") && !pathname.includes("views/")) {
-    return "/" + qs;
-  }
-  if (pathname.endsWith("login.html") || pathname === "/login") {
-    return "/login" + qs;
-  }
-  if (pathname.includes("views/sensores/ph")) return "/sensores/ph" + qs;
-  if (pathname.includes("views/sensores/ec")) return "/sensores/ec" + qs;
-  if (pathname.includes("views/sensores/nivel-temperatura")) return "/sensores/nivel-temperatura" + qs;
-  if (pathname.includes("views/sensores/nivel-agua")) return "/sensores/nivel-agua" + qs;
-  if (pathname.includes("views/sensores/temperatura_humedad")) return "/sensores/temperatura-humedad" + qs;
-  if (pathname.includes("views/sensores/temperatura")) return "/sensores/temperatura" + qs;
-  if (pathname.includes("views/reles")) return "/reles" + qs;
-  if (pathname.includes("views/nodo-maestro")) return "/nodo-maestro" + qs;
-  if (pathname.includes("views/reportes")) return "/reportes" + qs;
-  if (pathname.includes("views/configuracion")) return "/configuracion" + qs;
-
+  if (limpia === "" || limpia === "/") return "/";
   return limpia.startsWith("/") ? limpia : `/${limpia}`;
 }
 
@@ -169,18 +149,21 @@ export function AxionProvider({ children }) {
     setModoTema(nuevoModo);
   };
 
-  const iniciarSesionAdmin = (correo, mantenerSesion = false) => {
+  const iniciarSesionAdmin = (correoOrObj, mantenerSesion = false) => {
+    const esObj = correoOrObj && typeof correoOrObj === "object";
     const payload = {
       autenticado: true,
-      rol: "Administrador Único",
-      correo,
-      persistente: Boolean(mantenerSesion),
+      rol: (esObj && correoOrObj.rol) || "Administrador Único",
+      correo: esObj ? correoOrObj.correo : correoOrObj,
+      nombreVisible: (esObj && correoOrObj.nombreVisible) || "Administrador Único",
+      token: esObj ? correoOrObj.token : null,
+      persistente: Boolean(esObj ? correoOrObj.persistente ?? mantenerSesion : mantenerSesion),
       inicioIso: new Date().toISOString()
     };
     const serializado = JSON.stringify(payload);
     localStorage.removeItem(CLAVE_SESION_ADMIN);
     sessionStorage.removeItem(CLAVE_SESION_ADMIN);
-    if (mantenerSesion) {
+    if (payload.persistente) {
       localStorage.setItem(CLAVE_SESION_ADMIN, serializado);
     } else {
       sessionStorage.setItem(CLAVE_SESION_ADMIN, serializado);
@@ -205,18 +188,21 @@ export function AxionProvider({ children }) {
         if (!activo || !resumen) return;
         const idActual = resumen.ultimaLectura ? (resumen.ultimaLectura.id ?? resumen.ultimaLectura.ts ?? "") : "";
         const conectadoActual = resumen.dispositivo ? Boolean(resumen.dispositivo.conectado) : false;
-        const heartbeatActual = resumen.dispositivo?.ultimoHeartbeat ?? "";
-        const firmaActual = `${idActual}|${conectadoActual}|${heartbeatActual}`;
+        const rssiActual = resumen.dispositivo?.rssi ?? "";
+        const firmaReles = Array.isArray(resumen.reles)
+          ? resumen.reles.map((r) => `${r.canal}:${r.encendido}`).join(",")
+          : "";
+        const firmaActual = `${idActual}|${conectadoActual}|${rssiActual}|${firmaReles}`;
 
         if (resumen.ultimaLectura && idActual !== ultimaLecturaId) {
           ultimaLecturaId = idActual;
           window.dispatchEvent(new CustomEvent("axion:telemetria", { detail: resumen.ultimaLectura }));
+          window.dispatchEvent(new CustomEvent("axion:alertasActualizadas"));
         }
         if (firmaActual !== ultimaFirmaEstado) {
           ultimaFirmaEstado = firmaActual;
-          document.dispatchEvent(new CustomEvent("dashboard:actualizarLecturas", { detail: resumen.ultimaLectura }));
+          document.dispatchEvent(new CustomEvent("dashboard:actualizarLecturas", { detail: resumen }));
         }
-        window.dispatchEvent(new CustomEvent("axion:alertasActualizadas"));
       } catch {
         // Reintentar en el siguiente ciclo de polling HTTP
       }

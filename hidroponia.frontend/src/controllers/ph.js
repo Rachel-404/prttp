@@ -28,7 +28,6 @@ export default function initController() {
     try {
         (function () {
             const MODULO = "ph";
-            const FRECUENCIAS_VALIDAS = [300, 600, 900, 1800, 3600];
             const BUFFERS_SEGUNDO_PUNTO = {
                 "4.00": "Buffer Ácido pH 4.00",
                 "10.00": "Buffer Alcalino pH 10.00"
@@ -46,7 +45,6 @@ export default function initController() {
 
             const estadoModuloPh = {
                 activo: true,
-                frecuenciaLecturaSeg: 300,
                 phMinimo: 5.5,
                 phMaximo: 6.5,
                 voltajeNeutroMv: 1500.0,
@@ -58,7 +56,6 @@ export default function initController() {
             const btnEstado = document.getElementById("btn-estado");
             const txtEstado = document.getElementById("estado");
             const formControl = document.getElementById("form-control-cultivo");
-            const selectFrecuencia = document.getElementById("frecuencia-lectura");
             const inputPhMinimo = document.getElementById("ph-minimo");
             const inputPhMaximo = document.getElementById("ph-maximo");
             const errorFormulario = document.getElementById("error-control-cultivo");
@@ -112,15 +109,9 @@ export default function initController() {
                 accionConfirmarPendiente = null;
             }
 
-            function normalizarFrecuencia(val) {
-                const n = Number(val);
-                return FRECUENCIAS_VALIDAS.includes(n) ? n : 300;
-            }
-
             function aplicarDesdeBackend(cfg) {
                 if (!cfg) return;
                 if (typeof cfg.activo === "boolean") estadoModuloPh.activo = cfg.activo;
-                estadoModuloPh.frecuenciaLecturaSeg = normalizarFrecuencia(cfg.frecuenciaSeg);
                 if (Number.isFinite(Number(cfg.minNormal))) estadoModuloPh.phMinimo = Number(cfg.minNormal);
                 if (Number.isFinite(Number(cfg.maxNormal))) estadoModuloPh.phMaximo = Number(cfg.maxNormal);
 
@@ -145,7 +136,6 @@ export default function initController() {
             async function guardarControlEnBackend() {
                 const cfg = await window.AxionApi.put(`/sensores/${MODULO}/control`, {
                     activo: estadoModuloPh.activo,
-                    frecuenciaSeg: estadoModuloPh.frecuenciaLecturaSeg,
                     minNormal: estadoModuloPh.phMinimo,
                     maxNormal: estadoModuloPh.phMaximo
                 });
@@ -171,7 +161,6 @@ export default function initController() {
 
             function sincronizarFormulario() {
                 actualizarIndicadorVisual(estadoModuloPh.activo);
-                if (selectFrecuencia) selectFrecuencia.value = String(estadoModuloPh.frecuenciaLecturaSeg);
                 if (inputPhMinimo) inputPhMinimo.value = estadoModuloPh.phMinimo.toFixed(2);
                 if (inputPhMaximo) inputPhMaximo.value = estadoModuloPh.phMaximo.toFixed(2);
                 if (inputVoltajeNeutro) inputVoltajeNeutro.value = estadoModuloPh.voltajeNeutroMv.toFixed(1);
@@ -207,7 +196,7 @@ export default function initController() {
                 abrirModalConfirmacion({
                     titulo: nuevoEstado ? "¿Reactivar sensor de pH?" : "¿Pausar monitoreo de pH?",
                     mensaje: nuevoEstado
-                        ? "El sistema reanudará la lectura analógica de pH (GPIO 4) y la evaluación de alertas."
+                        ? "El sistema reanudará la lectura analógica de pH y la evaluación de alertas."
                         : "Se suspenderán temporalmente las alertas de pH durante limpieza o calibración.",
                     claseBoton: nuevoEstado ? "btn-modal-activar" : "btn-modal-pausar",
                     onAceptar: async () => {
@@ -274,14 +263,9 @@ export default function initController() {
                 e.preventDefault();
                 limpiarError(errorFormulario);
 
-                const frecuencia = Number(selectFrecuencia.value);
                 const phMin = Number.parseFloat(inputPhMinimo.value);
                 const phMax = Number.parseFloat(inputPhMaximo.value);
 
-                if (!FRECUENCIAS_VALIDAS.includes(frecuencia)) {
-                    mostrarError(errorFormulario, "Selecciona una frecuencia de lectura entre 5 minutos y 1 hora.");
-                    return;
-                }
                 if (!Number.isFinite(phMin) || phMin < 0 || phMin > 14 || !Number.isFinite(phMax) || phMax < 0 || phMax > 14) {
                     mostrarError(errorFormulario, "Los umbrales de pH deben estar entre 0.00 y 14.00.");
                     return;
@@ -291,7 +275,6 @@ export default function initController() {
                     return;
                 }
 
-                estadoModuloPh.frecuenciaLecturaSeg = frecuencia;
                 estadoModuloPh.phMinimo = Number(phMin.toFixed(2));
                 estadoModuloPh.phMaximo = Number(phMax.toFixed(2));
 

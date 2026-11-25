@@ -48,6 +48,7 @@ public class DashboardController {
             dispositivoResumen.put("firmware", disp.getFirmware());
             dispositivoResumen.put("conectado", disp.isConectado());
             dispositivoResumen.put("rssi", disp.getRssi());
+            dispositivoResumen.put("ssid", disp.getConfigRed() != null ? disp.getConfigRed().get("ssid") : null);
             dispositivoResumen.put("alimentacion", disp.getAlimentacion());
             dispositivoResumen.put("consumoMa", disp.getConsumoMa());
             dispositivoResumen.put("psramOcupadaPct", disp.getPsramOcupadaPct());
@@ -78,6 +79,18 @@ public class DashboardController {
         List<Map<String, Object>> serie = new ArrayList<>();
 
         for (TelemetriaLectura l : lecturas) {
+            String claveEstado = switch (variable) {
+                case "ec" -> "tds";
+                case "temp_agua" -> "pt100";
+                case "temp_ambiente", "humedad_ambiente" -> "dht22";
+                case "nivel_agua" -> "nivel";
+                default -> "ph";
+            };
+            Map<String, Object> est = l.getEstadoSensores();
+            if (est != null && est.get(claveEstado) != null
+                    && !"ok".equalsIgnoreCase(String.valueOf(est.get(claveEstado)).trim())) {
+                continue;
+            }
             Double valor = switch (variable) {
                 case "ec" -> l.getEcUsCm();
                 case "temp_agua" -> l.getTempAguaC();

@@ -167,11 +167,15 @@ export default function ConfiguracionGeneral() {
                                 <label htmlFor="filtro-auditoria-modulo" className="etiqueta-campo">Filtrar por módulo</label>
                                 <select id="filtro-auditoria-modulo" className="campo-control" defaultValue="todos">
                                     <option value="todos">Todos los módulos</option>
-                                    <option value="Conductividad / TDS">Conductividad / TDS</option>
-                                    <option value="pH RS485">pH RS485</option>
-                                    <option value="Nivel y Temperatura">Nivel y Temperatura</option>
+                                    <option value="pH">Sensor de pH Analógico</option>
+                                    <option value="Conductividad">Conductividad / TDS</option>
+                                    <option value="Nivel">Nivel de Agua</option>
+                                    <option value="Temperatura del Agua">Temperatura del Agua</option>
+                                    <option value="Microclima">Microclima Ambiental</option>
                                     <option value="Control de Equipos">Control de Equipos</option>
-                                    <option value="Nodo ESP32-S3">Nodo ESP32-S3</option>
+                                    <option value="Nodo ESP32-S3">Nodo Maestro ESP32-S3</option>
+                                    <option value="Cuenta Administrativa">Cuenta Administrativa</option>
+                                    <option value="Respaldos y Retención">Respaldos y Retención</option>
                                     <option value="Sistema y Tipografía">Sistema y Tipografía</option>
                                 </select>
                             </div>

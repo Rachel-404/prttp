@@ -3,18 +3,18 @@ package com.axion.hidroponia.service;
 import com.axion.hidroponia.model.TelemetriaLectura;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
 public class ReporteExportService {
 
     public byte[] generarXlsx(List<TelemetriaLectura> lecturas) {
-        try (Workbook wb = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (SXSSFWorkbook wb = new SXSSFWorkbook(100); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = wb.createSheet("Telemetria");
             Row header = sheet.createRow(0);
             String[] cols = {
@@ -40,10 +40,30 @@ public class ReporteExportService {
                 if (l.getRssi() != null) row.createCell(10).setCellValue(l.getRssi());
             }
             wb.write(out);
+            wb.dispose();
             return out.toByteArray();
         } catch (Exception e) {
             throw new IllegalStateException("No se pudo generar el archivo XLSX", e);
         }
+    }
+
+    public byte[] generarCsv(List<TelemetriaLectura> lecturas) {
+        StringBuilder sb = new StringBuilder("\uFEFF");
+        sb.append("FechaHora,Dispositivo,pH,EC_uS_cm,TDS_ppm,TempAgua_C,TempAire_C,Humedad_pct,Nivel_pct,Nivel_cm,RSSI_dBm\n");
+        for (TelemetriaLectura l : lecturas) {
+            sb.append(l.getTs() != null ? l.getTs() : "").append(',')
+              .append(l.getDispositivoId() != null ? l.getDispositivoId() : "").append(',')
+              .append(l.getPh() != null ? l.getPh() : "").append(',')
+              .append(l.getEcUsCm() != null ? l.getEcUsCm() : "").append(',')
+              .append(l.getTdsPpm() != null ? l.getTdsPpm() : "").append(',')
+              .append(l.getTempAguaC() != null ? l.getTempAguaC() : "").append(',')
+              .append(l.getTempAmbC() != null ? l.getTempAmbC() : "").append(',')
+              .append(l.getHumAmbPct() != null ? l.getHumAmbPct() : "").append(',')
+              .append(l.getNivelPct() != null ? l.getNivelPct() : "").append(',')
+              .append(l.getNivelCm() != null ? l.getNivelCm() : "").append(',')
+              .append(l.getRssi() != null ? l.getRssi() : "").append('\n');
+        }
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private void setDouble(Row row, int col, Double val) {

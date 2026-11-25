@@ -21,9 +21,6 @@ public class SensorConfiguracion {
     @Column(nullable = false)
     private boolean activo = true;
 
-    @Column(name = "frecuencia_seg", nullable = false)
-    private Integer frecuenciaSeg = 10;
-
     @Column(name = "min_normal")
     private Double minNormal;
 
@@ -43,8 +40,6 @@ public class SensorConfiguracion {
     public void setNombre(String nombre) { this.nombre = nombre; }
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
-    public Integer getFrecuenciaSeg() { return frecuenciaSeg; }
-    public void setFrecuenciaSeg(Integer frecuenciaSeg) { this.frecuenciaSeg = frecuenciaSeg; }
     public Double getMinNormal() { return minNormal; }
     public void setMinNormal(Double minNormal) { this.minNormal = minNormal; }
     public Double getMaxNormal() { return maxNormal; }

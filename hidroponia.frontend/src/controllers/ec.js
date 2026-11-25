@@ -28,7 +28,6 @@ export default function initController() {
     try {
         (function () {
             const MODULO = "ec";
-            const FRECUENCIAS_VALIDAS = [300, 600, 900, 1800, 3600];
             const SONDAS_TEMP_VALIDAS = ["pt100", "fijo25"];
             const GPIOS_ADC_VALIDOS = [
                 "GPIO1_ADC1", "GPIO2_ADC1", "GPIO3_ADC1", "GPIO4_ADC1",
@@ -46,7 +45,6 @@ export default function initController() {
 
             const estadoModuloEc = {
                 activo: true,
-                frecuenciaLecturaSeg: 300,
                 ecMinimo: 0.8,
                 ecMaximo: 1.8,
                 tdsMinimo: 400,
@@ -62,7 +60,6 @@ export default function initController() {
             const btnEstado = document.getElementById("btn-estado-ec");
             const txtEstado = document.getElementById("estado-ec");
             const formControl = document.getElementById("form-control-ec");
-            const selectFrecuencia = document.getElementById("frecuencia-lectura-ec");
             const inputEcMin = document.getElementById("ec-minimo");
             const inputEcMax = document.getElementById("ec-maximo");
             const inputTdsMin = document.getElementById("tds-minimo");
@@ -136,15 +133,9 @@ export default function initController() {
                 return Number((tdsPpm / (1000 * kValue)).toFixed(2));
             }
 
-            function normalizarFrecuencia(val) {
-                const n = Number(val);
-                return FRECUENCIAS_VALIDAS.includes(n) ? n : 300;
-            }
-
             function aplicarDesdeBackend(cfg) {
                 if (!cfg) return;
                 if (typeof cfg.activo === "boolean") estadoModuloEc.activo = cfg.activo;
-                estadoModuloEc.frecuenciaLecturaSeg = normalizarFrecuencia(cfg.frecuenciaSeg);
 
                 const p = cfg.parametrosTecnicos || {};
                 if (Number.isFinite(Number(p.kValue))) estadoTecnicoEc.kValue = Number(p.kValue);
@@ -195,7 +186,6 @@ export default function initController() {
             async function guardarControlEnBackend() {
                 await window.AxionApi.put(`/sensores/${MODULO}/control`, {
                     activo: estadoModuloEc.activo,
-                    frecuenciaSeg: estadoModuloEc.frecuenciaLecturaSeg,
                     minNormal: Math.round(estadoModuloEc.ecMinimo * 1000),
                     maxNormal: Math.round(estadoModuloEc.ecMaximo * 1000)
                 });
@@ -227,16 +217,21 @@ export default function initController() {
                 const fuente = selectSondaTemp ? selectSondaTemp.value : estadoModuloEc.sondaTempAsociada;
 
                 if (grupoManual) grupoManual.hidden = fuente !== "fijo25";
-                if (!window.AxionCache || !elEstado || !elTexto) return;
+                if (!elEstado || !elTexto) return;
 
-                const info = window.AxionCache.resolverTemperaturaAtc(
-                    fuente,
-                    inputTempManual ? inputTempManual.value : 25.0,
-                    ultimaTempAguaReal
-                );
+                let mensaje;
+                if (fuente === "pt100") {
+                    mensaje = Number.isFinite(ultimaTempAguaReal)
+                        ? `Compensación térmica activa desde PT100 · Lectura actual: ${ultimaTempAguaReal.toFixed(1)} °C`
+                        : "Compensación térmica enlazada a PT100 · Esperando lectura del controlador";
+                } else {
+                    const valFijo = Number.parseFloat(inputTempManual ? inputTempManual.value : "25.0");
+                    const tempFmt = Number.isFinite(valFijo) ? valFijo.toFixed(1) : "25.0";
+                    mensaje = `Temperatura manual fija activa · Valor aplicado: ${tempFmt} °C`;
+                }
                 elEstado.classList.remove("estado-normal", "estado-advertencia", "estado-critico");
-                elEstado.classList.add(info.estado === "advertencia" ? "estado-advertencia" : "estado-normal");
-                elTexto.textContent = info.mensaje;
+                elEstado.classList.add("estado-normal");
+                elTexto.textContent = mensaje;
             }
 
             function actualizarIndicadorVisual(activo) {
@@ -256,7 +251,6 @@ export default function initController() {
 
             function sincronizarFormulario() {
                 actualizarIndicadorVisual(estadoModuloEc.activo);
-                if (selectFrecuencia) selectFrecuencia.value = String(estadoModuloEc.frecuenciaLecturaSeg);
                 if (inputEcMin) inputEcMin.value = estadoModuloEc.ecMinimo.toFixed(2);
                 if (inputEcMax) inputEcMax.value = estadoModuloEc.ecMaximo.toFixed(2);
                 if (inputTdsMin) inputTdsMin.value = String(estadoModuloEc.tdsMinimo);
@@ -349,7 +343,6 @@ export default function initController() {
                 e.preventDefault();
                 limpiarError(errorControl);
 
-                const frecuencia = Number(selectFrecuencia.value);
                 const ecMin = Number.parseFloat(inputEcMin.value);
                 const ecMax = Number.parseFloat(inputEcMax.value);
                 const tdsMin = Number.parseFloat(inputTdsMin.value);
@@ -357,10 +350,6 @@ export default function initController() {
                 const sondaTemp = selectSondaTemp ? selectSondaTemp.value : "pt100";
                 const tempManual = Number.parseFloat(inputTempManual?.value || "25.0");
 
-                if (!FRECUENCIAS_VALIDAS.includes(frecuencia)) {
-                    mostrarError(errorControl, "Selecciona una frecuencia entre 5 minutos y 1 hora.");
-                    return;
-                }
                 if (!Number.isFinite(ecMin) || !Number.isFinite(ecMax) || ecMin < 0 || ecMin >= ecMax) {
                     mostrarError(errorControl, "EC Mínima debe ser mayor o igual a 0 y menor que EC Máxima.");
                     return;
@@ -370,7 +359,6 @@ export default function initController() {
                     return;
                 }
 
-                estadoModuloEc.frecuenciaLecturaSeg = frecuencia;
                 estadoModuloEc.ecMinimo = Number(ecMin.toFixed(2));
                 estadoModuloEc.ecMaximo = Number(ecMax.toFixed(2));
                 estadoModuloEc.tdsMinimo = Math.round(tdsMin);

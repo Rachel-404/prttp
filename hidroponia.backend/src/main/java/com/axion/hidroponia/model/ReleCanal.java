@@ -1,7 +1,12 @@
 package com.axion.hidroponia.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.OffsetDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "reles_canales")
@@ -25,6 +30,10 @@ public class ReleCanal {
     @Column(name = "logica_disparo", nullable = false, length = 10)
     private String logicaDisparo = "low";
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "regla_auto", columnDefinition = "jsonb", nullable = false)
+    private Map<String, Object> reglaAuto = new LinkedHashMap<>();
+
     @Column(name = "actualizado_en", nullable = false)
     private OffsetDateTime actualizadoEn = OffsetDateTime.now();
 
@@ -40,6 +49,8 @@ public class ReleCanal {
     public void setModoOperacion(String modoOperacion) { this.modoOperacion = modoOperacion; }
     public String getLogicaDisparo() { return logicaDisparo; }
     public void setLogicaDisparo(String logicaDisparo) { this.logicaDisparo = logicaDisparo; }
+    public Map<String, Object> getReglaAuto() { return reglaAuto; }
+    public void setReglaAuto(Map<String, Object> reglaAuto) { this.reglaAuto = reglaAuto != null ? reglaAuto : new LinkedHashMap<>(); }
     public OffsetDateTime getActualizadoEn() { return actualizadoEn; }
     public void setActualizadoEn(OffsetDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
 }
